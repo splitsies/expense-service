@@ -20,42 +20,21 @@ import { IExpenseProportionalItemsProcessor } from "../processors/expense-propor
 
 const container = new Container();
 
-container
-  .bind<IExpenseService>(IExpenseService)
-  .to(ExpenseService)
-  .inSingletonScope();
-container
-  .bind<IExpenseEngine>(IExpenseEngine)
-  .to(ExpenseEngine)
-  .inSingletonScope();
-container
-  .bind<IExpenseRepository>(IExpenseRepository)
-  .to(ExpenseRepository)
-  .inSingletonScope();
-container
-  .bind<IImageExpenseProcessor>(IImageExpenseProcessor)
-  .to(ImageExpenseProcessor)
-  .inSingletonScope();
+container.bind<IExpenseService>(IExpenseService).to(ExpenseService).inSingletonScope();
+container.bind<IExpenseEngine>(IExpenseEngine).to(ExpenseEngine).inSingletonScope();
+container.bind<IExpenseRepository>(IExpenseRepository).to(ExpenseRepository).inSingletonScope();
+container.bind<IImageExpenseProcessor>(IImageExpenseProcessor).to(ImageExpenseProcessor).inSingletonScope();
 
 container
-  .bind<IExpenseOcrMetadataProcessor>(IExpenseOcrMetadataProcessor)
-  .to(ExpenseOcrMetadataProcessor)
-  .inSingletonScope();
+    .bind<IExpenseOcrMetadataProcessor>(IExpenseOcrMetadataProcessor)
+    .to(ExpenseOcrMetadataProcessor)
+    .inSingletonScope();
+container.bind<IExpenseNameProcessor>(IExpenseNameProcessor).to(ExpenseNameProcessor).inSingletonScope();
+container.bind<IExpenseDateProcessor>(IExpenseDateProcessor).to(ExpenseDateProcessor).inSingletonScope();
+container.bind<IExpenseItemsProcessor>(IExpenseItemsProcessor).to(ExpenseItemsProcessor).inSingletonScope();
 container
-  .bind<IExpenseNameProcessor>(IExpenseNameProcessor)
-  .to(ExpenseNameProcessor)
-  .inSingletonScope();
-container
-  .bind<IExpenseDateProcessor>(IExpenseDateProcessor)
-  .to(ExpenseDateProcessor)
-  .inSingletonScope();
-container
-  .bind<IExpenseItemsProcessor>(IExpenseItemsProcessor)
-  .to(ExpenseItemsProcessor)
-  .inSingletonScope();
-container
-  .bind<IExpenseProportionalItemsProcessor>(IExpenseProportionalItemsProcessor)
-  .to(ExpenseProportionalItemsProcessor)
-  .inSingletonScope();
+    .bind<IExpenseProportionalItemsProcessor>(IExpenseProportionalItemsProcessor)
+    .to(ExpenseProportionalItemsProcessor)
+    .inSingletonScope();
 
 export { container };

@@ -11,13 +11,14 @@ import { IExpenseDateProcessor } from "../expense-date-processor/expense-date-pr
 
 @injectable()
 export class ImageExpenseProcessor implements IImageExpenseProcessor {
-
     constructor(
-        @inject(IExpenseOcrMetadataProcessor) private readonly _expenseOcrMetadataProcessor: IExpenseOcrMetadataProcessor,
+        @inject(IExpenseOcrMetadataProcessor)
+        private readonly _expenseOcrMetadataProcessor: IExpenseOcrMetadataProcessor,
         @inject(IExpenseNameProcessor) private readonly _nameProcessor: IExpenseNameProcessor,
         @inject(IExpenseDateProcessor) private readonly _dateProcessor: IExpenseDateProcessor,
         @inject(IExpenseItemsProcessor) private readonly _itemsProcessor: IExpenseItemsProcessor,
-        @inject(IExpenseProportionalItemsProcessor) private readonly _proportionalItemsProcessor: IExpenseProportionalItemsProcessor
+        @inject(IExpenseProportionalItemsProcessor)
+        private readonly _proportionalItemsProcessor: IExpenseProportionalItemsProcessor,
     ) {}
 
     process(ocrResult: IOcrResult): IExpense {
@@ -30,5 +31,4 @@ export class ImageExpenseProcessor implements IImageExpenseProcessor {
 
         return new Expense(randomUUID(), name, date, items, proportionalItems);
     }
-    
 }

@@ -7,35 +7,35 @@ import { IImageExpenseProcessor } from "src/processors/image-expense-processor/i
 
 @injectable()
 export class ExpenseEngine implements IExpenseEngine {
-  constructor(
-    @inject(IImageExpenseProcessor)
-    private readonly _imageExpenseProcessor: IImageExpenseProcessor
-  ) {}
+    constructor(
+        @inject(IImageExpenseProcessor)
+        private readonly _imageExpenseProcessor: IImageExpenseProcessor,
+    ) {}
 
-  createExpense(): IExpense {
-    return new Expense(randomUUID(), "", new Date(), [], []);
-  }
+    createExpense(): IExpense {
+        return new Expense(randomUUID(), "", new Date(), [], []);
+    }
 
-  createExpenseFromImage(ocrResult: IOcrResult): IExpense {
-    const expense = this._imageExpenseProcessor.process(ocrResult);
-    if (!expense) throw new Error("Unable to create expense from OCR data");
+    createExpenseFromImage(ocrResult: IOcrResult): IExpense {
+        const expense = this._imageExpenseProcessor.process(ocrResult);
+        if (!expense) throw new Error("Unable to create expense from OCR data");
 
-    // TODO: save to DB
+        // TODO: save to DB
 
-    return expense;
-  }
+        return expense;
+    }
 
-  updateExpense(id: string, updated: Omit<IExpense, "id">): IExpense {
-    const updatedExpense = new Expense(
-      id,
-      updated.name,
-      updated.transactionDate,
-      updated.items,
-      updated.proportionalItems
-    );
+    updateExpense(id: string, updated: Omit<IExpense, "id">): IExpense {
+        const updatedExpense = new Expense(
+            id,
+            updated.name,
+            updated.transactionDate,
+            updated.items,
+            updated.proportionalItems,
+        );
 
-    // TODO: Save the updated expense in DB
+        // TODO: Save the updated expense in DB
 
-    return updatedExpense;
-  }
+        return updatedExpense;
+    }
 }

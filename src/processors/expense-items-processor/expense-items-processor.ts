@@ -6,10 +6,7 @@ import { IExpenseOcrMetadata } from "../../models/expense-ocr-metadata/expense-o
 
 @injectable()
 export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
-  process(
-    ocrResult: IOcrResult,
-    metadata: IExpenseOcrMetadata
-  ): IExpenseItem[] {
-    throw new Error("Method not implemented.");
-  }
+    process(ocrResult: IOcrResult, metadata: IExpenseOcrMetadata): IExpenseItem[] {
+        throw new Error("Method not implemented.");
+    }
 }
