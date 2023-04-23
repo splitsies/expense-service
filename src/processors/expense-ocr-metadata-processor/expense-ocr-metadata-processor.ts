@@ -29,7 +29,7 @@ export class ExpenseOcrMetadataProcessor
       )
         continue;
 
-      const priceSearchResult = ExpenseRegex.RE_PRICE.exec(priceBlock.text);
+      const priceSearchResult = ExpenseRegex.Price.exec(priceBlock.text);
       if (!priceSearchResult.length || priceBlock.text.includes("%")) continue;
 
       const slope = this.getSlope(
@@ -41,8 +41,8 @@ export class ExpenseOcrMetadataProcessor
 
       // Match price_block against both price and total in case it was picked up as one line
       if (
-        ExpenseRegex.RE_TOTAL.test(priceBlock.text) ||
-        ExpenseRegex.RE_TOTAL.test(itemBlock.text)
+        ExpenseRegex.Total.test(priceBlock.text) ||
+        ExpenseRegex.Total.test(itemBlock.text)
       ) {
         maxPrice = Math.max(maxPrice, parseFloat(priceSearchResult[0]));
       }
@@ -73,14 +73,14 @@ export class ExpenseOcrMetadataProcessor
       const priceBlock = ocrResult.textBlocks[i];
 
       if (
-        ExpenseRegex.RE_PRICE.test(priceBlock.text) &&
-        ExpenseRegex.RE_TOTAL.test(priceBlock.text)
+        ExpenseRegex.Price.test(priceBlock.text) &&
+        ExpenseRegex.Total.test(priceBlock.text)
       ) {
         // Match price_block against both price and total in case it was picked up as one line
         topOfLastTotal = priceBlock.boundingBox.top;
       } else if (
-        ExpenseRegex.RE_PRICE.test(priceBlock.text) &&
-        ExpenseRegex.RE_TOTAL.test(itemBlock.text)
+        ExpenseRegex.Price.test(priceBlock.text) &&
+        ExpenseRegex.Total.test(itemBlock.text)
       ) {
         // Otherwise match the price and item block separately
         topOfLastTotal = Math.max(

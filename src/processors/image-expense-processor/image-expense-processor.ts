@@ -11,28 +11,24 @@ import { IExpenseDateProcessor } from "../expense-date-processor/expense-date-pr
 
 @injectable()
 export class ImageExpenseProcessor implements IImageExpenseProcessor {
-  constructor(
-    @inject(IExpenseOcrMetadataProcessor)
-    private readonly _expenseOcrMetadataProcessor: IExpenseOcrMetadataProcessor,
-    @inject(IExpenseNameProcessor)
-    private readonly _nameProcessor: IExpenseNameProcessor,
-    @inject(IExpenseDateProcessor)
-    private readonly _dateProcessor: IExpenseDateProcessor,
-    @inject(IExpenseItemsProcessor)
-    private readonly _itemsProcessor: IExpenseItemsProcessor,
-    @inject(IExpenseProportionalItemsProcessor)
-    private readonly _proportionalItemsProcessor: IExpenseProportionalItemsProcessor
-  ) {}
 
-  process(ocrResult: IOcrResult): IExpense {
-    const metadata = this._expenseOcrMetadataProcessor.process(ocrResult);
+    constructor(
+        @inject(IExpenseOcrMetadataProcessor) private readonly _expenseOcrMetadataProcessor: IExpenseOcrMetadataProcessor,
+        @inject(IExpenseNameProcessor) private readonly _nameProcessor: IExpenseNameProcessor,
+        @inject(IExpenseDateProcessor) private readonly _dateProcessor: IExpenseDateProcessor,
+        @inject(IExpenseItemsProcessor) private readonly _itemsProcessor: IExpenseItemsProcessor,
+        @inject(IExpenseProportionalItemsProcessor) private readonly _proportionalItemsProcessor: IExpenseProportionalItemsProcessor
+    ) {}
 
-    const name = this._nameProcessor.process(ocrResult);
-    const date = this._dateProcessor.process(ocrResult);
-    const items = this._itemsProcessor.process(ocrResult, metadata);
-    const proportionalItems =
-      this._proportionalItemsProcessor.process(ocrResult);
+    process(ocrResult: IOcrResult): IExpense {
+        const metadata = this._expenseOcrMetadataProcessor.process(ocrResult);
 
-    return new Expense(randomUUID(), name, date, items, proportionalItems);
-  }
+        const name = this._nameProcessor.process(ocrResult);
+        const date = this._dateProcessor.process(ocrResult);
+        const items = this._itemsProcessor.process(ocrResult, metadata);
+        const proportionalItems = this._proportionalItemsProcessor.process(ocrResult);
+
+        return new Expense(randomUUID(), name, date, items, proportionalItems);
+    }
+    
 }
