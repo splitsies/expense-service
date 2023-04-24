@@ -1,5 +1,4 @@
-import { IExpenseItem } from "../../services/expense-service";
-import { IOcrResult } from "@splitsies/shared-models";
+import { IOcrResult, IExpenseItem } from "@splitsies/shared-models";
 
 export interface IExpenseProportionalItemsProcessor {
     process(ocrResult: IOcrResult): IExpenseItem[];

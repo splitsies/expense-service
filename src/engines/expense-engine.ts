@@ -1,16 +1,12 @@
 import { inject, injectable } from "inversify";
 import { randomUUID } from "crypto";
-import { IOcrResult } from "@splitsies/shared-models";
+import { IOcrResult, IExpense, Expense} from "@splitsies/shared-models";
 import { IExpenseEngine } from "./expense-engine-interface";
-import { Expense, IExpense } from "../services/expense-service";
 import { IImageExpenseProcessor } from "src/processors/image-expense-processor/image-expense-processor-interface";
 
 @injectable()
 export class ExpenseEngine implements IExpenseEngine {
-    constructor(
-        @inject(IImageExpenseProcessor)
-        private readonly _imageExpenseProcessor: IImageExpenseProcessor,
-    ) {}
+    constructor(@inject(IImageExpenseProcessor) private readonly _imageExpenseProcessor: IImageExpenseProcessor) {}
 
     createExpense(): IExpense {
         return new Expense(randomUUID(), "", new Date(), [], []);

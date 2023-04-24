@@ -17,6 +17,7 @@ import { IExpenseDateProcessor } from "../processors/expense-date-processor/expe
 import { ExpenseItemsProcessor } from "../processors/expense-items-processor/expense-items-processor";
 import { IExpenseItemsProcessor } from "../processors/expense-items-processor/expense-items-processor-interface";
 import { IExpenseProportionalItemsProcessor } from "../processors/expense-proportional-items-processor/expense-proportional-items-processor-interface";
+import { ExpenseProportionalItemsProcessor } from "../processors/expense-proportional-items-processor/expense-proportional-items-processor";
 
 const container = new Container();
 

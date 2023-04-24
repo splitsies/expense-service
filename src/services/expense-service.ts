@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import { IExpense } from "@splitsies/shared-models";
 import { IExpenseService } from "./expense-service-interface";
 import { IExpenseEngine } from "../engines/expense-engine-interface";
 
@@ -18,43 +19,4 @@ export class ExpenseService implements IExpenseService {
     updateExpense(id: string, updated: Omit<IExpense, "id">): IExpense {
         return this._expenseEngine.updateExpense(id, updated);
     }
-}
-
-export interface IExpense {
-    readonly id: string;
-    readonly name: string;
-    readonly transactionDate: Date;
-    readonly items: IExpenseItem[];
-    readonly proportionalItems: IExpenseItem[];
-    readonly subtotal: number;
-    readonly total: number;
-}
-
-export interface IExpenseItem {
-    readonly id: string;
-    readonly name: string;
-    readonly price: number;
-    readonly owners: string[];
-}
-
-export class Expense implements IExpense {
-    constructor(
-        readonly id: string,
-        readonly name: string,
-        readonly transactionDate: Date,
-        readonly items: IExpenseItem[],
-        readonly proportionalItems: IExpenseItem[],
-    ) {}
-
-    get subtotal(): number {
-        return this.items.reduce((prev, curr) => prev + curr.price, 0);
-    }
-
-    get total(): number {
-        return this.subtotal + this.proportionalItems.reduce((prev, curr) => prev + curr.price, 0);
-    }
-}
-
-export class ExpenseItem implements IExpenseItem {
-    constructor(readonly id: string, readonly name: string, readonly price: number, readonly owners: string[]) {}
 }

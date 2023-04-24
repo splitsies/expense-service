@@ -1,5 +1,4 @@
-import { IExpense } from "../../services/expense-service";
-import { IOcrResult } from "@splitsies/shared-models";
+import { IOcrResult, IExpense } from "@splitsies/shared-models";
 
 export interface IImageExpenseProcessor {
     process(ocrResult: IOcrResult): IExpense;

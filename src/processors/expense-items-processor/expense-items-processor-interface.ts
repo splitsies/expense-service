@@ -1,5 +1,4 @@
-import { IOcrResult } from "@splitsies/shared-models";
-import { IExpenseItem } from "../../services/expense-service";
+import { IOcrResult, IExpenseItem } from "@splitsies/shared-models";
 import { IExpenseOcrMetadata } from "../../models/expense-ocr-metadata/expense-ocr-metadata-interface";
 
 export interface IExpenseItemsProcessor {

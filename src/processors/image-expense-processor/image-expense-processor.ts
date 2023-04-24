@@ -1,8 +1,7 @@
 import { inject, injectable } from "inversify";
 import { randomUUID } from "crypto";
-import { IOcrResult } from "@splitsies/shared-models";
+import { IOcrResult, IExpense, Expense } from "@splitsies/shared-models";
 import { IImageExpenseProcessor } from "./image-expense-processor-interface";
-import { Expense, IExpense } from "../../services/expense-service";
 import { IExpenseOcrMetadataProcessor } from "../expense-ocr-metadata-processor/expense-ocr-metadata-processor-interface";
 import { IExpenseNameProcessor } from "../expense-name-processor/expense-name-processor-interface";
 import { IExpenseProportionalItemsProcessor } from "../expense-proportional-items-processor/expense-proportional-items-processor-interface";
