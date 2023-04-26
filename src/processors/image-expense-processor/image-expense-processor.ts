@@ -26,7 +26,7 @@ export class ImageExpenseProcessor implements IImageExpenseProcessor {
         const name = this._nameProcessor.process(ocrResult);
         const date = this._dateProcessor.process(ocrResult);
         const items = this._itemsProcessor.process(ocrResult, metadata);
-        const proportionalItems = this._proportionalItemsProcessor.process(ocrResult);
+        const proportionalItems = this._proportionalItemsProcessor.process(ocrResult, metadata);
 
         return new Expense(randomUUID(), name, date, items, proportionalItems);
     }
