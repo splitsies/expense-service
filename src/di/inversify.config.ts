@@ -18,8 +18,15 @@ import { ExpenseItemsProcessor } from "../processors/expense-items-processor/exp
 import { IExpenseItemsProcessor } from "../processors/expense-items-processor/expense-items-processor-interface";
 import { IExpenseProportionalItemsProcessor } from "../processors/expense-proportional-items-processor/expense-proportional-items-processor-interface";
 import { ExpenseProportionalItemsProcessor } from "../processors/expense-proportional-items-processor/expense-proportional-items-processor";
+import { IOcrApiConfiguration } from "src/models/configuration/ocr-api-configuration-interface";
+import { OcrApiConfiguration } from "src/models/configuration/ocr-api-configuration";
+import { IOcrApi } from "src/api/ocr-api/ocr-api-client-interface";
+import { OcrApiClient } from "src/api/ocr-api/ocr-api-client";
+import { ILogger, Logger } from "@splitsies/utils";
 
 const container = new Container();
+
+container.bind<ILogger>(ILogger).to(Logger).inSingletonScope();
 
 container.bind<IExpenseService>(IExpenseService).to(ExpenseService).inSingletonScope();
 container.bind<IExpenseEngine>(IExpenseEngine).to(ExpenseEngine).inSingletonScope();
@@ -37,5 +44,8 @@ container
     .bind<IExpenseProportionalItemsProcessor>(IExpenseProportionalItemsProcessor)
     .to(ExpenseProportionalItemsProcessor)
     .inSingletonScope();
+
+container.bind<IOcrApi>(IOcrApi).to(OcrApiClient).inSingletonScope();
+container.bind<IOcrApiConfiguration>(IOcrApiConfiguration).to(OcrApiConfiguration).inSingletonScope();
 
 export { container };

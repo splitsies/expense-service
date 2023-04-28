@@ -5,7 +5,7 @@
   "main": "serverless.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "sls offline start",
+    "serve": "sls offline start --param='OCR_API_URI=http://localhost:12948/dev/'",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
@@ -16,7 +16,8 @@
   "dependencies": {
     "@middy/core": "^3.4.0",
     "@middy/http-json-body-parser": "^3.4.0",
-    "@splitsies/shared-models": "0.0.4",
+    "@splitsies/shared-models": "file:/Users/kevin/source/splitsies/shared-models/splitsies-shared-models-0.0.5.tgz",
+    "@splitsies/utils": "file:/Users/kevin/source/splitsies/utils/splitsies-utils-0.0.11.tgz",
     "inversify": "6.0.1",
     "mathjs": "^11.8.0",
     "reflect-metadata": "^0.1.13"

@@ -1,1 +1,1 @@
-export { default as hello } from "./hello";
+export { default as createExpenseFromImage } from "./expense/create-from-image";

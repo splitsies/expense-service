@@ -1,4 +1,4 @@
-import { IOcrResult, IExpense } from "@splitsies/shared-models";;
+import { IOcrResult, IExpense } from "@splitsies/shared-models";
 
 export interface IExpenseEngine {
     createExpense(): IExpense;

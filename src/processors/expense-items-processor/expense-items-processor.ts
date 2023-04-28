@@ -14,7 +14,7 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
     process(ocrResult: IOcrResult, metadata: IExpenseOcrMetadata): IExpenseItem[] {
         const items = new Array<IExpenseItem>();
 
-        for (let i = 0; i < ocrResult.textBlocks.length, i++) {
+        for (let i = 0; i < ocrResult.textBlocks.length; i++) {
             const block = ocrResult.textBlocks[i];
             if (block.boundingBox.top > metadata.lastTotalPosition) break;
 
@@ -25,13 +25,12 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
             if (!itemBlock) continue;
             // format price
             ExpenseRegex.Percent.exec(itemBlock.text);
-            const percentSearchResult = ExpenseRegex.Percent.test(itemBlock.text)
+            const percentSearchResult = ExpenseRegex.Percent.test(itemBlock.text);
             const price = parseFloat(priceBlock.text);
 
             if (price != 0 && price < metadata.maxPrice && !percentSearchResult) {
                 items.push(this.getLineItem(itemBlock, priceBlock));
             }
-
         }
 
         return items;
@@ -44,14 +43,13 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
         isTip: boolean,
         isSubtotal: boolean,
         isSubtotalAbbrev: boolean,
-        isTotal: boolean): IExpenseItem | undefined {
+        isTotal: boolean,
+    ): IExpenseItem | undefined {
         if (isTax && !(isSubtotal || isSubtotalAbbrev)) {
             return undefined;
-        }
-        else if (isTip && !(isSubtotal || isSubtotalAbbrev)) {
+        } else if (isTip && !(isSubtotal || isSubtotalAbbrev)) {
             return undefined;
-        }
-        else if (!(isSubtotal || isTotal || (isTax && isSubtotalAbbrev))) {
+        } else if (!(isSubtotal || isTotal || (isTax && isSubtotalAbbrev))) {
             return new ExpenseItem(randomUUID(), itemBlock.text, parseFloat(priceBlock.text), []);
         }
     }
@@ -72,25 +70,30 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
         const priceBlock = ocrResult.textBlocks[priceBlockIndex];
         const searchSpace = [
             ...ocrResult.textBlocks.slice(Math.min(0, priceBlockIndex - this.SearchSpaceOffset)),
-            ...ocrResult.textBlocks.slice(priceBlockIndex + 1 + this.SearchSpaceOffset, ocrResult.textBlocks.length)
-        ].filter(b => this.isValidSlope(b, priceBlock, metadata));
-        
-        if (searchSpace.length === 1) { return searchSpace[0]; }
+            ...ocrResult.textBlocks.slice(priceBlockIndex + 1 + this.SearchSpaceOffset, ocrResult.textBlocks.length),
+        ].filter((b) => this.isValidSlope(b, priceBlock, metadata));
+
+        if (searchSpace.length === 1) {
+            return searchSpace[0];
+        }
 
         // Items are likeky on the same line if the difference between slopes is small
-        if (Math.abs(
+        if (
+            Math.abs(
                 this.getSlope(searchSpace[0].boundingBox, priceBlock.boundingBox) -
-                this.getSlope(searchSpace[1].boundingBox, priceBlock.boundingBox)
-            ) > this.SLOPE_DIFFERENCE_THRESHOLD) { 
-            return (dollarRegex.test(searchSpace[0].text))
-                ? searchSpace[1]
-                : searchSpace[0];
+                    this.getSlope(searchSpace[1].boundingBox, priceBlock.boundingBox),
+            ) > this.SLOPE_DIFFERENCE_THRESHOLD
+        ) {
+            return dollarRegex.test(searchSpace[0].text) ? searchSpace[1] : searchSpace[0];
         }
 
         // Check if one of the top two matches a quantity or dollar sign
-        if (dollarRegex.test(searchSpace[0].text)) { return searchSpace[1]; }
-        if (dollarRegex.test(searchSpace[1].text)) { return searchSpace[0]; }
-
+        if (dollarRegex.test(searchSpace[0].text)) {
+            return searchSpace[1];
+        }
+        if (dollarRegex.test(searchSpace[1].text)) {
+            return searchSpace[0];
+        }
 
         // If neither matches non-qualifying item names, choose the one with the greater distance
         return this.getDistance(searchSpace[0].boundingBox, priceBlock.boundingBox) >
@@ -113,17 +116,17 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
      */
     private isValidSlope(itemBlock: ITextBlock, priceBlock: ITextBlock, metadata: IExpenseOcrMetadata): boolean {
         const slope = this.getSlope(itemBlock.boundingBox, priceBlock.boundingBox);
-        const threshold = this.STANDARD_DEV_THRESHOLD * metadata.slopeStandardDeviation
+        const threshold = this.STANDARD_DEV_THRESHOLD * metadata.slopeStandardDeviation;
 
         // 65-95-99.7 rule - 99.7% of distribution is within 3 std from the mean
-        return slope > (metadata.slopeMean - threshold)
-            && slope < (metadata.slopeMean + threshold)
+        return slope > metadata.slopeMean - threshold && slope < metadata.slopeMean + threshold;
     }
 
     private formatPrice(priceText: string): string {
         //    Formats price string to (-)0.00 format
         //   '''
-        if (priceText[0] === priceText && priceText[priceText.length - 1] === ')') {  # Negative denoted by parentheses
+        if (priceText[0] === priceText && priceText[priceText.length - 1] === ")") {
+            // Negative denoted by parentheses
             // Replace the parentheses with negative sign
             priceText = `$-${priceText.slice(1, priceText.length)}`;
 

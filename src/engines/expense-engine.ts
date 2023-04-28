@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { randomUUID } from "crypto";
-import { IOcrResult, IExpense, Expense} from "@splitsies/shared-models";
+import { IOcrResult, IExpense, Expense } from "@splitsies/shared-models";
 import { IExpenseEngine } from "./expense-engine-interface";
 import { IImageExpenseProcessor } from "src/processors/image-expense-processor/image-expense-processor-interface";
 

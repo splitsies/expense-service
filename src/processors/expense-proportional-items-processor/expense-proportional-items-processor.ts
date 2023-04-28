@@ -5,8 +5,10 @@ import { IExpenseProportionalItemsProcessor } from "./expense-proportional-items
 import { ExpenseItemsProcessor } from "../expense-items-processor/expense-items-processor";
 
 @injectable()
-export class ExpenseProportionalItemsProcessor extends ExpenseItemsProcessor implements IExpenseProportionalItemsProcessor {
-
+export class ExpenseProportionalItemsProcessor
+    extends ExpenseItemsProcessor
+    implements IExpenseProportionalItemsProcessor
+{
     protected override createExpenseItem(
         _itemBlock: ITextBlock,
         priceBlock: ITextBlock,
@@ -14,15 +16,14 @@ export class ExpenseProportionalItemsProcessor extends ExpenseItemsProcessor imp
         isTip: boolean,
         isSubtotal: boolean,
         isSubtotalAbbrev: boolean,
-        _isTotal: boolean): IExpenseItem | undefined {
-        
+        _isTotal: boolean,
+    ): IExpenseItem | undefined {
         if (isTax && !(isSubtotal || isSubtotalAbbrev)) {
             return new ExpenseItem(randomUUID(), "Tax", parseFloat(priceBlock.text), []);
-        }
-        else if (isTip && !(isSubtotal || isSubtotalAbbrev)) { 
+        } else if (isTip && !(isSubtotal || isSubtotalAbbrev)) {
             return new ExpenseItem(randomUUID(), "Tip", parseFloat(priceBlock.text), []);
         }
-        
+
         return undefined;
     }
 }
