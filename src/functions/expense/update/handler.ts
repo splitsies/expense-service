@@ -10,7 +10,8 @@ const expenseService = container.get<IExpenseService>(IExpenseService);
 
 export const main = middyfy(
     SplitsiesFunctionHandlerFactory.create<typeof schema, IExpense>(logger, async (event) => {
-        const result = await expenseService.createExpenseFromImage(event.body.image);
+        const { id, expense } = event.body;
+        const result = await expenseService.updateExpense(id, expense);
         return new DataResponse(HttpStatusCode.OK, result).toJson();
     }),
 );

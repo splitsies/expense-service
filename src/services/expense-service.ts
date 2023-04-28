@@ -20,7 +20,7 @@ export class ExpenseService implements IExpenseService {
         return this._expenseEngine.createExpenseFromImage(result.data);
     }
 
-    async updateExpense(id: string, updated: Omit<IExpense, "id">): Promise<IExpense> {
+    async updateExpense(id: string, updated: Omit<IExpense, "id" | "subtotal" | "total">): Promise<IExpense> {
         return Promise.resolve(this._expenseEngine.updateExpense(id, updated));
     }
 }

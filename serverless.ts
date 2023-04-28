@@ -3,6 +3,8 @@ import type { AWS } from '@serverless/typescript';
 import ocrApiConfig from "./src/config/ocr-api.config.json";
 
 import createFromImage from '@functions/expense/create-from-image';
+import create from '@functions/expense/create';
+import update from '@functions/expense/update';
 
 const serverlessConfiguration: AWS = {
     org: 'splitsies',
@@ -25,7 +27,7 @@ const serverlessConfiguration: AWS = {
         },
     },
     // import the function via paths
-    functions: { createFromImage },
+    functions: { create, createFromImage, update },
     package: { individually: true },
     custom: {
         esbuild: {

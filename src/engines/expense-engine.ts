@@ -21,7 +21,7 @@ export class ExpenseEngine implements IExpenseEngine {
         return expense;
     }
 
-    updateExpense(id: string, updated: Omit<IExpense, "id">): IExpense {
+    updateExpense(id: string, updated: Omit<IExpense, "id" | "subtotal" | "total">): IExpense {
         const updatedExpense = new Expense(
             id,
             updated.name,
