@@ -1,0 +1,3 @@
+{
+    "OCR_API_URI": "${param:OCR_API_URI}"
+}

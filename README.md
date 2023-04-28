@@ -39,6 +39,12 @@ In order to test the hello function locally, run the following command:
 
 Check the [sls invoke local command documentation](https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/) for more information.
 
+Alternatively, host the service locally with `serverless-offline`
+
+- `npm run serve`
+
+This command runs `sls offline` with local parameters. See `package.json` for more info.
+
 ### Remotely
 
 Copy and replace your `url` - found in Serverless `deploy` command output - and `name` parameter in the following `curl` command in your terminal or in Postman to test your newly deployed application.
