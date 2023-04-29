@@ -5,19 +5,24 @@
   "main": "serverless.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "sls offline start --param='OCR_API_URI=http://localhost:12948/dev/'",
+    "serve": "./utils/local-startup/startup.sh",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "lint": "tslint -p tsconfig.json",
+    "start-db": "cd utils/local-db && docker-compose up -d",
+    "recreate-db": "./utils/local-db/recreate.sh",
+    "kill-db": "docker kill splitsies-expense-db-local"
   },
   "engines": {
     "node": ">=14.15.0"
   },
   "prettier": "@splitsies/formatting",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.321.1",
+    "@aws-sdk/util-dynamodb": "^3.321.1",
     "@middy/core": "^3.4.0",
     "@middy/http-json-body-parser": "^3.4.0",
     "@splitsies/shared-models": "0.0.8",
-    "@splitsies/utils": "0.0.10",
+    "@splitsies/utils": "0.0.11",
     "inversify": "6.0.1",
     "mathjs": "^11.8.0",
     "reflect-metadata": "^0.1.13"

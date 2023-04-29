@@ -28,7 +28,7 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
             const percentSearchResult = ExpenseRegex.Percent.test(itemBlock.text);
             const price = parseFloat(priceBlock.text);
 
-            if (price != 0 && price < metadata.maxPrice && !percentSearchResult) {
+            if (price !== 0 && price < metadata.maxPrice && !percentSearchResult) {
                 items.push(this.getLineItem(itemBlock, priceBlock));
             }
         }

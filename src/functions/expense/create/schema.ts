@@ -1,5 +1,1 @@
-export default {
-    type: "object",
-    properties: {},
-    required: ["image"],
-} as const;
+export default {} as const;

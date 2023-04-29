@@ -1,0 +1,7 @@
+{
+    "dbAccessKeyId": "${param:DB_ACCESS_KEY_ID}",
+    "dbSecretAccessKey": "${param:DB_SECRET_ACCESS_KEY}",
+    "dbRegion": "${param:DB_REGION}",
+    "dbTableName": "${param:DB_TABLE_NAME}",
+    "dbEndpoint": "${param:DB_ENDPOINT}"
+}

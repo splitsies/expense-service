@@ -4,14 +4,32 @@ import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service-interface";
 import { HttpStatusCode, IExpense, DataResponse } from "@splitsies/shared-models";
 import { SplitsiesFunctionHandlerFactory, ILogger } from "@splitsies/utils";
+import { NotFoundError } from "src/models/error/not-found-error";
+import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 
 const logger = container.get<ILogger>(ILogger);
 const expenseService = container.get<IExpenseService>(IExpenseService);
 
 export const main = middyfy(
-    SplitsiesFunctionHandlerFactory.create<typeof schema, IExpense>(logger, async (event) => {
+    SplitsiesFunctionHandlerFactory.create<typeof schema, IExpense | string>(logger, async (event) => {
         const { id, expense } = event.body;
-        const result = await expenseService.updateExpense(id, expense);
-        return new DataResponse(HttpStatusCode.OK, result).toJson();
+
+        const update = {
+            name: expense.name,
+            transactionDate: new Date(Date.parse(expense.transactionDate)),
+            items: expense.items,
+            proportionalItems: expense.proportionalItems,
+        } as IExpenseUpdate;
+
+        try {
+            const result = await expenseService.updateExpense(id, update);
+            return new DataResponse(HttpStatusCode.OK, result).toJson();
+        } catch (e) {
+            if (e instanceof NotFoundError) {
+                return new DataResponse(HttpStatusCode.NOT_FOUND, e.message).toJson();
+            }
+
+            throw e;
+        }
     }),
 );

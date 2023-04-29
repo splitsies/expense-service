@@ -12,7 +12,7 @@ export class ExpenseService implements IExpenseService {
     ) {}
 
     async createExpense(): Promise<IExpense> {
-        return Promise.resolve(this._expenseEngine.createExpense());
+        return await this._expenseEngine.createExpense();
     }
 
     async createExpenseFromImage(base64Image: string): Promise<IExpense> {
@@ -21,6 +21,6 @@ export class ExpenseService implements IExpenseService {
     }
 
     async updateExpense(id: string, updated: Omit<IExpense, "id" | "subtotal" | "total">): Promise<IExpense> {
-        return Promise.resolve(this._expenseEngine.updateExpense(id, updated));
+        return await this._expenseEngine.updateExpense(id, updated);
     }
 }

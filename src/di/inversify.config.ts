@@ -18,11 +18,17 @@ import { ExpenseItemsProcessor } from "../processors/expense-items-processor/exp
 import { IExpenseItemsProcessor } from "../processors/expense-items-processor/expense-items-processor-interface";
 import { IExpenseProportionalItemsProcessor } from "../processors/expense-proportional-items-processor/expense-proportional-items-processor-interface";
 import { ExpenseProportionalItemsProcessor } from "../processors/expense-proportional-items-processor/expense-proportional-items-processor";
-import { IOcrApiConfiguration } from "src/models/configuration/ocr-api-configuration-interface";
-import { OcrApiConfiguration } from "src/models/configuration/ocr-api-configuration";
+import { IOcrApiConfiguration } from "src/models/configuration/ocr-api/ocr-api-configuration-interface";
+import { OcrApiConfiguration } from "src/models/configuration/ocr-api/ocr-api-configuration";
 import { IOcrApi } from "src/api/ocr-api/ocr-api-client-interface";
 import { OcrApiClient } from "src/api/ocr-api/ocr-api-client";
 import { ILogger, Logger } from "@splitsies/utils";
+import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
+import { DbConfiguration } from "src/models/configuration/db/db-configuration";
+import { ExpenseDao } from "src/dao/expense-dao/expense-dao";
+import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
+import { IExpenseMapper } from "src/mappers/expense-mapper/expense-mapper-interface";
+import { ExpenseMapper } from "src/mappers/expense-mapper/expense-mapper";
 
 const container = new Container();
 
@@ -47,5 +53,9 @@ container
 
 container.bind<IOcrApi>(IOcrApi).to(OcrApiClient).inSingletonScope();
 container.bind<IOcrApiConfiguration>(IOcrApiConfiguration).to(OcrApiConfiguration).inSingletonScope();
+container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSingletonScope();
+container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao).inSingletonScope();
+
+container.bind<IExpenseMapper>(IExpenseMapper).to(ExpenseMapper).inSingletonScope();
 
 export { container };
