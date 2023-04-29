@@ -1,12 +1,14 @@
 import { inject, injectable } from "inversify";
 import { IExpense } from "@splitsies/shared-models";
-import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 import { IExpenseDao } from "./expense-dao-interface";
 
-import { DynamoDBClient, PutItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, PutItemCommand, GetItemCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { ILogger } from "@splitsies/utils";
+import { IExpenseMapper } from "src/mappers/expense-mapper/expense-mapper-interface";
+import { IExpenseDa } from "src/models/expense-da/expense-da-interface";
+import { NotFoundError } from "src/models/error/not-found-error";
 
 @injectable()
 export class ExpenseDao implements IExpenseDao {
@@ -14,7 +16,9 @@ export class ExpenseDao implements IExpenseDao {
 
     constructor(
         @inject(ILogger) private readonly _logger: ILogger,
-        @inject(IDbConfiguration) private readonly _dbConfiguration: IDbConfiguration) {
+        @inject(IDbConfiguration) private readonly _dbConfiguration: IDbConfiguration,
+        @inject(IExpenseMapper) private readonly _mapper: IExpenseMapper,
+    ) {
         this._client = new DynamoDBClient({
             credentials: {
                 accessKeyId: this._dbConfiguration.dbAccessKeyId,
@@ -25,16 +29,18 @@ export class ExpenseDao implements IExpenseDao {
         });
     }
 
-    async upsert(expense: IExpense): Promise<IExpense> {
+    async create(expense: IExpense): Promise<IExpense> {
+        const expenseDa = this._mapper.toDaModel(expense);
+        this._logger.log(marshall(expenseDa, { convertClassInstanceToMap: true }) as any);
+
         const result = await this._client.send(
             new PutItemCommand({
                 TableName: this._dbConfiguration.tableName,
-                Item: marshall(expense, { convertClassInstanceToMap: true }),
+                Item: marshall(expenseDa, { convertClassInstanceToMap: true }),
             }),
         );
-        
-        if (result.$metadata.httpStatusCode !== 200) return;
 
+        if (result.$metadata.httpStatusCode !== 200) return undefined;
         return this.read(expense.id);
     }
 
@@ -46,14 +52,26 @@ export class ExpenseDao implements IExpenseDao {
             }),
         );
 
-        return unmarshall(readResult.Item) as IExpense;
+        if (!readResult.Item) return undefined;
+
+        const result = unmarshall(readResult.Item);
+        return result ? this._mapper.toDomainModel(result as IExpenseDa) : undefined;
     }
 
-    async update(id: string, update: IExpenseUpdate): Promise<IExpense> {
-        throw new Error("Method not implemented.");
+    async update(updated: IExpense): Promise<IExpense> {
+        const exists = !!(await this.read(updated.id));
+        if (!exists) throw new NotFoundError(`Expense with id=${updated.id} not found`);
+
+        // CREATE and UPDATE are the same in DynamoDB
+        return await this.create(updated);
     }
 
     async delete(id: string): Promise<void> {
-        throw new Error("Method not implemented.");
+        await this._client.send(
+            new DeleteItemCommand({
+                TableName: this._dbConfiguration.tableName,
+                Key: { id: { S: id } },
+            }),
+        );
     }
 }

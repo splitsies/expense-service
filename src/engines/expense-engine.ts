@@ -4,6 +4,7 @@ import { IOcrResult, IExpense, Expense } from "@splitsies/shared-models";
 import { IExpenseEngine } from "./expense-engine-interface";
 import { IImageExpenseProcessor } from "src/processors/image-expense-processor/image-expense-processor-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
+import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 
 @injectable()
 export class ExpenseEngine implements IExpenseEngine {
@@ -13,18 +14,18 @@ export class ExpenseEngine implements IExpenseEngine {
     ) {}
 
     async createExpense(): Promise<IExpense> {
-        return await this._expenseDao.upsert(new Expense(randomUUID(), "", new Date(), [], []));
+        return await this._expenseDao.create(new Expense(randomUUID(), "", new Date(), [], []));
     }
 
     async createExpenseFromImage(ocrResult: IOcrResult): Promise<IExpense> {
         const expense = this._imageExpenseProcessor.process(ocrResult);
         if (!expense) throw new Error("Unable to create expense from OCR data");
 
-        return await this._expenseDao.upsert(expense);
+        return await this._expenseDao.create(expense);
     }
 
-    async updateExpense(id: string, updated: Omit<IExpense, "id" | "subtotal" | "total">): Promise<IExpense> {
-        return await this._expenseDao.upsert(
+    async updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense> {
+        return await this._expenseDao.update(
             new Expense(id, updated.name, updated.transactionDate, updated.items, updated.proportionalItems),
         );
     }

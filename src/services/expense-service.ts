@@ -21,6 +21,6 @@ export class ExpenseService implements IExpenseService {
     }
 
     async updateExpense(id: string, updated: Omit<IExpense, "id" | "subtotal" | "total">): Promise<IExpense> {
-        return Promise.resolve(this._expenseEngine.updateExpense(id, updated));
+        return await this._expenseEngine.updateExpense(id, updated);
     }
 }

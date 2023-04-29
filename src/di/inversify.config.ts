@@ -27,6 +27,8 @@ import { IDbConfiguration } from "src/models/configuration/db/db-configuration-i
 import { DbConfiguration } from "src/models/configuration/db/db-configuration";
 import { ExpenseDao } from "src/dao/expense-dao/expense-dao";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
+import { IExpenseMapper } from "src/mappers/expense-mapper/expense-mapper-interface";
+import { ExpenseMapper } from "src/mappers/expense-mapper/expense-mapper";
 
 const container = new Container();
 
@@ -53,5 +55,7 @@ container.bind<IOcrApi>(IOcrApi).to(OcrApiClient).inSingletonScope();
 container.bind<IOcrApiConfiguration>(IOcrApiConfiguration).to(OcrApiConfiguration).inSingletonScope();
 container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSingletonScope();
 container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao).inSingletonScope();
+
+container.bind<IExpenseMapper>(IExpenseMapper).to(ExpenseMapper).inSingletonScope();
 
 export { container };
