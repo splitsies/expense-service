@@ -3,35 +3,29 @@ import { randomUUID } from "crypto";
 import { IOcrResult, IExpense, Expense } from "@splitsies/shared-models";
 import { IExpenseEngine } from "./expense-engine-interface";
 import { IImageExpenseProcessor } from "src/processors/image-expense-processor/image-expense-processor-interface";
+import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 
 @injectable()
 export class ExpenseEngine implements IExpenseEngine {
-    constructor(@inject(IImageExpenseProcessor) private readonly _imageExpenseProcessor: IImageExpenseProcessor) {}
+    constructor(
+        @inject(IExpenseDao) private readonly _expenseDao: IExpenseDao,
+        @inject(IImageExpenseProcessor) private readonly _imageExpenseProcessor: IImageExpenseProcessor,
+    ) {}
 
-    createExpense(): IExpense {
-        return new Expense(randomUUID(), "", new Date(), [], []);
+    async createExpense(): Promise<IExpense> {
+        return await this._expenseDao.upsert(new Expense(randomUUID(), "", new Date(), [], []));
     }
 
-    createExpenseFromImage(ocrResult: IOcrResult): IExpense {
+    async createExpenseFromImage(ocrResult: IOcrResult): Promise<IExpense> {
         const expense = this._imageExpenseProcessor.process(ocrResult);
         if (!expense) throw new Error("Unable to create expense from OCR data");
 
-        // TODO: save to DB
-
-        return expense;
+        return await this._expenseDao.upsert(expense);
     }
 
-    updateExpense(id: string, updated: Omit<IExpense, "id" | "subtotal" | "total">): IExpense {
-        const updatedExpense = new Expense(
-            id,
-            updated.name,
-            updated.transactionDate,
-            updated.items,
-            updated.proportionalItems,
+    async updateExpense(id: string, updated: Omit<IExpense, "id" | "subtotal" | "total">): Promise<IExpense> {
+        return await this._expenseDao.upsert(
+            new Expense(id, updated.name, updated.transactionDate, updated.items, updated.proportionalItems),
         );
-
-        // TODO: Save the updated expense in DB
-
-        return updatedExpense;
     }
 }

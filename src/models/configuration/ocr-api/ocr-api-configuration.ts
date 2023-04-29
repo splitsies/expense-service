@@ -7,7 +7,7 @@ export class OcrApiConfiguration implements IOcrApiConfiguration {
     readonly uri: string;
 
     constructor() {
-        assert(!!process.env.Uri, "OCR API URI was undefined");
+        assert(!!process.env.OCR_API_URI, "OCR API URI was undefined");
         this.uri = process.env.OCR_API_URI;
     }
 }

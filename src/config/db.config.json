@@ -1,0 +1,6 @@
+{
+    "dbAccessKeyId": "process.env.iamAccessId",
+    "dbSecretAccessKey": "process.env.iamSecret",
+    "dbRegion": "us-west-2",
+    "tableName": "Expense"
+}
