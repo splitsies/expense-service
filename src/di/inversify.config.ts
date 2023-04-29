@@ -23,6 +23,10 @@ import { OcrApiConfiguration } from "src/models/configuration/ocr-api/ocr-api-co
 import { IOcrApi } from "src/api/ocr-api/ocr-api-client-interface";
 import { OcrApiClient } from "src/api/ocr-api/ocr-api-client";
 import { ILogger, Logger } from "@splitsies/utils";
+import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
+import { DbConfiguration } from "src/models/configuration/db/db-configuration";
+import { ExpenseDao } from "src/dao/expense-dao/expense-dao";
+import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 
 const container = new Container();
 
@@ -47,5 +51,7 @@ container
 
 container.bind<IOcrApi>(IOcrApi).to(OcrApiClient).inSingletonScope();
 container.bind<IOcrApiConfiguration>(IOcrApiConfiguration).to(OcrApiConfiguration).inSingletonScope();
+container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSingletonScope();
+container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao).inSingletonScope();
 
 export { container };

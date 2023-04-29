@@ -1,0 +1,1 @@
+sls offline start --param='OCR_API_URI=http://localhost:12948/dev/'

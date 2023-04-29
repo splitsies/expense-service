@@ -12,7 +12,7 @@ export class ExpenseService implements IExpenseService {
     ) {}
 
     async createExpense(): Promise<IExpense> {
-        return Promise.resolve(this._expenseEngine.createExpense());
+        return await this._expenseEngine.createExpense();
     }
 
     async createExpenseFromImage(base64Image: string): Promise<IExpense> {

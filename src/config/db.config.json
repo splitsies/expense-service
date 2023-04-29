@@ -1,6 +1,7 @@
 {
-    "dbAccessKeyId": "process.env.iamAccessId",
-    "dbSecretAccessKey": "process.env.iamSecret",
+    "dbAccessKeyId": "local-key-id",
+    "dbSecretAccessKey": "local-secret-access-key",
     "dbRegion": "us-west-2",
-    "tableName": "Expense"
+    "dbTableName": "Expense",
+    "dbEndpoint": "http://localhost:8000/"
 }

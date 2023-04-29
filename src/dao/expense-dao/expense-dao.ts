@@ -6,18 +6,22 @@ import { IExpenseDao } from "./expense-dao-interface";
 import { DynamoDBClient, PutItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
+import { ILogger } from "@splitsies/utils";
 
 @injectable()
 export class ExpenseDao implements IExpenseDao {
     private readonly _client: DynamoDBClient;
 
-    constructor(@inject(IDbConfiguration) private readonly _dbConfiguration: IDbConfiguration) {
+    constructor(
+        @inject(ILogger) private readonly _logger: ILogger,
+        @inject(IDbConfiguration) private readonly _dbConfiguration: IDbConfiguration) {
         this._client = new DynamoDBClient({
             credentials: {
                 accessKeyId: this._dbConfiguration.dbAccessKeyId,
                 secretAccessKey: this._dbConfiguration.dbSecretAccessKey,
             },
             region: this._dbConfiguration.dbRegion,
+            endpoint: this._dbConfiguration.endpoint,
         });
     }
 
@@ -25,10 +29,10 @@ export class ExpenseDao implements IExpenseDao {
         const result = await this._client.send(
             new PutItemCommand({
                 TableName: this._dbConfiguration.tableName,
-                Item: marshall(expense),
+                Item: marshall(expense, { convertClassInstanceToMap: true }),
             }),
         );
-
+        
         if (result.$metadata.httpStatusCode !== 200) return;
 
         return this.read(expense.id);
@@ -38,7 +42,7 @@ export class ExpenseDao implements IExpenseDao {
         const readResult = await this._client.send(
             new GetItemCommand({
                 TableName: this._dbConfiguration.tableName,
-                Key: marshall({ id }),
+                Key: marshall({ id }, { convertClassInstanceToMap: true }),
             }),
         );
 

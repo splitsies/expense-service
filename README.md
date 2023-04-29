@@ -45,6 +45,9 @@ Alternatively, host the service locally with `serverless-offline`
 
 This command runs `sls offline` with local parameters. See `package.json` for more info.
 
+#### Database
+DynamoDB is used as the backing store. Run the `npm run start-db` command to locally run a DynamoDB instance. `docker-compose` is used to run the db container from `src/utils/local-db` 
+
 ### Remotely
 
 Copy and replace your `url` - found in Serverless `deploy` command output - and `name` parameter in the following `curl` command in your terminal or in Postman to test your newly deployed application.
