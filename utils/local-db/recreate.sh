@@ -1,8 +1,8 @@
+docker kill splitsies-expense-db-local
+
 rm -rf utils/local-db/docker
 
 cd utils/local-db
-
-docker kill splitsies-expense-db-local
 
 docker-compose up -d
 
@@ -13,3 +13,5 @@ aws dynamodb create-table \
     --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
     --table-class STANDARD \
     --endpoint-url http://localhost:8000
+
+docker kill splitsies-expense-db-local

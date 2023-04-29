@@ -8,7 +8,7 @@
     "serve": "./utils/local-startup/startup.sh",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
-    "start-db": "cd utils/local-db && docker-compose up -d",
+    "start-db": "cd utils/local-db && docker-compose up",
     "recreate-db": "./utils/local-db/recreate.sh",
     "kill-db": "docker kill splitsies-expense-db-local"
   },
