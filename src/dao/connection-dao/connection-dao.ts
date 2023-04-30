@@ -2,14 +2,7 @@ import { inject, injectable } from "inversify";
 import { IConnectionDao } from "./connection-dao-interface";
 import { IConnection } from "src/models/connection/connection-interface";
 import { ILogger } from "@splitsies/utils";
-import {
-    BatchWriteItemCommand,
-    DeleteItemCommand,
-    DynamoDBClient,
-    ExecuteStatementCommand,
-    GetItemCommand,
-    PutItemCommand,
-} from "@aws-sdk/client-dynamodb";
+import { DeleteItemCommand, DynamoDBClient, ExecuteStatementCommand, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { NotFoundError } from "src/models/error/not-found-error";
@@ -37,11 +30,12 @@ export class ConnectionDao implements IConnectionDao {
     }
 
     async getExpenseIdForConnection(connectionId: string): Promise<string> {
-        const result = await this._client.send(new ExecuteStatementCommand({
-            Statement: this._statements.GetExpenseIdForConnection,
-            Parameters: [{ S: connectionId }],
-        }));
-        
+        const result = await this._client.send(
+            new ExecuteStatementCommand({
+                Statement: this._statements.GetExpenseIdForConnection,
+                Parameters: [{ S: connectionId }],
+            }),
+        );
 
         return result.Items ? unmarshall(result.Items[0]).expenseId : undefined;
     }
@@ -71,15 +65,13 @@ export class ConnectionDao implements IConnectionDao {
 
     async read(connectionId: string): Promise<IConnection> {
         const readResult = await this._client.send(
-            new GetItemCommand({
-                TableName: this._table,
-                Key: marshall({ connectionId }, { convertClassInstanceToMap: true }),
+            new ExecuteStatementCommand({
+                Statement: this._statements.GetByConnectionId,
+                Parameters: [{ S: connectionId }],
             }),
         );
 
-        if (!readResult.Item) return undefined;
-
-        return unmarshall(readResult.Item) as IConnection;
+        return readResult.Items ? (unmarshall(readResult.Items[0]) as IConnection) : undefined;
     }
 
     async update(updated: IConnection): Promise<IConnection> {
@@ -97,12 +89,15 @@ export class ConnectionDao implements IConnectionDao {
             return;
         }
 
-        await this._client.send(new DeleteItemCommand({
-            TableName: this._table, Key: {
-                connectionId: { S: id },
-                expenseId: { S: expenseId }
-            }
-        }));
+        await this._client.send(
+            new DeleteItemCommand({
+                TableName: this._table,
+                Key: {
+                    connectionId: { S: id },
+                    expenseId: { S: expenseId },
+                },
+            }),
+        );
     }
 
     async deleteExpiredConnections(): Promise<string[]> {
@@ -113,9 +108,9 @@ export class ConnectionDao implements IConnectionDao {
             }),
         );
 
-        const expiredIds = result.Items.map(i => unmarshall(i) as { connectionId: string; expenseId: string; });
-        await Promise.all(expiredIds.map(ids => this.delete(ids.connectionId, ids.expenseId)));
+        const expiredIds = result.Items.map((i) => unmarshall(i) as { connectionId: string; expenseId: string });
+        await Promise.all(expiredIds.map((ids) => this.delete(ids.connectionId, ids.expenseId)));
 
-        return expiredIds.map(i => i.connectionId);
+        return expiredIds.map((i) => i.connectionId);
     }
 }

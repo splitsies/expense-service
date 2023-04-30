@@ -5,6 +5,7 @@ export interface IConnectionService {
     refreshTtl(id: string): Promise<IConnection>;
     delete(id: string): Promise<void>;
     getRelatedConnections(connectionId: string): Promise<string[]>;
+    getExpenseIdForConnection(connectionId: string): Promise<string>;
 }
 
 export const IConnectionService = Symbol.for("IConnectionService");

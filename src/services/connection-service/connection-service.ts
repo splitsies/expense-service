@@ -9,10 +9,13 @@ import { NotFoundError } from "src/models/error/not-found-error";
 export class ConnectionService implements IConnectionService {
     constructor(
         @inject(IExpenseService) private readonly _expenseService: IExpenseService,
-        @inject(IConnectionEngine) private readonly _connectionEngine: IConnectionEngine) { }
+        @inject(IConnectionEngine) private readonly _connectionEngine: IConnectionEngine,
+    ) {}
 
     async create(id: string, expenseId: string): Promise<IConnection> {
-        if (!(await this._expenseService.getExpense(expenseId))) {throw new NotFoundError(`Could create a connection for expense id=${expenseId}`);}
+        if (!(await this._expenseService.getExpense(expenseId))) {
+            throw new NotFoundError(`Could create a connection for expense id=${expenseId}`);
+        }
         return await this._connectionEngine.createConnection(id, expenseId);
     }
 
@@ -26,5 +29,9 @@ export class ConnectionService implements IConnectionService {
 
     async getRelatedConnections(connectionId: string): Promise<string[]> {
         return await this._connectionEngine.getRelatedConnections(connectionId);
+    }
+
+    async getExpenseIdForConnection(connectionId: string): Promise<string> {
+        return await this._connectionEngine.getExpenseIdForConnection(connectionId);
     }
 }

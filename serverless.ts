@@ -10,6 +10,8 @@ import create from '@functions/expense/create';
 import update from '@functions/expense/update';
 
 import connect from '@functions/connection/connect';
+import disconnect from '@functions/connection/disconnect';
+import updateExpense from '@functions/connection/update-expense';
 
 const serverlessConfiguration: AWS = {
     org: 'splitsies',
@@ -26,8 +28,9 @@ const serverlessConfiguration: AWS = {
         shouldStartNameWithService: true,
         },
         environment: {
-        AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+            AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
             NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+            APIG_URL: "${param:APIG_URL}",
             ...ocrApiConfig,
             ...algorithmsApiConfig,
             ...dbConfig,
@@ -35,9 +38,10 @@ const serverlessConfiguration: AWS = {
         },
     },
     // import the function via paths
-    functions: { create, createFromImage, update, connect },
+    functions: { create, createFromImage, update, connect, disconnect, updateExpense },
     package: { individually: true },
     custom: {
+        apigUri: { 'Fn::GetAtt': ['HttpApi', 'ApiEndpoint'] },
         esbuild: {
             bundle: true,
             minify: false,

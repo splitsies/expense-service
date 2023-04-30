@@ -6,6 +6,7 @@ import { IOcrApi } from "../api/ocr-api/ocr-api-client-interface";
 import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client-interface";
 import { ImageProcessingError } from "src/models/error/image-processing-error";
 import { IExpenseMapper } from "src/mappers/expense-mapper/expense-mapper-interface";
+import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -14,8 +15,8 @@ export class ExpenseService implements IExpenseService {
         @inject(IOcrApi) private readonly _ocrApi: IOcrApi,
         @inject(IAlgorithmsApiClient) private readonly _algorithsmApiClient: IAlgorithmsApiClient,
         @inject(IExpenseMapper) private readonly _mapper: IExpenseMapper,
-    ) { }
-    
+    ) {}
+
     async getExpense(id: string): Promise<IExpense> {
         return this._expenseEngine.getExpense(id);
     }
@@ -32,7 +33,7 @@ export class ExpenseService implements IExpenseService {
         return this._expenseEngine.createExpenseFromImage(this._mapper.toDomainModel(expenseResult.data));
     }
 
-    async updateExpense(id: string, updated: Omit<IExpense, "id" | "subtotal" | "total">): Promise<IExpense> {
+    async updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense> {
         return await this._expenseEngine.updateExpense(id, updated);
     }
 }

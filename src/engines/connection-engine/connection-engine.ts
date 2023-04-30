@@ -38,4 +38,8 @@ export class ConnectionEngine implements IConnectionEngine {
         const expenseId = await this._connectionDao.getExpenseIdForConnection(connectionId);
         return await this._connectionDao.getConnectionsForExpense(expenseId);
     }
+
+    async getExpenseIdForConnection(connectionId: string): Promise<string> {
+        return await this._connectionDao.getExpenseIdForConnection(connectionId);
+    }
 }

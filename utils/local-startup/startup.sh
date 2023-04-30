@@ -6,4 +6,5 @@ sls offline start \
     --param='DB_REGION=us-west-2' \
     --param='DB_TABLE_NAME=Expense' \
     --param='CONNECTION_TABLE_NAME=ExpenseConnection' \
-    --param='DB_ENDPOINT=http://localhost:8000/'
+    --param='DB_ENDPOINT=http://localhost:8000/' \
+    --param='APIG_URL=http://localhost:14624/'

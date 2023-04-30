@@ -1,3 +1,8 @@
-import { IExpense } from "@splitsies/shared-models";
+import { IExpenseItem } from "@splitsies/shared-models";
 
-export type IExpenseUpdate = Omit<IExpense, "id" | "subtotal" | "total">;
+export interface IExpenseUpdate {
+    readonly name: string;
+    readonly transactionDate: string;
+    readonly items: IExpenseItem[];
+    readonly proportionalItems: IExpenseItem[];
+}
