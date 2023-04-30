@@ -3,10 +3,13 @@ import type { AWS } from '@serverless/typescript';
 import ocrApiConfig from "./src/config/ocr-api.config.json";
 import algorithmsApiConfig from "./src/config/algorithms-api.config.json";
 import dbConfig from "./src/config/db.config.json";
+import connectionConfig from "./src/config/connection.config.json";
 
 import createFromImage from '@functions/expense/create-from-image';
 import create from '@functions/expense/create';
 import update from '@functions/expense/update';
+
+import connect from '@functions/connection/connect';
 
 const serverlessConfiguration: AWS = {
     org: 'splitsies',
@@ -27,11 +30,12 @@ const serverlessConfiguration: AWS = {
             NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
             ...ocrApiConfig,
             ...algorithmsApiConfig,
-            ...dbConfig
+            ...dbConfig,
+            ...connectionConfig
         },
     },
     // import the function via paths
-    functions: { create, createFromImage, update },
+    functions: { create, createFromImage, update, connect },
     package: { individually: true },
     custom: {
         esbuild: {

@@ -8,6 +8,7 @@ export class DbConfiguration implements IDbConfiguration {
     private readonly _dbSecretAccessKey: string;
     private readonly _dbRegion: string;
     private readonly _tableName: string;
+    private readonly _connectionTableName: string;
     private readonly _endpoint: string;
 
     constructor() {
@@ -15,12 +16,14 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.dbSecretAccessKey, "db secret access key was undefined");
         assert(!!process.env.dbRegion, "db region was undefined");
         assert(!!process.env.dbTableName, "db table name was undefined");
+        assert(!!process.env.connectionTableName, "db table name was undefined");
         assert(!!process.env.dbEndpoint, "db endpoint was undefined");
 
         this._dbAccessKeyId = process.env.dbAccessKeyId;
         this._dbSecretAccessKey = process.env.dbSecretAccessKey;
         this._dbRegion = process.env.dbRegion;
         this._tableName = process.env.dbTableName;
+        this._connectionTableName = process.env.connectionTableName;
         this._endpoint = process.env.dbEndpoint;
     }
 
@@ -38,6 +41,10 @@ export class DbConfiguration implements IDbConfiguration {
 
     get tableName(): string {
         return this._tableName;
+    }
+
+    get connectionTableName(): string {
+        return this._connectionTableName;
     }
 
     get endpoint(): string {

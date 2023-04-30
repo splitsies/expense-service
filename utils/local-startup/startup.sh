@@ -5,4 +5,5 @@ sls offline start \
     --param='DB_SECRET_ACCESS_KEY=local-secret-access-key' \
     --param='DB_REGION=us-west-2' \
     --param='DB_TABLE_NAME=Expense' \
+    --param='CONNECTION_TABLE_NAME=ExpenseConnection' \
     --param='DB_ENDPOINT=http://localhost:8000/'

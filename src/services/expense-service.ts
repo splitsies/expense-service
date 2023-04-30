@@ -14,7 +14,11 @@ export class ExpenseService implements IExpenseService {
         @inject(IOcrApi) private readonly _ocrApi: IOcrApi,
         @inject(IAlgorithmsApiClient) private readonly _algorithsmApiClient: IAlgorithmsApiClient,
         @inject(IExpenseMapper) private readonly _mapper: IExpenseMapper,
-    ) {}
+    ) { }
+    
+    async getExpense(id: string): Promise<IExpense> {
+        return this._expenseEngine.getExpense(id);
+    }
 
     async createExpense(): Promise<IExpense> {
         return await this._expenseEngine.createExpense();

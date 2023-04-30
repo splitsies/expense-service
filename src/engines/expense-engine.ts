@@ -7,7 +7,11 @@ import { IExpenseUpdate } from "src/models/expense-update/expense-update-interfa
 
 @injectable()
 export class ExpenseEngine implements IExpenseEngine {
-    constructor(@inject(IExpenseDao) private readonly _expenseDao: IExpenseDao) {}
+    constructor(@inject(IExpenseDao) private readonly _expenseDao: IExpenseDao) { }
+    
+    async getExpense(id: string): Promise<IExpense> {
+        return await this._expenseDao.read(id);
+    }
 
     async createExpense(): Promise<IExpense> {
         return await this._expenseDao.create(new Expense(randomUUID(), "", new Date(), [], []));

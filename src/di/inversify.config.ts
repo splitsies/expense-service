@@ -19,6 +19,16 @@ import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-a
 import { AlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client";
 import { IAlgorithmsApiConfiguration } from "src/models/configuration/algorithms-api/algorithms-api-configuration-interface";
 import { AlgorithsmApiConfiguration } from "src/models/configuration/algorithms-api/algorithms-api-configuration";
+import { IConnectionDao } from "src/dao/connection-dao/connection-dao-interface";
+import { ConnectionDao } from "src/dao/connection-dao/connection-dao";
+import { IConnectionEngine } from "src/engines/connection-engine/connection-engine-interface";
+import { ConnectionEngine } from "src/engines/connection-engine/connection-engine";
+import { IConnectionService } from "src/services/connection-service/connection-service-interface";
+import { ConnectionService } from "src/services/connection-service/connection-service";
+import { IConnectionDaoStatements } from "src/dao/connection-dao/connection-dao-statements-interface";
+import { ConnectionDaoStatements } from "src/dao/connection-dao/connection-dao-statements";
+import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
+import { ConnectionConfiguration } from "src/models/configuration/connection/connection-configuration";
 
 const container = new Container();
 
@@ -34,8 +44,15 @@ container
 container.bind<IOcrApi>(IOcrApi).to(OcrApiClient).inSingletonScope();
 container.bind<IOcrApiConfiguration>(IOcrApiConfiguration).to(OcrApiConfiguration).inSingletonScope();
 container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSingletonScope();
+container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(ConnectionConfiguration).inSingletonScope();
 container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao).inSingletonScope();
 
 container.bind<IExpenseMapper>(IExpenseMapper).to(ExpenseMapper).inSingletonScope();
+
+container.bind<IConnectionService>(IConnectionService).to(ConnectionService).inSingletonScope();
+container.bind<IConnectionEngine>(IConnectionEngine).to(ConnectionEngine).inSingletonScope();
+container.bind<IConnectionDao>(IConnectionDao).to(ConnectionDao).inSingletonScope();
+
+container.bind<IConnectionDaoStatements>(IConnectionDaoStatements).to(ConnectionDaoStatements).inSingletonScope();
 
 export { container };

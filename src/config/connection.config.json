@@ -1,0 +1,3 @@
+{
+    "connectionTtlSec": "${param:CONNECTION_TTL_SEC}"
+}
