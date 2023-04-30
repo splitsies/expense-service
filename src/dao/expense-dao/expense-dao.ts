@@ -7,7 +7,7 @@ import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { ILogger } from "@splitsies/utils";
 import { IExpenseMapper } from "src/mappers/expense-mapper/expense-mapper-interface";
-import { IExpenseDa } from "src/models/expense-da/expense-da-interface";
+import { IExpenseDto } from "src/models/expense-dto/expense-dto-interface";
 import { NotFoundError } from "src/models/error/not-found-error";
 
 @injectable()
@@ -30,12 +30,12 @@ export class ExpenseDao implements IExpenseDao {
     }
 
     async create(expense: IExpense): Promise<IExpense> {
-        const expenseDa = this._mapper.toDaModel(expense);
+        const expenseDto = this._mapper.toDtoModel(expense);
 
         const result = await this._client.send(
             new PutItemCommand({
                 TableName: this._dbConfiguration.tableName,
-                Item: marshall(expenseDa, { convertClassInstanceToMap: true }),
+                Item: marshall(expenseDto, { convertClassInstanceToMap: true }),
             }),
         );
 
@@ -54,7 +54,7 @@ export class ExpenseDao implements IExpenseDao {
         if (!readResult.Item) return undefined;
 
         const result = unmarshall(readResult.Item);
-        return result ? this._mapper.toDomainModel(result as IExpenseDa) : undefined;
+        return result ? this._mapper.toDomainModel(result as IExpenseDto) : undefined;
     }
 
     async update(updated: IExpense): Promise<IExpense> {

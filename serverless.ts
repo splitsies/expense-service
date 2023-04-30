@@ -1,6 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
 import ocrApiConfig from "./src/config/ocr-api.config.json";
+import algorithmsApiConfig from "./src/config/algorithms-api.config.json";
 import dbConfig from "./src/config/db.config.json";
 
 import createFromImage from '@functions/expense/create-from-image';
@@ -25,6 +26,7 @@ const serverlessConfiguration: AWS = {
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
             NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
             ...ocrApiConfig,
+            ...algorithmsApiConfig,
             ...dbConfig
         },
     },

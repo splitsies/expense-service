@@ -1,13 +1,13 @@
 import { injectable } from "inversify";
 import { IExpenseMapper } from "./expense-mapper-interface";
 import { Expense, IExpense } from "@splitsies/shared-models";
-import { IExpenseDa } from "src/models/expense-da/expense-da-interface";
-import { ExpenseDa } from "src/models/expense-da/expense-da";
+import { IExpenseDto } from "src/models/expense-dto/expense-dto-interface";
+import { ExpenseDto } from "src/models/expense-dto/expense-dto";
 
 @injectable()
 export class ExpenseMapper implements IExpenseMapper {
-    toDaModel(expense: IExpense): IExpenseDa {
-        return new ExpenseDa(
+    toDtoModel(expense: IExpense): IExpenseDto {
+        return new ExpenseDto(
             expense.id,
             expense.name,
             expense.transactionDate.toISOString(),
@@ -16,13 +16,13 @@ export class ExpenseMapper implements IExpenseMapper {
         );
     }
 
-    toDomainModel(expenseDa: IExpenseDa): IExpense {
+    toDomainModel(expenseDto: IExpenseDto): IExpense {
         return new Expense(
-            expenseDa.id,
-            expenseDa.name,
-            new Date(Date.parse(expenseDa.transactionDate)),
-            expenseDa.items,
-            expenseDa.proportionalItems,
+            expenseDto.id,
+            expenseDto.name,
+            new Date(Date.parse(expenseDto.transactionDate)),
+            expenseDto.items,
+            expenseDto.proportionalItems,
         );
     }
 }

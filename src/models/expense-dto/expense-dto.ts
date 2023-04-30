@@ -1,7 +1,7 @@
 import { IExpenseItem } from "@splitsies/shared-models";
-import { IExpenseDa } from "./expense-da-interface";
+import { IExpenseDto } from "./expense-dto-interface";
 
-export class ExpenseDa implements IExpenseDa {
+export class ExpenseDto implements IExpenseDto {
     constructor(
         readonly id: string,
         readonly name: string,

@@ -1,9 +1,9 @@
-import { IOcrResult, IExpense } from "@splitsies/shared-models";
+import { IExpense } from "@splitsies/shared-models";
 import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 
 export interface IExpenseEngine {
     createExpense(): Promise<IExpense>;
-    createExpenseFromImage(ocrResult: IOcrResult): Promise<IExpense>;
+    createExpenseFromImage(expense: IExpense): Promise<IExpense>;
     updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense>;
 }
 
