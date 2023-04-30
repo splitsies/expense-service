@@ -24,9 +24,7 @@ export class ImageExpenseProcessor implements IImageExpenseProcessor {
 
     process(ocrResult: IOcrResult): IExpense {
         try {
-            this._logger.debug(JSON.stringify(ocrResult, null, 2));
             const metadata = this._expenseOcrMetadataProcessor.process(ocrResult);
-            this._logger.debug(metadata as any);
 
             const name = this._nameProcessor.process(ocrResult);
             const date = this._dateProcessor.process(ocrResult);

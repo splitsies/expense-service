@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import { randomUUID } from "crypto";
-import { IOcrResult, IExpenseItem, ITextBlock, ExpenseItem } from "@splitsies/shared-models";
+import { IExpenseItem, ExpenseItem } from "@splitsies/shared-models";
 import { IExpenseProportionalItemsProcessor } from "./expense-proportional-items-processor-interface";
 import { ExpenseItemsProcessor } from "../expense-items-processor/expense-items-processor";
 
@@ -10,8 +10,8 @@ export class ExpenseProportionalItemsProcessor
     implements IExpenseProportionalItemsProcessor
 {
     protected override createExpenseItem(
-        _itemBlock: ITextBlock,
-        priceBlock: ITextBlock,
+        _itemText: string,
+        priceText: string,
         isTax: boolean,
         isTip: boolean,
         isSubtotal: boolean,
@@ -19,9 +19,9 @@ export class ExpenseProportionalItemsProcessor
         _isTotal: boolean,
     ): IExpenseItem | undefined {
         if (isTax && !(isSubtotal || isSubtotalAbbrev)) {
-            return new ExpenseItem(randomUUID(), "Tax", this.formatPrice(priceBlock.text), []);
+            return new ExpenseItem(randomUUID(), "Tax", this.formatPrice(priceText), []);
         } else if (isTip && !(isSubtotal || isSubtotalAbbrev)) {
-            return new ExpenseItem(randomUUID(), "Tip", this.formatPrice(priceBlock.text), []);
+            return new ExpenseItem(randomUUID(), "Tip", this.formatPrice(priceText), []);
         }
 
         return undefined;

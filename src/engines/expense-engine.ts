@@ -22,8 +22,7 @@ export class ExpenseEngine implements IExpenseEngine {
         const expense = this._imageExpenseProcessor.process(ocrResult);
         if (!expense) throw new ImageProcessingError("Unable to create expense from OCR data");
 
-        return expense;
-        // return await this._expenseDao.create(expense);
+        return await this._expenseDao.create(expense);
     }
 
     async updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense> {

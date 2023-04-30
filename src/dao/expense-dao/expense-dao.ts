@@ -31,7 +31,6 @@ export class ExpenseDao implements IExpenseDao {
 
     async create(expense: IExpense): Promise<IExpense> {
         const expenseDa = this._mapper.toDaModel(expense);
-        this._logger.log(marshall(expenseDa, { convertClassInstanceToMap: true }) as any);
 
         const result = await this._client.send(
             new PutItemCommand({

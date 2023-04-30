@@ -8,9 +8,6 @@ import { ExpenseRegex } from "src/constants/expense-regex";
 @injectable()
 export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
     private readonly STANDARD_DEV_THRESHOLD = 2.5;
-    private readonly SLOPE_DIFFERENCE_THRESHOLD = 0.019;
-    private readonly MEAN_SLOPE_SCALE = 0.15;
-    private readonly SearchSpaceOffset = 3;
 
     process(ocrResult: IOcrResult, metadata: IExpenseOcrMetadata): IExpenseItem[] {
         const items = new Array<IExpenseItem>();
@@ -23,15 +20,14 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
             if (!priceSearchResult || !priceSearchResult.length || block.text.includes("%")) continue;
 
             const priceBlock = ocrResult.textBlocks[i];
-            const itemBlock = this.getMatchingItem(ocrResult, i, metadata);
-            if (!itemBlock) continue;
-            
-            ExpenseRegex.Percent.exec(itemBlock.text);
-            const percentSearchResult = ExpenseRegex.Percent.test(itemBlock.text);
+            const itemName = this.getMatchingItem(ocrResult, i, metadata);
+            if (!itemName) continue;
+
+            const percentSearchResult = ExpenseRegex.Percent.test(itemName);
             const price = this.formatPrice(priceBlock.text);
 
             if (price !== 0 && price < metadata.maxPrice && !percentSearchResult) {
-                const item = this.getLineItem(itemBlock, priceBlock);
+                const item = this.getLineItem(itemName, priceBlock.text);
                 if (item) items.push(item);
             }
         }
@@ -52,8 +48,8 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
     }
 
     protected createExpenseItem(
-        itemBlock: ITextBlock,
-        priceBlock: ITextBlock,
+        itemText: string,
+        priceText: string,
         isTax: boolean,
         isTip: boolean,
         isSubtotal: boolean,
@@ -65,67 +61,35 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
         } else if (isTip && !(isSubtotal || isSubtotalAbbrev)) {
             return undefined;
         } else if (!(isSubtotal || isTotal || (isTax && isSubtotalAbbrev))) {
-            return new ExpenseItem(randomUUID(), itemBlock.text, this.formatPrice(priceBlock.text), []);
+            return new ExpenseItem(randomUUID(), itemText, this.formatPrice(priceText), []);
         }
     }
 
-    private getLineItem(itemBlock: ITextBlock, priceBlock: ITextBlock): IExpenseItem {
-        const isTax = ExpenseRegex.Tax.test(itemBlock.text);
-        const isTip = ExpenseRegex.Tip.test(itemBlock.text);
-        const isSubtotal = ExpenseRegex.Subtotal.test(itemBlock.text);
-        const isSubtotalAbbrev = ExpenseRegex.SubtotalAbbrev.test(itemBlock.text);
-        const isTotal = ExpenseRegex.Total.test(itemBlock.text);
+    private getLineItem(itemText: string, priceText: string): IExpenseItem {
+        const isTax = ExpenseRegex.Tax.test(itemText);
+        const isTip = ExpenseRegex.Tip.test(itemText);
+        const isSubtotal = ExpenseRegex.Subtotal.test(itemText);
+        const isSubtotalAbbrev = ExpenseRegex.SubtotalAbbrev.test(itemText);
+        const isTotal = ExpenseRegex.Total.test(itemText);
 
-        return this.createExpenseItem(itemBlock, priceBlock, isTax, isTip, isSubtotal, isSubtotalAbbrev, isTotal);
+        return this.createExpenseItem(itemText, priceText, isTax, isTip, isSubtotal, isSubtotalAbbrev, isTotal);
     }
 
-    private getMatchingItem(ocrResult: IOcrResult, priceBlockIndex: number, metadata: IExpenseOcrMetadata): ITextBlock {
-        const dollarRegex = /(\s?\d+\s?$|s?\$\s?$)/;
-        // return match
+    private getMatchingItem(ocrResult: IOcrResult, priceBlockIndex: number, metadata: IExpenseOcrMetadata): string {
         const priceBlock = ocrResult.textBlocks[priceBlockIndex];
-        let searchSpace = [
-            ...ocrResult.textBlocks.slice(Math.min(0, priceBlockIndex - this.SearchSpaceOffset)),
-            ...ocrResult.textBlocks.slice(priceBlockIndex + 1 + this.SearchSpaceOffset, ocrResult.textBlocks.length),
-        ]
-            .filter((b) => this.isValidSlope(b, priceBlock, metadata))
-            .sort(
-                (a, b) =>
-                    metadata.slopeMean * this.MEAN_SLOPE_SCALE -
-                    this.getSlope(a.boundingBox, ocrResult.textBlocks[priceBlockIndex].boundingBox) -
-                    (metadata.slopeMean * this.MEAN_SLOPE_SCALE -
-                        this.getSlope(b.boundingBox, ocrResult.textBlocks[priceBlockIndex].boundingBox)),
-            );
 
-        if (!searchSpace.length) return undefined;
-        if (searchSpace.length === 1) return searchSpace[0];
-
-        // Items are likeky on the same line if the difference between slopes is small
-        if (
-            Math.abs(
-                this.getSlope(searchSpace[0].boundingBox, priceBlock.boundingBox) -
-                    this.getSlope(searchSpace[1].boundingBox, priceBlock.boundingBox),
-            ) > this.SLOPE_DIFFERENCE_THRESHOLD
-        ) {
-            return dollarRegex.test(searchSpace[0].text) ? searchSpace[1] : searchSpace[0];
+        // join the text of everything preceding the price block until we don't have a valid slope
+        // i.e. find the words before the price on the same line
+        let prev = priceBlockIndex - 1;
+        let blocks = [];
+        while (prev >= 0 && this.isValidSlope(ocrResult.textBlocks[prev], priceBlock, metadata)) {
+            blocks = [ocrResult.textBlocks[prev], ...blocks];
+            prev -= 1;
         }
 
-        // Check if one of the top two matches a quantity or dollar sign
-        if (dollarRegex.test(searchSpace[0].text)) {
-            return searchSpace[1];
-        }
-        if (dollarRegex.test(searchSpace[1].text)) {
-            return searchSpace[0];
-        }
+        if (blocks.length === 0) return undefined;
 
-        // If neither matches non-qualifying item names, choose the one with the greater distance
-        return this.getDistance(searchSpace[0].boundingBox, priceBlock.boundingBox) >
-            this.getDistance(searchSpace[1].boundingBox, priceBlock.boundingBox)
-            ? searchSpace[0]
-            : searchSpace[1];
-    }
-
-    private getDistance(box1: IBoundingBox, box2: IBoundingBox): number {
-        return Math.pow(box1.left - box2.left, 2) + Math.pow(box1.top - box2.top, 2);
+        return blocks.map((b) => b.text).join(" ");
     }
 
     private getSlope(itemBox: IBoundingBox, priceBox: IBoundingBox): number {
