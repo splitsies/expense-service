@@ -8,7 +8,7 @@ import { ExpenseRegex } from "../../constants/expense-regex";
 
 @injectable()
 export class ExpenseOcrMetadataProcessor implements IExpenseOcrMetadataProcessor {
-    private static readonly OUTLIER_SLOPE_THRESHOLD = 1;
+    private static readonly OUTLIER_SLOPE_THRESHOLD = 1.5;
 
     process(ocrResult: IOcrResult): IExpenseOcrMetadata {
         let maxPrice = -Infinity;
@@ -24,14 +24,14 @@ export class ExpenseOcrMetadataProcessor implements IExpenseOcrMetadataProcessor
             if (Math.min(priceBlock.boundingBox.top, itemBlock.boundingBox.top) > lastTotalPosition) continue;
 
             const priceSearchResult = ExpenseRegex.Price.exec(priceBlock.text);
-            if (!priceSearchResult.length || priceBlock.text.includes("%")) continue;
+            if (!priceSearchResult || !priceSearchResult.length || priceBlock.text.includes("%")) continue;
 
             const slope = this.getSlope(itemBlock.boundingBox, priceBlock.boundingBox);
             if (Math.abs(slope) < ExpenseOcrMetadataProcessor.OUTLIER_SLOPE_THRESHOLD) slopes.push(slope);
 
             // Match price_block against both price and total in case it was picked up as one line
             if (ExpenseRegex.Total.test(priceBlock.text) || ExpenseRegex.Total.test(itemBlock.text)) {
-                maxPrice = Math.max(maxPrice, parseFloat(priceSearchResult[0]));
+                maxPrice = Math.max(maxPrice, this.formatPrice(priceSearchResult[0]));
             }
         }
 
@@ -68,5 +68,17 @@ export class ExpenseOcrMetadataProcessor implements IExpenseOcrMetadataProcessor
 
     private getSlope(itemBox: IBoundingBox, priceBox: IBoundingBox): number {
         return (priceBox.top - itemBox.top) / (priceBox.left - itemBox.left);
+    }
+
+    private formatPrice(priceText: string): number {
+        //    Formats price string to (-)0.00 format
+        if (priceText[0] === priceText && priceText[priceText.length - 1] === ")") {
+            // Negative denoted by parentheses -- Replace the parentheses with negative sign
+            priceText = `$-${priceText.slice(1, priceText.length)}`;
+        }
+
+        // Reformat the price by stripping all non-numeric characters and replacing the decimal
+        const strippedPrice = priceText.replace(/[^\-\d\.]/, "");
+        return parseFloat(strippedPrice);
     }
 }

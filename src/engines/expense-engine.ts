@@ -5,6 +5,7 @@ import { IExpenseEngine } from "./expense-engine-interface";
 import { IImageExpenseProcessor } from "src/processors/image-expense-processor/image-expense-processor-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
+import { ImageProcessingError } from "src/models/error/image-processing-error";
 
 @injectable()
 export class ExpenseEngine implements IExpenseEngine {
@@ -19,9 +20,10 @@ export class ExpenseEngine implements IExpenseEngine {
 
     async createExpenseFromImage(ocrResult: IOcrResult): Promise<IExpense> {
         const expense = this._imageExpenseProcessor.process(ocrResult);
-        if (!expense) throw new Error("Unable to create expense from OCR data");
+        if (!expense) throw new ImageProcessingError("Unable to create expense from OCR data");
 
-        return await this._expenseDao.create(expense);
+        return expense;
+        // return await this._expenseDao.create(expense);
     }
 
     async updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense> {

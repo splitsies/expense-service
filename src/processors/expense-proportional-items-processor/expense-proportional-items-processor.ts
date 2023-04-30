@@ -19,9 +19,9 @@ export class ExpenseProportionalItemsProcessor
         _isTotal: boolean,
     ): IExpenseItem | undefined {
         if (isTax && !(isSubtotal || isSubtotalAbbrev)) {
-            return new ExpenseItem(randomUUID(), "Tax", parseFloat(priceBlock.text), []);
+            return new ExpenseItem(randomUUID(), "Tax", this.formatPrice(priceBlock.text), []);
         } else if (isTip && !(isSubtotal || isSubtotalAbbrev)) {
-            return new ExpenseItem(randomUUID(), "Tip", parseFloat(priceBlock.text), []);
+            return new ExpenseItem(randomUUID(), "Tip", this.formatPrice(priceBlock.text), []);
         }
 
         return undefined;

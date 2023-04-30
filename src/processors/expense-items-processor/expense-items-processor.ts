@@ -7,8 +7,9 @@ import { ExpenseRegex } from "src/constants/expense-regex";
 
 @injectable()
 export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
-    private readonly STANDARD_DEV_THRESHOLD = 3;
-    private readonly SLOPE_DIFFERENCE_THRESHOLD = 3;
+    private readonly STANDARD_DEV_THRESHOLD = 2.5;
+    private readonly SLOPE_DIFFERENCE_THRESHOLD = 0.019;
+    private readonly MEAN_SLOPE_SCALE = 0.15;
     private readonly SearchSpaceOffset = 3;
 
     process(ocrResult: IOcrResult, metadata: IExpenseOcrMetadata): IExpenseItem[] {
@@ -19,21 +20,35 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
             if (block.boundingBox.top > metadata.lastTotalPosition) break;
 
             const priceSearchResult = ExpenseRegex.Price.exec(block.text);
-            if (!priceSearchResult.length || block.text.includes("%")) continue;
+            if (!priceSearchResult || !priceSearchResult.length || block.text.includes("%")) continue;
+
             const priceBlock = ocrResult.textBlocks[i];
             const itemBlock = this.getMatchingItem(ocrResult, i, metadata);
             if (!itemBlock) continue;
-            // format price
+            
             ExpenseRegex.Percent.exec(itemBlock.text);
             const percentSearchResult = ExpenseRegex.Percent.test(itemBlock.text);
-            const price = parseFloat(priceBlock.text);
+            const price = this.formatPrice(priceBlock.text);
 
             if (price !== 0 && price < metadata.maxPrice && !percentSearchResult) {
-                items.push(this.getLineItem(itemBlock, priceBlock));
+                const item = this.getLineItem(itemBlock, priceBlock);
+                if (item) items.push(item);
             }
         }
 
         return items;
+    }
+
+    protected formatPrice(priceText: string): number {
+        // Formats price string to (-)0.00 format
+        if (priceText[0] === priceText && priceText[priceText.length - 1] === ")") {
+            // Negative denoted by parentheses -- Replace the parentheses with negative sign
+            priceText = `$-${priceText.slice(1, priceText.length)}`;
+        }
+
+        // Reformat the price by stripping all non-numeric characters and replacing the decimal
+        const strippedPrice = priceText.replace(/[^\-\d\.]/, "");
+        return parseFloat(strippedPrice);
     }
 
     protected createExpenseItem(
@@ -50,7 +65,7 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
         } else if (isTip && !(isSubtotal || isSubtotalAbbrev)) {
             return undefined;
         } else if (!(isSubtotal || isTotal || (isTax && isSubtotalAbbrev))) {
-            return new ExpenseItem(randomUUID(), itemBlock.text, parseFloat(priceBlock.text), []);
+            return new ExpenseItem(randomUUID(), itemBlock.text, this.formatPrice(priceBlock.text), []);
         }
     }
 
@@ -68,14 +83,21 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
         const dollarRegex = /(\s?\d+\s?$|s?\$\s?$)/;
         // return match
         const priceBlock = ocrResult.textBlocks[priceBlockIndex];
-        const searchSpace = [
+        let searchSpace = [
             ...ocrResult.textBlocks.slice(Math.min(0, priceBlockIndex - this.SearchSpaceOffset)),
             ...ocrResult.textBlocks.slice(priceBlockIndex + 1 + this.SearchSpaceOffset, ocrResult.textBlocks.length),
-        ].filter((b) => this.isValidSlope(b, priceBlock, metadata));
+        ]
+            .filter((b) => this.isValidSlope(b, priceBlock, metadata))
+            .sort(
+                (a, b) =>
+                    metadata.slopeMean * this.MEAN_SLOPE_SCALE -
+                    this.getSlope(a.boundingBox, ocrResult.textBlocks[priceBlockIndex].boundingBox) -
+                    (metadata.slopeMean * this.MEAN_SLOPE_SCALE -
+                        this.getSlope(b.boundingBox, ocrResult.textBlocks[priceBlockIndex].boundingBox)),
+            );
 
-        if (searchSpace.length === 1) {
-            return searchSpace[0];
-        }
+        if (!searchSpace.length) return undefined;
+        if (searchSpace.length === 1) return searchSpace[0];
 
         // Items are likeky on the same line if the difference between slopes is small
         if (
@@ -120,23 +142,5 @@ export class ExpenseItemsProcessor implements IExpenseItemsProcessor {
 
         // 65-95-99.7 rule - 99.7% of distribution is within 3 std from the mean
         return slope > metadata.slopeMean - threshold && slope < metadata.slopeMean + threshold;
-    }
-
-    private formatPrice(priceText: string): string {
-        //    Formats price string to (-)0.00 format
-        //   '''
-        if (priceText[0] === priceText && priceText[priceText.length - 1] === ")") {
-            // Negative denoted by parentheses
-            // Replace the parentheses with negative sign
-            priceText = `$-${priceText.slice(1, priceText.length)}`;
-
-            // Reformat the price by stripping all non-numeric characters and replacing the decimal
-            // stripped_price = re.sub(r'[^\-\d]', '', price_text)
-            // price_text = stripped_price[:-2] + '.' + \
-            //     stripped_price[-2:] if len(stripped_price) > 2 else stripped_price
-
-            // return price_text
-        }
-        return priceText;
     }
 }

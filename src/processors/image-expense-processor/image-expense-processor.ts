@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { randomUUID } from "crypto";
 import { IOcrResult, IExpense, Expense } from "@splitsies/shared-models";
+import { ILogger } from "@splitsies/utils";
 import { IImageExpenseProcessor } from "./image-expense-processor-interface";
 import { IExpenseOcrMetadataProcessor } from "../expense-ocr-metadata-processor/expense-ocr-metadata-processor-interface";
 import { IExpenseNameProcessor } from "../expense-name-processor/expense-name-processor-interface";
@@ -11,6 +12,7 @@ import { IExpenseDateProcessor } from "../expense-date-processor/expense-date-pr
 @injectable()
 export class ImageExpenseProcessor implements IImageExpenseProcessor {
     constructor(
+        @inject(ILogger) private readonly _logger: ILogger,
         @inject(IExpenseOcrMetadataProcessor)
         private readonly _expenseOcrMetadataProcessor: IExpenseOcrMetadataProcessor,
         @inject(IExpenseNameProcessor) private readonly _nameProcessor: IExpenseNameProcessor,
@@ -21,13 +23,20 @@ export class ImageExpenseProcessor implements IImageExpenseProcessor {
     ) {}
 
     process(ocrResult: IOcrResult): IExpense {
-        const metadata = this._expenseOcrMetadataProcessor.process(ocrResult);
+        try {
+            this._logger.debug(JSON.stringify(ocrResult, null, 2));
+            const metadata = this._expenseOcrMetadataProcessor.process(ocrResult);
+            this._logger.debug(metadata as any);
 
-        const name = this._nameProcessor.process(ocrResult);
-        const date = this._dateProcessor.process(ocrResult);
-        const items = this._itemsProcessor.process(ocrResult, metadata);
-        const proportionalItems = this._proportionalItemsProcessor.process(ocrResult, metadata);
+            const name = this._nameProcessor.process(ocrResult);
+            const date = this._dateProcessor.process(ocrResult);
+            const items = this._itemsProcessor.process(ocrResult, metadata);
+            const proportionalItems = this._proportionalItemsProcessor.process(ocrResult, metadata);
 
-        return new Expense(randomUUID(), name, date, items, proportionalItems);
+            return new Expense(randomUUID(), name, date, items, proportionalItems);
+        } catch (e) {
+            this._logger.error(e);
+            return undefined;
+        }
     }
 }

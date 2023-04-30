@@ -4,8 +4,6 @@ import { IExpenseService } from "../services/expense-service-interface";
 import { ExpenseService } from "../services/expense-service";
 import { IExpenseEngine } from "../engines/expense-engine-interface";
 import { ExpenseEngine } from "../engines/expense-engine";
-import { IExpenseRepository } from "../repositories/expense-repository-interface";
-import { ExpenseRepository } from "../repositories/expense-repository";
 import { IImageExpenseProcessor } from "../processors/image-expense-processor/image-expense-processor-interface";
 import { ImageExpenseProcessor } from "../processors/image-expense-processor/image-expense-processor";
 import { IExpenseOcrMetadataProcessor } from "../processors/expense-ocr-metadata-processor/expense-ocr-metadata-processor-interface";
@@ -36,7 +34,6 @@ container.bind<ILogger>(ILogger).to(Logger).inSingletonScope();
 
 container.bind<IExpenseService>(IExpenseService).to(ExpenseService).inSingletonScope();
 container.bind<IExpenseEngine>(IExpenseEngine).to(ExpenseEngine).inSingletonScope();
-container.bind<IExpenseRepository>(IExpenseRepository).to(ExpenseRepository).inSingletonScope();
 container.bind<IImageExpenseProcessor>(IImageExpenseProcessor).to(ImageExpenseProcessor).inSingletonScope();
 
 container
