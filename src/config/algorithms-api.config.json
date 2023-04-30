@@ -1,0 +1,3 @@
+{
+    "ALGORITHMS_API_URI": "${param:ALGORITHMS_API_URI}"
+}

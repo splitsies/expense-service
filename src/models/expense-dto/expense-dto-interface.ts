@@ -1,6 +1,6 @@
 import { IExpenseItem } from "@splitsies/shared-models";
 
-export interface IExpenseDa {
+export interface IExpenseDto {
     readonly id: string;
     readonly name: string;
     readonly transactionDate: string;
