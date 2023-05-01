@@ -7,7 +7,6 @@ import connectionConfig from "./src/config/connection.config.json";
 
 import createFromImage from '@functions/expense/create-from-image';
 import create from '@functions/expense/create';
-import update from '@functions/expense/update';
 
 import connect from '@functions/connection/connect';
 import disconnect from '@functions/connection/disconnect';
@@ -39,7 +38,7 @@ const serverlessConfiguration: AWS = {
         },
     },
     // import the function via paths
-    functions: { create, createFromImage, update, connect, disconnect, updateExpense, deleteExpiredConnections },
+    functions: { create, createFromImage, connect, disconnect, updateExpense, deleteExpiredConnections },
     package: { individually: true },
     custom: {
         apigUri: { 'Fn::GetAtt': ['HttpApi', 'ApiEndpoint'] },
