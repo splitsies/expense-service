@@ -2,12 +2,11 @@ import "reflect-metadata";
 import schema from "./schema";
 import { ILogger, SplitsiesFunctionHandlerFactory } from "@splitsies/utils";
 import { container } from "src/di/inversify.config";
-import { DataResponse, HttpStatusCode } from "@splitsies/shared-models";
+import { DataResponse, HttpStatusCode, IExpenseUpdate } from "@splitsies/shared-models";
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 import { middyfyWs } from "@libs/lambda";
 import { IExpenseService } from "src/services/expense-service-interface";
 import { sendMessage } from "@libs/broadcast";
-import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
 
 const logger = container.get<ILogger>(ILogger);

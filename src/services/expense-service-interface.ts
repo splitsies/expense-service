@@ -1,5 +1,4 @@
-import { IExpense } from "@splitsies/shared-models";
-import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
+import { IExpense, IExpenseUpdate } from "@splitsies/shared-models";
 
 export interface IExpenseService {
     getExpense(id: string): Promise<IExpense>;
