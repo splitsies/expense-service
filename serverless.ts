@@ -19,7 +19,7 @@ const serverlessConfiguration: AWS = {
     app: 'expense-service',
     service: 'expense-service',
     frameworkVersion: '3',
-    plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-offline-scheduler'],
+    plugins: ['serverless-esbuild', 'serverless-offline'],
     provider: {
         name: 'aws',
         stage: 'dev',
