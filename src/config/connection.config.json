@@ -1,0 +1,5 @@
+{
+    "connectionTtlSec": "${param:CONNECTION_TTL_SEC}",
+    "deleteExpiredIntervalMin": "${param:DELETE_EXPIRED_INTERVAL_MIN}",
+    "gatewayUrl": "${param:APIG_URL}"
+}

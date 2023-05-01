@@ -21,6 +21,7 @@
     "@aws-sdk/util-dynamodb": "^3.321.1",
     "@middy/core": "^3.4.0",
     "@middy/http-json-body-parser": "^3.4.0",
+    "@middy/ws-json-body-parser": "^4.4.0",
     "@splitsies/shared-models": "0.0.8",
     "@splitsies/utils": "0.0.11",
     "inversify": "6.0.1",

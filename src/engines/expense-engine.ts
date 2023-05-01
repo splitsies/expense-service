@@ -9,6 +9,10 @@ import { IExpenseUpdate } from "src/models/expense-update/expense-update-interfa
 export class ExpenseEngine implements IExpenseEngine {
     constructor(@inject(IExpenseDao) private readonly _expenseDao: IExpenseDao) {}
 
+    async getExpense(id: string): Promise<IExpense> {
+        return await this._expenseDao.read(id);
+    }
+
     async createExpense(): Promise<IExpense> {
         return await this._expenseDao.create(new Expense(randomUUID(), "", new Date(), [], []));
     }
@@ -19,7 +23,13 @@ export class ExpenseEngine implements IExpenseEngine {
 
     async updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense> {
         return await this._expenseDao.update(
-            new Expense(id, updated.name, updated.transactionDate, updated.items, updated.proportionalItems),
+            new Expense(
+                id,
+                updated.name,
+                new Date(Date.parse(updated.transactionDate)),
+                updated.items,
+                updated.proportionalItems,
+            ),
         );
     }
 }
