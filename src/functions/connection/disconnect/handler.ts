@@ -9,7 +9,6 @@ const logger = container.get<ILogger>(ILogger);
 const connectionService = container.get<IConnectionService>(IConnectionService);
 
 export const main = SplitsiesFunctionHandlerFactory.create<typeof schema, any>(logger, async (event) => {
-    console.log({ disconnectionId: event.requestContext.connectionId });
     await connectionService.delete(event.requestContext.connectionId);
     return new DataResponse(HttpStatusCode.OK, undefined).toJson();
 });
