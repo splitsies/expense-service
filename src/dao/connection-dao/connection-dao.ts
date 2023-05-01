@@ -33,7 +33,7 @@ export class ConnectionDao implements IConnectionDao {
         const result = await this._client.send(
             new ExecuteStatementCommand({
                 Statement: this._statements.GetExpenseIdForConnection,
-                Parameters: [{ S: connectionId }],
+                Parameters: [{ S: connectionId }, { N: Date.now().toString() }],
             }),
         );
 
@@ -44,7 +44,7 @@ export class ConnectionDao implements IConnectionDao {
         const result = await this._client.send(
             new ExecuteStatementCommand({
                 Statement: this._statements.GetConnectionIdsForExpense,
-                Parameters: [{ S: expenseId }],
+                Parameters: [{ S: expenseId }, { N: Date.now().toString() }],
             }),
         );
 
@@ -103,14 +103,23 @@ export class ConnectionDao implements IConnectionDao {
     async deleteExpiredConnections(): Promise<string[]> {
         const result = await this._client.send(
             new ExecuteStatementCommand({
-                Statement: this._statements.GetExpiredConnectionIds,
+                Statement: this._statements.GetExpiredConnections,
                 Parameters: [{ N: Date.now().toString() }],
             }),
         );
 
-        const expiredIds = result.Items.map((i) => unmarshall(i) as { connectionId: string; expenseId: string });
-        await Promise.all(expiredIds.map((ids) => this.delete(ids.connectionId, ids.expenseId)));
+        const expired = result.Items.map((i) => unmarshall(i) as IConnection);
 
-        return expiredIds.map((i) => i.connectionId);
+        if (expired.length <= 0) {
+            this._logger.log(`No expired connections to clean up`);
+            return [];
+        }
+
+        await Promise.all(expired.map((connection) => this.delete(connection.connectionId, connection.expenseId)));
+        this._logger.log(
+            `Successfully deleted expired connections: ${expired.map((c) => `${c.connectionId}::${c.ttl}`).join(",")}`,
+        );
+
+        return expired.map((i) => i.connectionId);
     }
 }

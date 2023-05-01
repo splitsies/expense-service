@@ -14,15 +14,8 @@ export const main = middyfy(
     SplitsiesFunctionHandlerFactory.create<typeof schema, IExpense | string>(logger, async (event) => {
         const { id, expense } = event.body;
 
-        const update = {
-            name: expense.name,
-            transactionDate: new Date(Date.parse(expense.transactionDate)),
-            items: expense.items,
-            proportionalItems: expense.proportionalItems,
-        } as IExpenseUpdate;
-
         try {
-            const result = await expenseService.updateExpense(id, update);
+            const result = await expenseService.updateExpense(id, expense as IExpenseUpdate);
             return new DataResponse(HttpStatusCode.OK, result).toJson();
         } catch (e) {
             if (e instanceof NotFoundError) {

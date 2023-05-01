@@ -6,14 +6,14 @@ import { IDbConfiguration } from "src/models/configuration/db/db-configuration-i
 export class ConnectionDaoStatements implements IConnectionDaoStatements {
     readonly GetExpenseIdForConnection: string;
     readonly GetConnectionIdsForExpense: string;
-    readonly GetExpiredConnectionIds: string;
+    readonly GetExpiredConnections: string;
     readonly GetByConnectionId: string;
 
-    constructor(@inject(IDbConfiguration) _dbConfiguration: IDbConfiguration) {
-        const table = _dbConfiguration.connectionTableName;
-        this.GetConnectionIdsForExpense = `SELECT connectionId FROM ${table} WHERE expenseId = ?`;
-        this.GetExpenseIdForConnection = `SELECT expenseId FROM ${table} WHERE connectionId = ?`;
-        this.GetExpiredConnectionIds = `SELECT connectionId, expenseId FROM ${table} WHERE ttl > ?`;
+    constructor(@inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
+        const table = dbConfiguration.connectionTableName;
+        this.GetConnectionIdsForExpense = `SELECT connectionId FROM ${table} WHERE expenseId = ? AND ttl >= ?`;
+        this.GetExpenseIdForConnection = `SELECT expenseId FROM ${table} WHERE connectionId = ? AND ttl >= ?`;
+        this.GetExpiredConnections = `SELECT * FROM ${table} WHERE ttl < ?`;
         this.GetByConnectionId = `SELECT * FROM ${table} WHERE connectionId = ?`;
     }
 }

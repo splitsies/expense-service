@@ -34,6 +34,11 @@ export class ConnectionEngine implements IConnectionEngine {
         await this._connectionDao.delete(connectionId);
     }
 
+    async deleteExpired(): Promise<void> {
+        await this._connectionDao.deleteExpiredConnections();
+        return;
+    }
+
     async getRelatedConnections(connectionId: string): Promise<string[]> {
         const expenseId = await this._connectionDao.getExpenseIdForConnection(connectionId);
         return await this._connectionDao.getConnectionsForExpense(expenseId);

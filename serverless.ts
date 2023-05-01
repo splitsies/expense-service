@@ -12,13 +12,14 @@ import update from '@functions/expense/update';
 import connect from '@functions/connection/connect';
 import disconnect from '@functions/connection/disconnect';
 import updateExpense from '@functions/connection/update-expense';
+import deleteExpiredConnections from '@functions/connection/delete-expired';
 
 const serverlessConfiguration: AWS = {
     org: 'splitsies',
     app: 'expense-service',
     service: 'expense-service',
     frameworkVersion: '3',
-    plugins: ['serverless-esbuild', 'serverless-offline'],
+    plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-offline-scheduler'],
     provider: {
         name: 'aws',
         stage: 'dev',
@@ -38,7 +39,7 @@ const serverlessConfiguration: AWS = {
         },
     },
     // import the function via paths
-    functions: { create, createFromImage, update, connect, disconnect, updateExpense },
+    functions: { create, createFromImage, update, connect, disconnect, updateExpense, deleteExpiredConnections },
     package: { individually: true },
     custom: {
         apigUri: { 'Fn::GetAtt': ['HttpApi', 'ApiEndpoint'] },

@@ -1,7 +1,7 @@
 export interface IConnectionDaoStatements {
     readonly GetExpenseIdForConnection: string;
     readonly GetConnectionIdsForExpense: string;
-    readonly GetExpiredConnectionIds: string;
+    readonly GetExpiredConnections: string;
     readonly GetByConnectionId: string;
 }
 
