@@ -8,13 +8,18 @@ import { IOcrApiConfiguration } from "src/models/configuration/ocr-api/ocr-api-c
 import { OcrApiConfiguration } from "src/models/configuration/ocr-api/ocr-api-configuration";
 import { IOcrApi } from "src/api/ocr-api/ocr-api-client-interface";
 import { OcrApiClient } from "src/api/ocr-api/ocr-api-client";
-import { ILogger, Logger } from "@splitsies/utils";
+import {
+    ExpenseMapper,
+    ExpenseUpdateMapper,
+    IExpenseMapper,
+    IExpenseUpdateMapper,
+    ILogger,
+    Logger,
+} from "@splitsies/utils";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { DbConfiguration } from "src/models/configuration/db/db-configuration";
 import { ExpenseDao } from "src/dao/expense-dao/expense-dao";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
-import { IExpenseMapper } from "src/mappers/expense-mapper/expense-mapper-interface";
-import { ExpenseMapper } from "src/mappers/expense-mapper/expense-mapper";
 import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client-interface";
 import { AlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client";
 import { IAlgorithmsApiConfiguration } from "src/models/configuration/algorithms-api/algorithms-api-configuration-interface";
@@ -48,6 +53,7 @@ container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(Connection
 container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao).inSingletonScope();
 
 container.bind<IExpenseMapper>(IExpenseMapper).to(ExpenseMapper).inSingletonScope();
+container.bind<IExpenseUpdateMapper>(IExpenseUpdateMapper).to(ExpenseUpdateMapper).inSingletonScope();
 
 container.bind<IConnectionService>(IConnectionService).to(ConnectionService).inSingletonScope();
 container.bind<IConnectionEngine>(IConnectionEngine).to(ConnectionEngine).inSingletonScope();

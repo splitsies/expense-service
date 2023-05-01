@@ -1,12 +1,11 @@
 import { inject, injectable } from "inversify";
-import { IExpense } from "@splitsies/shared-models";
+import { IExpense, IExpenseUpdate } from "@splitsies/shared-models";
 import { IExpenseService } from "./expense-service-interface";
 import { IExpenseEngine } from "../engines/expense-engine-interface";
 import { IOcrApi } from "../api/ocr-api/ocr-api-client-interface";
 import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client-interface";
 import { ImageProcessingError } from "src/models/error/image-processing-error";
-import { IExpenseMapper } from "src/mappers/expense-mapper/expense-mapper-interface";
-import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
+import { IExpenseMapper } from "@splitsies/utils";
 
 @injectable()
 export class ExpenseService implements IExpenseService {

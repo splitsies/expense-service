@@ -1,13 +1,11 @@
 import { inject, injectable } from "inversify";
-import { IExpense } from "@splitsies/shared-models";
+import { IExpense, IExpenseDto } from "@splitsies/shared-models";
 import { IExpenseDao } from "./expense-dao-interface";
 
 import { DynamoDBClient, PutItemCommand, GetItemCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
-import { ILogger } from "@splitsies/utils";
-import { IExpenseMapper } from "src/mappers/expense-mapper/expense-mapper-interface";
-import { IExpenseDto } from "src/models/expense-dto/expense-dto-interface";
+import { IExpenseMapper, ILogger } from "@splitsies/utils";
 import { NotFoundError } from "src/models/error/not-found-error";
 
 @injectable()

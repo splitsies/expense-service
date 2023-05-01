@@ -1,5 +1,4 @@
-import { IDataResponse, IOcrResult } from "@splitsies/shared-models";
-import { IExpenseDto } from "src/models/expense-dto/expense-dto-interface";
+import { IDataResponse, IExpenseDto, IOcrResult } from "@splitsies/shared-models";
 
 export interface IAlgorithmsApiClient {
     processImage(ocrResult: IOcrResult): Promise<IDataResponse<IExpenseDto>>;

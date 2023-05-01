@@ -4,10 +4,14 @@ import { IExpense, Expense } from "@splitsies/shared-models";
 import { IExpenseEngine } from "./expense-engine-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
+import { IExpenseUpdateMapper } from "@splitsies/utils";
 
 @injectable()
 export class ExpenseEngine implements IExpenseEngine {
-    constructor(@inject(IExpenseDao) private readonly _expenseDao: IExpenseDao) {}
+    constructor(
+        @inject(IExpenseDao) private readonly _expenseDao: IExpenseDao,
+        @inject(IExpenseUpdateMapper) private readonly _expenseUpdateMapper: IExpenseUpdateMapper,
+    ) {}
 
     async getExpense(id: string): Promise<IExpense> {
         return await this._expenseDao.read(id);
@@ -22,14 +26,6 @@ export class ExpenseEngine implements IExpenseEngine {
     }
 
     async updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense> {
-        return await this._expenseDao.update(
-            new Expense(
-                id,
-                updated.name,
-                new Date(Date.parse(updated.transactionDate)),
-                updated.items,
-                updated.proportionalItems,
-            ),
-        );
+        return await this._expenseDao.update(this._expenseUpdateMapper.toDomainModel(updated, id));
     }
 }

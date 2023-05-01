@@ -1,9 +1,8 @@
 import { SplitsiesApiClientBase } from "@splitsies/utils";
 import { inject, injectable } from "inversify";
 import { IAlgorithmsApiClient } from "./algorithms-api-client-interface";
-import { IOcrResult, IDataResponse } from "@splitsies/shared-models";
+import { IOcrResult, IDataResponse, IExpenseDto } from "@splitsies/shared-models";
 import { IAlgorithmsApiConfiguration } from "src/models/configuration/algorithms-api/algorithms-api-configuration-interface";
-import { IExpenseDto } from "src/models/expense-dto/expense-dto-interface";
 
 @injectable()
 export class AlgorithmsApiClient extends SplitsiesApiClientBase implements IAlgorithmsApiClient {

@@ -82,7 +82,7 @@ export class ConnectionDao implements IConnectionDao {
         return await this.create(updated);
     }
 
-    async delete(id: string, expenseId: string = undefined): Promise<void> {
+    async delete(id: string, expenseId?: string): Promise<void> {
         if (!expenseId) expenseId = await this.getExpenseIdForConnection(id);
         if (!expenseId) {
             this._logger.warn(`Attempted to delete connection id=${id} that did not exist`);
