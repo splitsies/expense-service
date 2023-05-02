@@ -1,5 +1,5 @@
 import { IExpense } from "@splitsies/shared-models";
-import { IDao } from "../dao-interface";
+import { IDao } from "@splitsies/utils";
 
-export interface IExpenseDao extends IDao<IExpense, string> {}
+export interface IExpenseDao extends IDao<IExpense> {}
 export const IExpenseDao = Symbol.for("IExpenseDao");

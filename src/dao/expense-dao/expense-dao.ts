@@ -2,8 +2,7 @@ import { inject, injectable } from "inversify";
 import { IExpense, IExpenseDto } from "@splitsies/shared-models";
 import { IExpenseDao } from "./expense-dao-interface";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
-import { IExpenseMapper, ILogger } from "@splitsies/utils";
-import { DaoBase } from "../dao-base";
+import { DaoBase, IExpenseMapper, ILogger } from "@splitsies/utils";
 
 @injectable()
 export class ExpenseDao extends DaoBase<IExpense, IExpenseDto> implements IExpenseDao {

@@ -1,13 +1,11 @@
 import { inject, injectable } from "inversify";
 import { IConnectionDao } from "./connection-dao-interface";
 import { IConnection } from "src/models/connection/connection-interface";
-import { ILogger } from "@splitsies/utils";
+import { DaoBase, ILogger } from "@splitsies/utils";
 import { ExecuteStatementCommand } from "@aws-sdk/client-dynamodb";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { IConnectionDaoStatements } from "./connection-dao-statements-interface";
-import { DaoBase } from "../dao-base";
-
 @injectable()
 export class ConnectionDao extends DaoBase<IConnection> implements IConnectionDao {
     constructor(
@@ -56,7 +54,7 @@ export class ConnectionDao extends DaoBase<IConnection> implements IConnectionDa
             return [];
         }
 
-        await Promise.all(expired.map((connection) => this.delete(connection.connectionId, connection.expenseId)));
+        await Promise.all(expired.map((connection) => this.delete(this._keySelector(connection))));
         this._logger.log(
             `Successfully deleted expired connections: ${expired.map((c) => `${c.connectionId}::${c.ttl}`).join(",")}`,
         );
