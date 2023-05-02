@@ -1,7 +1,7 @@
+import { IDao } from "@splitsies/utils";
 import { IConnection } from "src/models/connection/connection-interface";
-import { IDao } from "../dao-interface";
 
-export interface IConnectionDao extends IDao<IConnection, string> {
+export interface IConnectionDao extends IDao<IConnection> {
     getExpenseIdForConnection(connectionId: string): Promise<string>;
     getConnectionsForExpense(expenseId: string): Promise<string[]>;
     deleteExpiredConnections(): Promise<string[]>;

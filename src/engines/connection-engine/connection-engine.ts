@@ -22,16 +22,18 @@ export class ConnectionEngine implements IConnectionEngine {
     }
 
     async refreshTtl(connectionId: string): Promise<IConnection> {
-        const existing = await this._connectionDao.read(connectionId);
+        const expenseId = await this._connectionDao.getExpenseIdForConnection(connectionId);
+        const existing = await this._connectionDao.read({ connectionId, expenseId });
         if (!existing) throw new NotFoundError(`Could not find connection with id=${connectionId}`);
 
-        return await this._connectionDao.create(
+        return await this._connectionDao.update(
             new Connection(existing.connectionId, existing.expenseId, Date.now() + this._connectionConfiguration.ttlMs),
         );
     }
 
     async deleteConnection(connectionId: string): Promise<void> {
-        await this._connectionDao.delete(connectionId);
+        const expenseId = this._connectionDao.getExpenseIdForConnection(connectionId);
+        await this._connectionDao.delete({ connectionId, expenseId });
     }
 
     async deleteExpired(): Promise<void> {
