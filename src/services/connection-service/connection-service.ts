@@ -1,11 +1,11 @@
 import { inject, injectable } from "inversify";
 import { IConnection } from "src/models/connection/connection-interface";
 import { IConnectionService } from "./connection-service-interface";
-import { IConnectionEngine } from "src/engines/connection-engine/connection-engine-interface";
+import { IConnectionManager } from "src/managers/connection-manager/connection-manager-interface";
 
 @injectable()
 export class ConnectionService implements IConnectionService {
-    constructor(@inject(IConnectionEngine) private readonly _connectionEngine: IConnectionEngine) {}
+    constructor(@inject(IConnectionManager) private readonly _connectionEngine: IConnectionManager) {}
 
     async create(id: string, expenseId: string): Promise<IConnection> {
         return await this._connectionEngine.createConnection(id, expenseId);

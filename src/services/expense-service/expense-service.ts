@@ -1,17 +1,17 @@
 import { inject, injectable } from "inversify";
 import { IExpense, IExpenseUpdate } from "@splitsies/shared-models";
 import { IExpenseService } from "./expense-service-interface";
-import { IExpenseEngine } from "../engines/expense-engine-interface";
-import { IOcrApi } from "../api/ocr-api/ocr-api-client-interface";
 import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client-interface";
 import { ImageProcessingError } from "src/models/error/image-processing-error";
 import { IExpenseMapper } from "@splitsies/utils";
+import { IExpenseManager } from "src/managers/expense-manager/expense-manager-interface";
+import { IOcrApiClient } from "src/api/ocr-api-client/ocr-api-client-interface";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
     constructor(
-        @inject(IExpenseEngine) private readonly _expenseEngine: IExpenseEngine,
-        @inject(IOcrApi) private readonly _ocrApi: IOcrApi,
+        @inject(IExpenseManager) private readonly _expenseEngine: IExpenseManager,
+        @inject(IOcrApiClient) private readonly _ocrApiClient: IOcrApiClient,
         @inject(IAlgorithmsApiClient) private readonly _algorithsmApiClient: IAlgorithmsApiClient,
         @inject(IExpenseMapper) private readonly _mapper: IExpenseMapper,
     ) {}
@@ -25,7 +25,7 @@ export class ExpenseService implements IExpenseService {
     }
 
     async createExpenseFromImage(base64Image: string): Promise<IExpense> {
-        const ocrResult = await this._ocrApi.processImage(base64Image);
+        const ocrResult = await this._ocrApiClient.processImage(base64Image);
         const expenseResult = await this._algorithsmApiClient.processImage(ocrResult.data);
         if (!expenseResult.success) throw new ImageProcessingError("Could not create expense from image");
 

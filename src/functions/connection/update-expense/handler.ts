@@ -5,7 +5,7 @@ import { container } from "src/di/inversify.config";
 import { DataResponse, HttpStatusCode, IExpenseUpdate } from "@splitsies/shared-models";
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 import { middyfyWs } from "@libs/lambda";
-import { IExpenseService } from "src/services/expense-service-interface";
+import { IExpenseService } from "src/services/expense-service/expense-service-interface";
 import { sendMessage } from "@libs/broadcast";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
 

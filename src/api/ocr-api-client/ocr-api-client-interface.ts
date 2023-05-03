@@ -1,7 +1,7 @@
 import { IDataResponse, IOcrResult } from "@splitsies/shared-models";
 
-export interface IOcrApi {
+export interface IOcrApiClient {
     processImage(base64Image: string): Promise<IDataResponse<IOcrResult>>;
 }
 
-export const IOcrApi = Symbol.for("IOcrApi");
+export const IOcrApiClient = Symbol.for("IOcrApiClient");

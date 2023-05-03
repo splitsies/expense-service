@@ -1,13 +1,12 @@
 import "reflect-metadata";
 import { Container } from "inversify";
-import { IExpenseService } from "../services/expense-service-interface";
-import { ExpenseService } from "../services/expense-service";
-import { IExpenseEngine } from "../engines/expense-engine-interface";
-import { ExpenseEngine } from "../engines/expense-engine";
+import { IExpenseService } from "../services/expense-service/expense-service-interface";
+import { ExpenseService } from "../services/expense-service/expense-service";
+import { IExpenseManager } from "../managers/expense-manager/expense-manager-interface";
 import { IOcrApiConfiguration } from "src/models/configuration/ocr-api/ocr-api-configuration-interface";
 import { OcrApiConfiguration } from "src/models/configuration/ocr-api/ocr-api-configuration";
-import { IOcrApi } from "src/api/ocr-api/ocr-api-client-interface";
-import { OcrApiClient } from "src/api/ocr-api/ocr-api-client";
+import { IOcrApiClient } from "src/api/ocr-api-client/ocr-api-client-interface";
+import { OcrApiClient } from "src/api/ocr-api-client/ocr-api-client";
 import {
     ExpenseMapper,
     ExpenseUpdateMapper,
@@ -26,27 +25,28 @@ import { IAlgorithmsApiConfiguration } from "src/models/configuration/algorithms
 import { AlgorithsmApiConfiguration } from "src/models/configuration/algorithms-api/algorithms-api-configuration";
 import { IConnectionDao } from "src/dao/connection-dao/connection-dao-interface";
 import { ConnectionDao } from "src/dao/connection-dao/connection-dao";
-import { IConnectionEngine } from "src/engines/connection-engine/connection-engine-interface";
-import { ConnectionEngine } from "src/engines/connection-engine/connection-engine";
+import { IConnectionManager } from "src/managers/connection-manager/connection-manager-interface";
+import { ConnectionManager } from "src/managers/connection-manager/connection-manager";
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 import { ConnectionService } from "src/services/connection-service/connection-service";
 import { IConnectionDaoStatements } from "src/dao/connection-dao/connection-dao-statements-interface";
 import { ConnectionDaoStatements } from "src/dao/connection-dao/connection-dao-statements";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
 import { ConnectionConfiguration } from "src/models/configuration/connection/connection-configuration";
+import { ExpenseManager } from "src/managers/expense-manager/expense-manager";
 
 const container = new Container();
 
 container.bind<ILogger>(ILogger).to(Logger).inSingletonScope();
 
 container.bind<IExpenseService>(IExpenseService).to(ExpenseService).inSingletonScope();
-container.bind<IExpenseEngine>(IExpenseEngine).to(ExpenseEngine).inSingletonScope();
+container.bind<IExpenseManager>(IExpenseManager).to(ExpenseManager).inSingletonScope();
 container.bind<IAlgorithmsApiClient>(IAlgorithmsApiClient).to(AlgorithmsApiClient).inSingletonScope();
 container
     .bind<IAlgorithmsApiConfiguration>(IAlgorithmsApiConfiguration)
     .to(AlgorithsmApiConfiguration)
     .inSingletonScope();
-container.bind<IOcrApi>(IOcrApi).to(OcrApiClient).inSingletonScope();
+container.bind<IOcrApiClient>(IOcrApiClient).to(OcrApiClient).inSingletonScope();
 container.bind<IOcrApiConfiguration>(IOcrApiConfiguration).to(OcrApiConfiguration).inSingletonScope();
 container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSingletonScope();
 container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(ConnectionConfiguration).inSingletonScope();
@@ -56,7 +56,7 @@ container.bind<IExpenseMapper>(IExpenseMapper).to(ExpenseMapper).inSingletonScop
 container.bind<IExpenseUpdateMapper>(IExpenseUpdateMapper).to(ExpenseUpdateMapper).inSingletonScope();
 
 container.bind<IConnectionService>(IConnectionService).to(ConnectionService).inSingletonScope();
-container.bind<IConnectionEngine>(IConnectionEngine).to(ConnectionEngine).inSingletonScope();
+container.bind<IConnectionManager>(IConnectionManager).to(ConnectionManager).inSingletonScope();
 container.bind<IConnectionDao>(IConnectionDao).to(ConnectionDao).inSingletonScope();
 
 container.bind<IConnectionDaoStatements>(IConnectionDaoStatements).to(ConnectionDaoStatements).inSingletonScope();

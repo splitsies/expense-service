@@ -1,6 +1,6 @@
 import { IConnection } from "src/models/connection/connection-interface";
 
-export interface IConnectionEngine {
+export interface IConnectionManager {
     createConnection(connectionId: string, expenseId: string): Promise<IConnection>;
     refreshTtl(connectionId: string): Promise<IConnection>;
     deleteConnection(connectionId: string): Promise<void>;
@@ -9,4 +9,4 @@ export interface IConnectionEngine {
     getExpenseIdForConnection(connectionId: string): Promise<string>;
 }
 
-export const IConnectionEngine = Symbol.for("IConnectionEngine");
+export const IConnectionManager = Symbol.for("IConnectionManager");
