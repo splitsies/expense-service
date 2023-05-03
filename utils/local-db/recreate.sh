@@ -7,7 +7,7 @@ cd utils/local-db
 docker-compose up -d
 
 aws dynamodb create-table \
-    --table-name Expense \
+    --table-name Expense-local \
     --attribute-definitions AttributeName=id,AttributeType=S \
     --key-schema AttributeName=id,KeyType=HASH \
     --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
@@ -16,7 +16,7 @@ aws dynamodb create-table \
 
 
 aws dynamodb create-table \
-    --table-name ExpenseConnection \
+    --table-name ExpenseConnection-local \
     --attribute-definitions \
         AttributeName=connectionId,AttributeType=S \
         AttributeName=expenseId,AttributeType=S \
