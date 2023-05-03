@@ -1,7 +1,7 @@
 import schema from "./schema";
 import { middyfy } from "../../../libs/lambda";
 import { container } from "../../../di/inversify.config";
-import { IExpenseService } from "../../../services/expense-service-interface";
+import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
 import { HttpStatusCode, IExpense, DataResponse } from "@splitsies/shared-models";
 import { SplitsiesFunctionHandlerFactory, ILogger } from "@splitsies/utils";
 import { ImageProcessingError } from "src/models/error/image-processing-error";

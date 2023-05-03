@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify";
 import { randomUUID } from "crypto";
 import { IExpense, Expense, IExpenseUpdate } from "@splitsies/shared-models";
-import { IExpenseEngine } from "./expense-engine-interface";
+import { IExpenseManager } from "./expense-manager-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 import { IExpenseUpdateMapper } from "@splitsies/utils";
 
 @injectable()
-export class ExpenseEngine implements IExpenseEngine {
+export class ExpenseManager implements IExpenseManager {
     constructor(
         @inject(IExpenseDao) private readonly _expenseDao: IExpenseDao,
         @inject(IExpenseUpdateMapper) private readonly _expenseUpdateMapper: IExpenseUpdateMapper,

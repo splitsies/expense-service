@@ -13,8 +13,8 @@ export class ConnectionConfiguration implements IConnectionConfiguration {
         assert(!!process.env.deleteExpiredIntervalMin, "DELETE_EXPIRED_INTERVAL_MIN was undefined");
         assert(!!process.env.gatewayUrl, "APIG_URL was undefined");
 
-        this.ttlMs = parseInt(process.env.connectionTtlSec) * 1000;
-        this.deleteExpiredIntervalMin = parseInt(process.env.deleteExpiredIntervalMin);
+        this.ttlMs = parseInt(process.env.connectionTtlSec, 10) * 1000;
+        this.deleteExpiredIntervalMin = parseInt(process.env.deleteExpiredIntervalMin, 10);
         this.gatewayUrl = process.env.gatewayUrl;
     }
 }
