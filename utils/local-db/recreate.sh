@@ -4,7 +4,7 @@ rm -rf utils/local-db/docker
 
 cd utils/local-db
 
-docker-compose up -d
+docker-compose -p splitsies-expense-db up -d
 
 aws dynamodb create-table \
     --table-name Expense-local \
