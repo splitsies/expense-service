@@ -4,5 +4,6 @@
     "dbRegion": "${param:DB_REGION}",
     "dbTableName": "${param:DB_TABLE_NAME}",
     "connectionTableName": "${param:CONNECTION_TABLE_NAME}",
+    "userExpenseTableName": "${param:DB_USER_EXPENSE_TABLE_NAME}",
     "dbEndpoint": "${param:DB_ENDPOINT}"
 }

@@ -4,6 +4,7 @@ export interface IDbConfiguration {
     readonly dbRegion: string;
     readonly tableName: string;
     readonly connectionTableName: string;
+    readonly userExpenseTableName: string;
     readonly endpoint: string;
 }
 

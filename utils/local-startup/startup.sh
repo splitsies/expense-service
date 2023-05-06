@@ -5,4 +5,9 @@ sls offline start \
     --param='APIG_URL=http://localhost:14624/' \
     --param='DELETE_EXPIRED_INTERVAL_MIN=5' \
     --param='CONNECTION_TABLE_NAME=ExpenseConnection-local' \
-    --param='DB_TABLE_NAME=Expense-local'
+    --param='DB_TABLE_NAME=Expense-local' \
+    --param='DB_USER_EXPENSE_TABLE_NAME=Splitsies-UserExpense-local' \
+    --param='DB_ACCESS_KEY_ID=null' \
+    --param='DB_SECRET_ACCESS_KEY=null' \
+    --param='DB_REGION=us-east-1'
+    
