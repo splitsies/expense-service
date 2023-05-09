@@ -5,19 +5,20 @@ import { IUserExpenseDao } from "./user-expense-dao-interface";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { IUserExpenseStatements } from "./user-expense-statements-interface";
 import { ExecuteStatementCommand } from "@aws-sdk/client-dynamodb";
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 @injectable()
 export class UserExpenseDao extends DaoBase<IUserExpense> implements IUserExpenseDao {
+    readonly key: (model: IUserExpense) => Record<string, string | number>;
+
     constructor(
         @inject(ILogger) logger: ILogger,
         @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
         @inject(IUserExpenseStatements) private readonly _statements: IUserExpenseStatements,
     ) {
-        super(logger, dbConfiguration, dbConfiguration.userExpenseTableName, (e) => ({
-            expenseId: e.expenseId,
-            userId: e.userId,
-        }));
+        const keySelector = (e: IUserExpense) => ({ expenseId: e.expenseId, userId: e.userId });
+        super(logger, dbConfiguration, dbConfiguration.userExpenseTableName, keySelector);
+        this.key = keySelector;
     }
 
     async getExpenseIdsForUser(userId: string): Promise<string[]> {

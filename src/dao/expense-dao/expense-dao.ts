@@ -10,7 +10,7 @@ import { unmarshall } from "@aws-sdk/util-dynamodb";
 export class ExpenseDao extends DaoBase<IExpense, IExpenseDto> implements IExpenseDao {
     constructor(
         @inject(ILogger) logger: ILogger,
-        @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
+        @inject(IDbConfiguration) private readonly dbConfiguration: IDbConfiguration,
         @inject(IExpenseMapper) mapper: IExpenseMapper,
     ) {
         const keySelector = (e: IExpense) => ({ id: e.id });
@@ -18,10 +18,10 @@ export class ExpenseDao extends DaoBase<IExpense, IExpenseDto> implements IExpen
     }
 
     async getExpensesForUser(userId: string): Promise<IExpense[]> {
-        // TODO: Actually get them from the table
+        // TODO: Remove and use the UserExpenseDao
         const result = await this._client.send(
             new ExecuteStatementCommand({
-                Statement: `SELECT * FROM Expense`,
+                Statement: `SELECT * FROM "${this.dbConfiguration.tableName}"`,
             }),
         );
 

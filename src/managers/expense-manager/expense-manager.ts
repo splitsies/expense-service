@@ -5,6 +5,7 @@ import { IExpenseManager } from "./expense-manager-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 import { IExpenseUpdateMapper } from "@splitsies/utils";
 import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-interface";
+import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -36,5 +37,12 @@ export class ExpenseManager implements IExpenseManager {
 
         // const expenseIds = await this._userExpenseDao.getExpenseIdsForUser(userId);
         // return await Promise.all(expenseIds.map((id) => this._expenseDao.read({ id })));
+    }
+
+    async addUserToExpense(userExpense: IUserExpense): Promise<void> {
+        const exists = !!(await this._userExpenseDao.read(this._userExpenseDao.key(userExpense)));
+        if (exists) return;
+
+        await this._userExpenseDao.create(userExpense);
     }
 }

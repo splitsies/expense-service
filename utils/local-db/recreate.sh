@@ -28,7 +28,7 @@ aws dynamodb create-table \
     --endpoint-url http://localhost:8000
 
 aws dynamodb create-table \
-    --table-name Splitsies-UserExpenses-local \
+    --table-name Splitsies-UserExpense-local \
     --attribute-definitions \
         AttributeName=expenseId,AttributeType=S \
         AttributeName=userId,AttributeType=S \

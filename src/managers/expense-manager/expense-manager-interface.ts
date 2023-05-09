@@ -6,6 +6,7 @@ export interface IExpenseManager {
     createExpenseFromImage(expense: IExpense): Promise<IExpense>;
     updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense>;
     getExpensesForUser(userId: string): Promise<IExpense[]>;
+    addUserToExpense(userExpense: IUserExpense): Promise<void>;
 }
 
 export const IExpenseManager = Symbol.for("IExpenseManager");

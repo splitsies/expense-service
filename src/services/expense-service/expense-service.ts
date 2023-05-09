@@ -3,13 +3,15 @@ import { IExpense, IExpenseUpdate } from "@splitsies/shared-models";
 import { IExpenseService } from "./expense-service-interface";
 import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client-interface";
 import { ImageProcessingError } from "src/models/error/image-processing-error";
-import { IExpenseMapper } from "@splitsies/utils";
+import { IExpenseMapper, ILogger } from "@splitsies/utils";
 import { IExpenseManager } from "src/managers/expense-manager/expense-manager-interface";
 import { IOcrApiClient } from "src/api/ocr-api-client/ocr-api-client-interface";
+import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
     constructor(
+        @inject(ILogger) private readonly _logger: ILogger,
         @inject(IExpenseManager) private readonly _expenseManager: IExpenseManager,
         @inject(IOcrApiClient) private readonly _ocrApiClient: IOcrApiClient,
         @inject(IAlgorithmsApiClient) private readonly _algorithsmApiClient: IAlgorithmsApiClient,
@@ -26,6 +28,7 @@ export class ExpenseService implements IExpenseService {
 
     async createExpenseFromImage(base64Image: string): Promise<IExpense> {
         const ocrResult = await this._ocrApiClient.processImage(base64Image);
+        this._logger.log({ ocrResult });
         const expenseResult = await this._algorithsmApiClient.processImage(ocrResult.data);
         if (!expenseResult.success) throw new ImageProcessingError("Could not create expense from image");
 
@@ -38,5 +41,9 @@ export class ExpenseService implements IExpenseService {
 
     async getExpensesForUser(userId: string): Promise<IExpense[]> {
         return await this._expenseManager.getExpensesForUser(userId);
+    }
+
+    addUserToExpense(userExpense: IUserExpense): Promise<void> {
+        return this._expenseManager.addUserToExpense(userExpense);
     }
 }
