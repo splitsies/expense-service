@@ -15,7 +15,12 @@ export class OcrApiClient extends SplitsiesApiClientBase implements IOcrApiClien
 
     async processImage(base64Image: string): Promise<IDataResponse<IOcrResult>> {
         try {
-            return await this.postJson(`${this._ocrApiConfiguration.uri}process`, { image: base64Image });
+            const result = await this.postJson<IOcrResult>(`${this._ocrApiConfiguration.uri}process`, { image: base64Image });
+            if (!result?.success) {
+                this._logger.error(`Error on request: ${result.data}`);
+            }
+
+            return result;
         } catch (e) {
             this._logger.error(`Error on request: ${e}`);
         }
