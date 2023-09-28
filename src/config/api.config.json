@@ -1,0 +1,5 @@
+{
+    "USERS_API_URI": "${param:USERS_API_URI}",    
+    "ALGORITHMS_API_URI": "${param:ALGORITHMS_API_URI}",    
+    "OCR_API_URI": "${param:OCR_API_URI}"
+}

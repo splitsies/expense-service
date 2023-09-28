@@ -7,6 +7,6 @@ export class UserExpenseStatements implements IUserExpenseStatements {
     readonly GetExpenseIdsForUser: string;
 
     constructor(@inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
-        this.GetExpenseIdsForUser = `SELECT * FROM ${dbConfiguration.userExpenseTableName} WHERE userId = ?`;
+        this.GetExpenseIdsForUser = `SELECT * FROM "${dbConfiguration.userExpenseTableName}" WHERE userId = ?`;
     }
 }
