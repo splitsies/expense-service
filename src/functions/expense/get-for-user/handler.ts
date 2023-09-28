@@ -10,12 +10,12 @@ const expenseService = container.get<IExpenseService>(IExpenseService);
 
 export const main = middyfy(
     SplitsiesFunctionHandlerFactory.create<typeof schema, IExpense[] | string>(logger, async (event) => {
-        // if (!event.queryStringParameters.userId) {
-        //     return new DataResponse(HttpStatusCode.BAD_REQUEST, "userId was not found in query string");
-        // }
+        if (!event.queryStringParameters.userId) {
+            return new DataResponse(HttpStatusCode.BAD_REQUEST, "userId was not found in query string");
+        }
 
-        // const userId = event.queryStringParameters.userId;
-        const result = await expenseService.getExpensesForUser("userId");
+        const userId = event.queryStringParameters.userId;
+        const result = await expenseService.getExpensesForUser(userId);
         return new DataResponse(HttpStatusCode.OK, result).toJson();
     }),
 );

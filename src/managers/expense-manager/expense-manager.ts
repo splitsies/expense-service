@@ -19,12 +19,16 @@ export class ExpenseManager implements IExpenseManager {
         return await this._expenseDao.read({ id });
     }
 
-    async createExpense(): Promise<IExpense> {
-        return await this._expenseDao.create(new Expense(randomUUID(), "", new Date(), [], []));
+    async createExpense(userId: string): Promise<IExpense> {
+        const created = await this._expenseDao.create(new Expense(randomUUID(), "", new Date(), [], []));
+        await this._userExpenseDao.create({ expenseId: created.id, userId });
+        return created;
     }
 
-    async createExpenseFromImage(expense: IExpense): Promise<IExpense> {
-        return await this._expenseDao.create(expense);
+    async createExpenseFromImage(expense: IExpense, userId: string): Promise<IExpense> {
+        const created = await this._expenseDao.create(expense);
+        await this._userExpenseDao.create({ expenseId: created.id, userId });
+        return created;
     }
 
     async updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense> {
@@ -32,11 +36,9 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async getExpensesForUser(userId: string): Promise<IExpense[]> {
-        // TODO: Remove once user implemention is in
-        return await this._expenseDao.getExpensesForUser(userId);
-
-        // const expenseIds = await this._userExpenseDao.getExpenseIdsForUser(userId);
-        // return await Promise.all(expenseIds.map((id) => this._expenseDao.read({ id })));
+        console.log({ userId });
+        const expenseIds = await this._userExpenseDao.getExpenseIdsForUser(userId);
+        return await Promise.all(expenseIds.map((id) => this._expenseDao.read({ id })));
     }
 
     async addUserToExpense(userExpense: IUserExpense): Promise<void> {
