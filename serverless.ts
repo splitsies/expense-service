@@ -3,6 +3,7 @@ import type { AWS } from "@serverless/typescript";
 import apiConfig from "./src/config/api.config.json";
 import dbConfig from "./src/config/db.config.json";
 import connectionConfig from "./src/config/connection.config.json";
+import firebaseConfig from "./src/config/firebase.config.json";
 
 import create from "@functions/expense/create";
 import connect from "@functions/connection/connect";
@@ -10,6 +11,7 @@ import disconnect from "@functions/connection/disconnect";
 import updateExpense from "@functions/connection/update-expense";
 import deleteExpiredConnections from "@functions/connection/delete-expired";
 import getForUser from "@functions/expense/get-for-user";
+import verifyToken from "@functions/auth/verify-token";
 
 const serverlessConfiguration: AWS = {
     org: "splitsies",
@@ -23,12 +25,12 @@ const serverlessConfiguration: AWS = {
         runtime: "nodejs18.x",
         httpApi: {
             authorizers: {
-                firebaseTokenAuth: {
-                    identitySource: "$request.headers.Authorization",
+                verifyToken: {
+                    identitySource: "$request.header.Authorization",
                     issuerUrl: "https://securetoken.google.com/splitsies-${sls:stage}",
-                    audience: ["splitsies-${sls:stage}"]
-                }
-            }
+                    audience: ["splitsies-${sls:stage}"],
+                },
+            },
         },
         apiGateway: {
             minimumCompressionSize: 1024,
@@ -41,10 +43,11 @@ const serverlessConfiguration: AWS = {
             ...apiConfig,
             ...dbConfig,
             ...connectionConfig,
+            ...firebaseConfig,
         },
     },
     // import the function via paths
-    functions: { create, connect, disconnect, updateExpense, deleteExpiredConnections, getForUser },
+    functions: { verifyToken, create, connect, disconnect, updateExpense, deleteExpiredConnections, getForUser },
     package: { individually: true },
     custom: {
         apigUri: { "Fn::GetAtt": ["HttpApi", "ApiEndpoint"] },
@@ -62,7 +65,7 @@ const serverlessConfiguration: AWS = {
             httpPort: 14623,
             websocketPort: 14624,
             lambdaPort: 14625,
-            ignoreJWTSignature: true
+            ignoreJWTSignature: true,
         },
     },
 };

@@ -7,7 +7,7 @@ export default {
         {
             http: {
                 method: "get",
-                authorizer: {  name: "firebaseTokenAuth" },
+                authorizer: { name: "verifyToken" },
                 path: "expense",
             },
         },
