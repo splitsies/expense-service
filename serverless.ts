@@ -11,6 +11,7 @@ import disconnect from "@functions/connection/disconnect";
 import updateExpense from "@functions/connection/update-expense";
 import deleteExpiredConnections from "@functions/connection/delete-expired";
 import getForUser from "@functions/expense/get-for-user";
+import addUserToExpense from "@functions/expense/add-user-to-expense";
 import verifyToken from "@functions/auth/verify-token";
 
 const serverlessConfiguration: AWS = {
@@ -47,7 +48,7 @@ const serverlessConfiguration: AWS = {
         },
     },
     // import the function via paths
-    functions: { verifyToken, create, connect, disconnect, updateExpense, deleteExpiredConnections, getForUser },
+    functions: { verifyToken, create, connect, disconnect, updateExpense, deleteExpiredConnections, getForUser, addUserToExpense },
     package: { individually: true },
     custom: {
         apigUri: { "Fn::GetAtt": ["HttpApi", "ApiEndpoint"] },

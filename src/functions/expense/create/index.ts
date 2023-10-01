@@ -8,7 +8,8 @@ export default {
         {
             http: {
                 method: "post",
-                path: "expense",
+                path: "expenses",
+                authorizer: { name: "verifyToken" },
                 request: {
                     schemas: {
                         "application/json": schema,

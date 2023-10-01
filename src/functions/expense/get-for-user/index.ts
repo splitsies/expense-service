@@ -8,7 +8,7 @@ export default {
             http: {
                 method: "get",
                 authorizer: { name: "verifyToken" },
-                path: "expense",
+                path: "expenses",
             },
         },
     ],

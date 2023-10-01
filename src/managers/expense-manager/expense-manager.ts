@@ -6,6 +6,7 @@ import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 import { IExpenseUpdateMapper } from "@splitsies/utils";
 import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
+import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -36,15 +37,19 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async getExpensesForUser(userId: string): Promise<IExpense[]> {
-        console.log({ userId });
+        console.log({ userId });ß
         const expenseIds = await this._userExpenseDao.getExpenseIdsForUser(userId);
         return await Promise.all(expenseIds.map((id) => this._expenseDao.read({ id })));
     }
 
-    async addUserToExpense(userExpense: IUserExpense): Promise<void> {
-        const exists = !!(await this._userExpenseDao.read(this._userExpenseDao.key(userExpense)));
-        if (exists) return;
+    async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
+        // make sure the requesting user is actually on the expense
+        const original = { userId: requestingUserId, expenseId: userExpense.expenseId } as IUserExpense;
+        const key = this._userExpenseDao.key(original);
+        const exists = !!(await this._userExpenseDao.read(key));
+        if (!exists) throw new UnauthorizedUserError();
 
+        if (!!(await this._userExpenseDao.read(this._userExpenseDao.key(userExpense)))) { return; }
         await this._userExpenseDao.create(userExpense);
     }
 }
