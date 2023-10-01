@@ -1,4 +1,5 @@
 sls offline start \
+    --noAuth \
     --param='OCR_API_URI=http://localhost:12948/dev-pr/' \
     --param='ALGORITHMS_API_URI=http://localhost:5001/dev-pr/' \
     --param='USERS_API_URI=http://localhost:6001/dev-pr/users/' \

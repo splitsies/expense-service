@@ -21,6 +21,15 @@ const serverlessConfiguration: AWS = {
         name: "aws",
         stage: "dev-pr",
         runtime: "nodejs18.x",
+        httpApi: {
+            authorizers: {
+                firebaseTokenAuth: {
+                    identitySource: "$request.headers.Authorization",
+                    issuerUrl: "https://securetoken.google.com/splitsies-${sls:stage}",
+                    audience: ["splitsies-${sls:stage}"]
+                }
+            }
+        },
         apiGateway: {
             minimumCompressionSize: 1024,
             shouldStartNameWithService: true,
@@ -53,6 +62,7 @@ const serverlessConfiguration: AWS = {
             httpPort: 14623,
             websocketPort: 14624,
             lambdaPort: 14625,
+            ignoreJWTSignature: true
         },
     },
 };
