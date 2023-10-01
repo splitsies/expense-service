@@ -48,7 +48,16 @@ const serverlessConfiguration: AWS = {
         },
     },
     // import the function via paths
-    functions: { verifyToken, create, connect, disconnect, updateExpense, deleteExpiredConnections, getForUser, addUserToExpense },
+    functions: {
+        verifyToken,
+        create,
+        connect,
+        disconnect,
+        updateExpense,
+        deleteExpiredConnections,
+        getForUser,
+        addUserToExpense,
+    },
     package: { individually: true },
     custom: {
         apigUri: { "Fn::GetAtt": ["HttpApi", "ApiEndpoint"] },

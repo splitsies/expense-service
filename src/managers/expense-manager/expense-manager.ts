@@ -37,7 +37,8 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async getExpensesForUser(userId: string): Promise<IExpense[]> {
-        console.log({ userId });ß
+        console.log({ userId });
+        ß;
         const expenseIds = await this._userExpenseDao.getExpenseIdsForUser(userId);
         return await Promise.all(expenseIds.map((id) => this._expenseDao.read({ id })));
     }
@@ -49,7 +50,9 @@ export class ExpenseManager implements IExpenseManager {
         const exists = !!(await this._userExpenseDao.read(key));
         if (!exists) throw new UnauthorizedUserError();
 
-        if (!!(await this._userExpenseDao.read(this._userExpenseDao.key(userExpense)))) { return; }
+        if (!!(await this._userExpenseDao.read(this._userExpenseDao.key(userExpense)))) {
+            return;
+        }
         await this._userExpenseDao.create(userExpense);
     }
 }
