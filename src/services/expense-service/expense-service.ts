@@ -20,6 +20,10 @@ export class ExpenseService implements IExpenseService {
         @inject(IExpenseMapper) private readonly _mapper: IExpenseMapper,
     ) {}
 
+    async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
+        return this._expenseManager.getUserExpense(userId, expenseId);
+    }
+
     async getExpense(id: string): Promise<IExpense> {
         return this._expenseManager.getExpense(id);
     }

@@ -16,6 +16,12 @@ export class ExpenseManager implements IExpenseManager {
         @inject(IExpenseUpdateMapper) private readonly _expenseUpdateMapper: IExpenseUpdateMapper,
     ) {}
 
+    async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
+        const userExpense = { userId, expenseId } as IUserExpense;
+        const key = this._userExpenseDao.key(userExpense);
+        return await this._userExpenseDao.read(key);
+    }
+
     async getExpense(id: string): Promise<IExpense> {
         return await this._expenseDao.read({ id });
     }
@@ -37,8 +43,6 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async getExpensesForUser(userId: string): Promise<IExpense[]> {
-        console.log({ userId });
-        ß;
         const expenseIds = await this._userExpenseDao.getExpenseIdsForUser(userId);
         return await Promise.all(expenseIds.map((id) => this._expenseDao.read({ id })));
     }

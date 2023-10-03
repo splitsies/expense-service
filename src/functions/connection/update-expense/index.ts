@@ -2,5 +2,12 @@ import { handlerPath } from "../../../libs/handler-resolver";
 
 export default {
     handler: `${handlerPath(__dirname)}/handler.main`,
-    events: [{ websocket: "$default" }],
+    events: [
+        {
+            websocket: {
+                route: "$default",
+                authorizer: "verifyToken",
+            },
+        },
+    ],
 };

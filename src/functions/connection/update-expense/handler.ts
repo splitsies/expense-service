@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import schema from "./schema";
-import { ILogger, SplitsiesFunctionHandlerFactory } from "@splitsies/utils";
+import { ExpectedError, ILogger, SplitsiesFunctionHandlerFactory } from "@splitsies/utils";
 import { container } from "src/di/inversify.config";
 import { DataResponse, HttpStatusCode, IExpenseUpdate } from "@splitsies/shared-models";
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
@@ -8,28 +8,43 @@ import { middyfyWs } from "@libs/lambda";
 import { IExpenseService } from "src/services/expense-service/expense-service-interface";
 import { sendMessage } from "@libs/broadcast";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
+import { MismatchedExpenseError } from "src/models/error/mismatched-expense-error";
 
 const logger = container.get<ILogger>(ILogger);
 const connectionService = container.get<IConnectionService>(IConnectionService);
 const expenseService = container.get<IExpenseService>(IExpenseService);
 const connectionConfiguration = container.get<IConnectionConfiguration>(IConnectionConfiguration);
 
+const expectedErrors = [
+    new ExpectedError(MismatchedExpenseError, HttpStatusCode.FORBIDDEN, "Cannot update this expense in this session"),
+];
+
 export const main = middyfyWs(
-    SplitsiesFunctionHandlerFactory.create<typeof schema, any>(logger, async (event) => {
-        const expenseId = await connectionService.getExpenseIdForConnection(event.requestContext.connectionId);
-        if (expenseId !== event.body.id) {
-            logger.warn(`connection for expenseId=${expenseId} attempted to update expenseId=${event.body.id}`);
-            return new DataResponse(HttpStatusCode.BAD_REQUEST, "Cannot update requested expense with this connection");
-        }
+    SplitsiesFunctionHandlerFactory.create<typeof schema, any>(
+        logger,
+        async (event) => {
+            const expenseId = await connectionService.getExpenseIdForConnection(event.requestContext.connectionId);
+            if (expenseId !== event.body.id) {
+                logger.warn(`connection for expenseId=${expenseId} attempted to update expenseId=${event.body.id}`);
+                throw new MismatchedExpenseError();
+            }
 
-        await connectionService.refreshTtl(event.requestContext.connectionId);
+            await connectionService.refreshTtl(event.requestContext.connectionId);
 
-        const updated = await expenseService.updateExpense(expenseId, event.body.expense as IExpenseUpdate);
-        const relatedConnectionIds = await connectionService.getRelatedConnections(event.requestContext.connectionId);
+            const userId = event.requestContext.authorizer.userId;
+            const userExpense = await expenseService.getUserExpense(userId, expenseId);
+            if (!userExpense) throw new MismatchedExpenseError();
 
-        await Promise.all(
-            relatedConnectionIds.map((id) => sendMessage(connectionConfiguration.gatewayUrl, id, updated)),
-        );
-        return new DataResponse(HttpStatusCode.OK, updated).toJson();
-    }),
+            const updated = await expenseService.updateExpense(expenseId, event.body.expense as IExpenseUpdate);
+            const relatedConnectionIds = await connectionService.getRelatedConnections(
+                event.requestContext.connectionId,
+            );
+
+            await Promise.all(
+                relatedConnectionIds.map((id) => sendMessage(connectionConfiguration.gatewayUrl, id, updated)),
+            );
+            return new DataResponse(HttpStatusCode.OK, updated).toJson();
+        },
+        expectedErrors,
+    ),
 );

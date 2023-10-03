@@ -9,8 +9,8 @@ const jwtStrategyProvider = container.get<IJwtStrategyProvider>(IJwtStrategyProv
 
 export const main = async (event: APIGatewayTokenAuthorizerEvent): Promise<AuthResponse> => {
     try {
-        logger.log(event.authorizationToken);
-        const jwt = (event.authorizationToken as string).split(" ")[1];
+        const authToken = (event.authorizationToken ?? (event as any).headers?.Authorization) as string;
+        const jwt = authToken.split(" ")[1];
 
         const strategy = jwtStrategyProvider.provide();
         const policy = await strategy.authenticate(jwt);
@@ -18,6 +18,5 @@ export const main = async (event: APIGatewayTokenAuthorizerEvent): Promise<AuthR
         return policy;
     } catch (e) {
         logger.error(e);
-        logger.error("there was an error oh no");
     }
 };
