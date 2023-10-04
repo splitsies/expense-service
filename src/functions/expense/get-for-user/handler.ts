@@ -25,6 +25,8 @@ export const main = middyfy(
                 throw new UnauthorizedUserError();
             }
 
+            logger.log(event);
+
             const userId = event.queryStringParameters.userId;
             const result = await expenseService.getExpensesForUser(userId);
             return new DataResponse(HttpStatusCode.OK, result).toJson();

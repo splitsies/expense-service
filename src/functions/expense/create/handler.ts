@@ -20,6 +20,7 @@ export const main = middyfy(
     SplitsiesFunctionHandlerFactory.create<typeof schema, IExpense>(
         logger,
         async (event) => {
+            logger.log(event);
             if (event.body.userId !== event.requestContext.authorizer.userId) {
                 throw new UnauthorizedUserError();
             }
