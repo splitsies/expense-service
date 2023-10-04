@@ -31,10 +31,6 @@ export const main = middyfyWs(
 
             await connectionService.refreshTtl(event.requestContext.connectionId);
 
-            const userId = event.requestContext.authorizer.userId;
-            const userExpense = await expenseService.getUserExpense(userId, expenseId);
-            if (!userExpense) throw new MismatchedExpenseError();
-
             const updated = await expenseService.updateExpense(expenseId, event.body.expense as IExpenseUpdate);
             const relatedConnectionIds = await connectionService.getRelatedConnections(
                 event.requestContext.connectionId,

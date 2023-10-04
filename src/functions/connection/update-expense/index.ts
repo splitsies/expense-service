@@ -5,8 +5,7 @@ export default {
     events: [
         {
             websocket: {
-                route: "$default",
-                authorizer: "verifyToken",
+                route: "$default"
             },
         },
     ],
