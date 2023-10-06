@@ -23,15 +23,8 @@ export const main = middyfyWs(
     SplitsiesFunctionHandlerFactory.create<typeof schema, any>(
         logger,
         async (event) => {
-            const expenseId = await connectionService.getExpenseIdForConnection(event.requestContext.connectionId);
-            if (expenseId !== event.body.id) {
-                logger.warn(`connection for expenseId=${expenseId} attempted to update expenseId=${event.body.id}`);
-                throw new MismatchedExpenseError();
-            }
-
             await connectionService.refreshTtl(event.requestContext.connectionId);
-
-            const updated = await expenseService.updateExpense(expenseId, event.body.expense as IExpenseUpdate);
+            const updated = await expenseService.updateExpense(event.body.id, event.body.expense as IExpenseUpdate);
             const relatedConnectionIds = await connectionService.getRelatedConnections(
                 event.requestContext.connectionId,
             );
