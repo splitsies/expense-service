@@ -9,7 +9,11 @@ const jwtStrategyProvider = container.get<IJwtStrategyProvider>(IJwtStrategyProv
 
 export const main = async (event: APIGatewayTokenAuthorizerEvent): Promise<AuthResponse> => {
     try {
-        const authToken = (event.authorizationToken ?? (event as any).headers?.Authorization) as string;
+
+        console.log({ headers: Object.values(event.headers) });
+        
+        const authToken = event.authorizationToken
+            ?? Object.values(event.headers).find((header: string) => header.includes?.("Bearer")) as string;
         const jwt = authToken.split(" ")[1];
 
         const strategy = jwtStrategyProvider.provide();
