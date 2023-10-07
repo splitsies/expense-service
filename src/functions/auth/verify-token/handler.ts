@@ -11,7 +11,7 @@ export const main = async (event: APIGatewayTokenAuthorizerEvent): Promise<AuthR
     try {
         const authToken =
             event.authorizationToken ??
-            (Object.values(event.headers).find((header: string) => header.includes?.("Bearer")) as string);
+            (Object.values((event as any).headers).find((header: string) => header.includes?.("Bearer")) as string);
         const jwt = authToken.split(" ")[1];
 
         const strategy = jwtStrategyProvider.provide();
