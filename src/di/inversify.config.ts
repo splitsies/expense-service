@@ -38,6 +38,16 @@ import { IOcrApiClient } from "src/api/ocr-api-client/ocr-api-client-interface";
 import { OcrApiClient } from "src/api/ocr-api-client/ocr-api-client";
 import { IUsersApiClient } from "src/api/users-api-client/users-api-client-interface";
 import { UsersApiClient } from "src/api/users-api-client/users-api-client";
+import { IFirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration-interface";
+import { FirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration";
+import { IAdminAuthProvider } from "src/providers/admin-auth-provider-interface";
+import { AdminAuthProvider } from "src/providers/admin-auth-provider";
+import { IJwtStrategyProvider } from "src/providers/jwt-strategy-provider/jwt-strategy-provider-interface";
+import { JwtStrategyProvider } from "src/providers/jwt-strategy-provider/jwt-strategy-provider";
+import { IEmulatedJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/emulated-jwt-auth-strategy/emulated-jwt-auth-strategy-interface";
+import { EmulatedJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/emulated-jwt-auth-strategy/emulated-jwt-auth-strategy";
+import { IFirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy-interface";
+import { FirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy";
 
 const container = new Container();
 
@@ -64,5 +74,9 @@ container.bind<IConnectionDaoStatements>(IConnectionDaoStatements).to(Connection
 
 container.bind<IUserExpenseDao>(IUserExpenseDao).to(UserExpenseDao).inSingletonScope();
 container.bind<IUserExpenseStatements>(IUserExpenseStatements).to(UserExpenseStatements).inSingletonScope();
-
+container.bind<IFirebaseConfiguration>(IFirebaseConfiguration).to(FirebaseConfiguration).inSingletonScope();
+container.bind<IAdminAuthProvider>(IAdminAuthProvider).to(AdminAuthProvider).inSingletonScope();
+container.bind<IJwtStrategyProvider>(IJwtStrategyProvider).to(JwtStrategyProvider).inSingletonScope();
+container.bind<IEmulatedJwtAuthStrategy>(IEmulatedJwtAuthStrategy).to(EmulatedJwtAuthStrategy).inSingletonScope();
+container.bind<IFirebaseJwtAuthStrategy>(IFirebaseJwtAuthStrategy).to(FirebaseJwtAuthStrategy).inSingletonScope();
 export { container };

@@ -3,7 +3,7 @@ export default {
     properties: {
         queryStringParameters: {
             type: "object",
-            properties: { expenseId: { type: "S" } },
+            properties: { expenseId: { type: "S" }, authToken: { type: "S" } },
             required: ["expenseId"],
         },
         requestContext: {
