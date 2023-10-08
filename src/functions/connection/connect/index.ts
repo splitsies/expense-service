@@ -6,7 +6,6 @@ export default {
         {
             websocket: {
                 route: "$connect",
-                authorizer: "verifyToken",
             },
         },
     ],
