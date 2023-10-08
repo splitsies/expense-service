@@ -23,7 +23,11 @@ export const main = SplitsiesFunctionHandlerFactory.create<typeof schema, IExpen
 
         const connectionId = requestContext.connectionId;
         const userExpense = await expenseService.getUserExpense(requestContext.authorizer.userId, expenseId);
-        if (!userExpense) throw new UnauthorizedUserError();
+
+        if (!userExpense) {
+            log.error(`No expense found for user ${requestContext.authorizer.userId} expense ${expenseId}`);
+            throw new UnauthorizedUserError();
+        }
 
         const expense = await expenseService.getExpense(userExpense.expenseId);
         await connectionService.create(connectionId, expenseId);
