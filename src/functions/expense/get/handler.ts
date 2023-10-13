@@ -20,11 +20,10 @@ export const main = middyfy(
             const expenseId = event.pathParameters.expenseId;
             const userId = event.requestContext.authorizer.userId;
 
-
-            console.log({ expenseId, userId });
             const result = await expenseService.getUserExpense(userId, expenseId);
-            if (!result) { throw new UnauthorizedUserError(); }
-
+            if (!result) {
+                throw new UnauthorizedUserError();
+            }
 
             const expense = await expenseService.getExpense(result.expenseId);
             return new DataResponse(HttpStatusCode.OK, expense).toJson();

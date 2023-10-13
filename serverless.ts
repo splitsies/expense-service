@@ -58,7 +58,7 @@ const serverlessConfiguration: AWS = {
         deleteExpiredConnections,
         getForUser,
         addUserToExpense,
-        getExpense
+        getExpense,
     },
     package: { individually: true },
     custom: {
