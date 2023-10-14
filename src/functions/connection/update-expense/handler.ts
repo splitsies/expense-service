@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import schema from "./schema";
-import { ExpectedError, ILogger, SplitsiesFunctionHandlerFactory } from "@splitsies/utils";
+import { ExpectedError, IExpenseMapper, ILogger, SplitsiesFunctionHandlerFactory } from "@splitsies/utils";
 import { container } from "src/di/inversify.config";
 import { DataResponse, HttpStatusCode, IExpenseUpdate } from "@splitsies/shared-models";
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
@@ -14,6 +14,7 @@ const logger = container.get<ILogger>(ILogger);
 const connectionService = container.get<IConnectionService>(IConnectionService);
 const expenseService = container.get<IExpenseService>(IExpenseService);
 const connectionConfiguration = container.get<IConnectionConfiguration>(IConnectionConfiguration);
+const expenseMapper = container.get<IExpenseMapper>(IExpenseMapper);
 
 const expectedErrors = [
     new ExpectedError(MismatchedExpenseError, HttpStatusCode.FORBIDDEN, "Cannot update this expense in this session"),
@@ -30,7 +31,7 @@ export const main = middyfyWs(
             );
 
             await Promise.all(
-                relatedConnectionIds.map((id) => sendMessage(connectionConfiguration.gatewayUrl, id, updated)),
+                relatedConnectionIds.map((id) => sendMessage(connectionConfiguration.gatewayUrl, id, expenseMapper.toDtoModel(updated))),
             );
             return new DataResponse(HttpStatusCode.OK, updated).toJson();
         },
