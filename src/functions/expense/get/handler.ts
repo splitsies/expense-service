@@ -3,7 +3,13 @@ import { middyfy } from "../../../libs/lambda";
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
 import { HttpStatusCode, DataResponse, IExpenseDto } from "@splitsies/shared-models";
-import { SplitsiesFunctionHandlerFactory, ILogger, ExpectedError, IExpectedError, IExpenseMapper } from "@splitsies/utils";
+import {
+    SplitsiesFunctionHandlerFactory,
+    ILogger,
+    ExpectedError,
+    IExpectedError,
+    IExpenseMapper,
+} from "@splitsies/utils";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 
 const logger = container.get<ILogger>(ILogger);

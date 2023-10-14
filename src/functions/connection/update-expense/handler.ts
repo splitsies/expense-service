@@ -31,7 +31,9 @@ export const main = middyfyWs(
             );
 
             await Promise.all(
-                relatedConnectionIds.map((id) => sendMessage(connectionConfiguration.gatewayUrl, id, expenseMapper.toDtoModel(updated))),
+                relatedConnectionIds.map((id) =>
+                    sendMessage(connectionConfiguration.gatewayUrl, id, expenseMapper.toDtoModel(updated)),
+                ),
             );
             return new DataResponse(HttpStatusCode.OK, updated).toJson();
         },
