@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { randomUUID } from "crypto";
-import { IExpense, Expense, IExpenseUpdate } from "@splitsies/shared-models";
+import { IExpense, Expense, IExpenseUpdate, ExpenseItem } from "@splitsies/shared-models";
 import { IExpenseManager } from "./expense-manager-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 import { IExpenseUpdateMapper } from "@splitsies/utils";
@@ -58,5 +58,18 @@ export class ExpenseManager implements IExpenseManager {
             return;
         }
         await this._userExpenseDao.create(userExpense);
+    }
+
+    async addItemToExpense(
+        name: string,
+        price: number,
+        owners: string[],
+        isProportional: boolean,
+        expenseId: string,
+    ): Promise<IExpense> {
+        const item = new ExpenseItem(randomUUID(), name, price, owners);
+        const expense = await this.getExpense(expenseId);
+        isProportional ? expense.proportionalItems.push(item) : expense.items.push(item);
+        return this.updateExpense(expense.id, this._expenseUpdateMapper.toDtoModel(expense));
     }
 }

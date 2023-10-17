@@ -8,7 +8,7 @@ import firebaseConfig from "./src/config/firebase.config.json";
 import create from "@functions/expense/create";
 import connect from "@functions/connection/connect";
 import disconnect from "@functions/connection/disconnect";
-import updateExpense from "@functions/connection/update-expense";
+import message from "@functions/connection/message";
 import deleteExpiredConnections from "@functions/connection/delete-expired";
 import getForUser from "@functions/expense/get-for-user";
 import addUserToExpense from "@functions/expense/add-user-to-expense";
@@ -54,7 +54,7 @@ const serverlessConfiguration: AWS = {
         create,
         connect,
         disconnect,
-        updateExpense,
+        message,
         deleteExpiredConnections,
         getForUser,
         addUserToExpense,

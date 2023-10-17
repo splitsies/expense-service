@@ -53,4 +53,8 @@ export class ConnectionManager implements IConnectionManager {
     async getExpenseIdForConnection(connectionId: string): Promise<string> {
         return await this._connectionDao.getExpenseIdForConnection(connectionId);
     }
+
+    async getConnectionsForExpenseId(expenseId: string): Promise<string[]> {
+        return await this._connectionDao.getConnectionsForExpense(expenseId);
+    }
 }

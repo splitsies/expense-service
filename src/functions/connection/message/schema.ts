@@ -4,7 +4,7 @@ const expenseItemSchema = {
         id: { type: "string" },
         name: { type: "string" },
         price: { type: "number" },
-        owners: { type: "array", items: "string" },
+        owners: { type: "array", items: { type: "string" } },
     },
 } as const;
 
@@ -12,6 +12,7 @@ export default {
     type: "object",
     properties: {
         id: { type: "string" },
+        method: { type: "string" },
         expense: {
             type: "object",
             properties: {
@@ -21,6 +22,8 @@ export default {
                 proportionalItems: { type: "array", items: expenseItemSchema },
             },
         },
+        item: expenseItemSchema,
+        isProportional: { type: "boolean" },
     },
-    required: ["id", "expense"],
+    required: ["id", "method"],
 } as const;
