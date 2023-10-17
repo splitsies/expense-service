@@ -9,6 +9,13 @@ export interface IExpenseService {
     updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense>;
     getExpensesForUser(userId: string): Promise<IExpense[]>;
     addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void>;
+    addItemToExpense(
+        name: string,
+        price: number,
+        owners: string[],
+        isProportional: boolean,
+        expenseId: string,
+    ): Promise<IExpense>;
 }
 
 export const IExpenseService: symbol = Symbol.for("IExpenseService");

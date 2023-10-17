@@ -61,4 +61,14 @@ export class ExpenseService implements IExpenseService {
     addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
         return this._expenseManager.addUserToExpense(userExpense, requestingUserId);
     }
+
+    addItemToExpense(
+        name: string,
+        price: number,
+        owners: string[],
+        isProportional: boolean,
+        expenseId: string,
+    ): Promise<IExpense> {
+        return this._expenseManager.addItemToExpense(name, price, owners, isProportional, expenseId);
+    }
 }

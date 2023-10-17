@@ -7,6 +7,7 @@ export interface IConnectionManager {
     deleteExpired(): Promise<void>;
     getRelatedConnections(connectionId: string): Promise<string[]>;
     getExpenseIdForConnection(connectionId: string): Promise<string>;
+    getConnectionsForExpenseId(expenseId: string): Promise<string[]>;
 }
 
 export const IConnectionManager = Symbol.for("IConnectionManager");
