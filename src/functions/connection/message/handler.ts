@@ -1,11 +1,12 @@
 import "reflect-metadata";
 import schema from "./schema";
-import { ExpectedError, IExpenseMapper, ILogger, SplitsiesFunctionHandlerFactory } from "@splitsies/utils";
+import { ExpectedError, ILogger, SplitsiesFunctionHandlerFactory } from "@splitsies/utils";
 import { container } from "src/di/inversify.config";
 import {
     DataResponse,
     HttpStatusCode,
     IExpense,
+    IExpenseMapper,
     IExpenseUpdate,
     InvalidArgumentsError,
 } from "@splitsies/shared-models";
@@ -44,8 +45,8 @@ export const main = middyfyWs(
                     break;
                 case "addItem":
                     if (!event.body.item) throw new InvalidArgumentsError();
-                    const { name, price, owners } = event.body.item;
-                    updated = await add(event.body.id, name, price, owners, event.body.isProportional);
+                    const { name, price, owners, isProportional } = event.body.item;
+                    updated = await add(event.body.id, name, price, owners, isProportional);
                     break;
                 default:
                     throw new MethodNotSupportedError();

@@ -3,14 +3,7 @@ import { Container } from "inversify";
 import { IExpenseService } from "../services/expense-service/expense-service-interface";
 import { ExpenseService } from "../services/expense-service/expense-service";
 import { IExpenseManager } from "../managers/expense-manager/expense-manager-interface";
-import {
-    ExpenseMapper,
-    ExpenseUpdateMapper,
-    IExpenseMapper,
-    IExpenseUpdateMapper,
-    ILogger,
-    Logger,
-} from "@splitsies/utils";
+import { ILogger, Logger } from "@splitsies/utils";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { DbConfiguration } from "src/models/configuration/db/db-configuration";
 import { ExpenseDao } from "src/dao/expense-dao/expense-dao";
@@ -48,6 +41,9 @@ import { IEmulatedJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/emula
 import { EmulatedJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/emulated-jwt-auth-strategy/emulated-jwt-auth-strategy";
 import { IFirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy-interface";
 import { FirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy";
+import { ExpenseMapper, ExpenseUpdateMapper, IExpenseMapper, IExpenseUpdateMapper } from "@splitsies/shared-models";
+import { IExpenseStatements } from "src/dao/expense-dao/expense-statements-interface";
+import { ExpenseStatements } from "src/dao/expense-dao/expense-statements";
 
 const container = new Container();
 
@@ -79,4 +75,5 @@ container.bind<IAdminAuthProvider>(IAdminAuthProvider).to(AdminAuthProvider).inS
 container.bind<IJwtStrategyProvider>(IJwtStrategyProvider).to(JwtStrategyProvider).inSingletonScope();
 container.bind<IEmulatedJwtAuthStrategy>(IEmulatedJwtAuthStrategy).to(EmulatedJwtAuthStrategy).inSingletonScope();
 container.bind<IFirebaseJwtAuthStrategy>(IFirebaseJwtAuthStrategy).to(FirebaseJwtAuthStrategy).inSingletonScope();
+container.bind<IExpenseStatements>(IExpenseStatements).to(ExpenseStatements).inSingletonScope();
 export { container };

@@ -1,9 +1,8 @@
 import { inject, injectable } from "inversify";
 import { randomUUID } from "crypto";
-import { IExpense, Expense, IExpenseUpdate, ExpenseItem } from "@splitsies/shared-models";
+import { IExpense, Expense, IExpenseUpdate, ExpenseItem, IExpenseUpdateMapper } from "@splitsies/shared-models";
 import { IExpenseManager } from "./expense-manager-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
-import { IExpenseUpdateMapper } from "@splitsies/utils";
 import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
@@ -27,7 +26,7 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async createExpense(userId: string): Promise<IExpense> {
-        const created = await this._expenseDao.create(new Expense(randomUUID(), "", new Date(), [], []));
+        const created = await this._expenseDao.create(new Expense(randomUUID(), "", new Date(), []));
         await this._userExpenseDao.create({ expenseId: created.id, userId });
         return created;
     }
@@ -44,7 +43,7 @@ export class ExpenseManager implements IExpenseManager {
 
     async getExpensesForUser(userId: string): Promise<IExpense[]> {
         const expenseIds = await this._userExpenseDao.getExpenseIdsForUser(userId);
-        return await Promise.all(expenseIds.map((id) => this._expenseDao.read({ id })));
+        return await this._expenseDao.getExpenses(expenseIds);
     }
 
     async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
@@ -57,6 +56,7 @@ export class ExpenseManager implements IExpenseManager {
         if (!!(await this._userExpenseDao.read(this._userExpenseDao.key(userExpense)))) {
             return;
         }
+
         await this._userExpenseDao.create(userExpense);
     }
 
@@ -67,9 +67,9 @@ export class ExpenseManager implements IExpenseManager {
         isProportional: boolean,
         expenseId: string,
     ): Promise<IExpense> {
-        const item = new ExpenseItem(randomUUID(), name, price, owners);
+        const item = new ExpenseItem(randomUUID(), name, price, owners, isProportional);
         const expense = await this.getExpense(expenseId);
-        isProportional ? expense.proportionalItems.push(item) : expense.items.push(item);
+        expense.items.push(item);
         return this.updateExpense(expense.id, this._expenseUpdateMapper.toDtoModel(expense));
     }
 }
