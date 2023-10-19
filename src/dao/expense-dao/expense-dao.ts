@@ -12,11 +12,11 @@ export class ExpenseDao extends DaoBase<IExpense, IExpenseDto> implements IExpen
     constructor(
         @inject(ILogger) logger: ILogger,
         @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
-        @inject(IExpenseMapper) private readonly _mapper: IExpenseMapper,
+        @inject(IExpenseMapper) mapper: IExpenseMapper,
         @inject(IExpenseStatements) private readonly _expenseStatements: IExpenseStatements,
     ) {
         const keySelector = (e: IExpense) => ({ id: e.id });
-        super(logger, dbConfiguration, dbConfiguration.tableName, keySelector, _mapper);
+        super(logger, dbConfiguration, dbConfiguration.tableName, keySelector, mapper);
     }
 
     async getExpenses(expenseIds: string[]): Promise<IExpense[]> {
