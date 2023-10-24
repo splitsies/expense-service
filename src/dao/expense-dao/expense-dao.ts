@@ -1,30 +1,36 @@
 import { inject, injectable } from "inversify";
-import { IExpense, IExpenseDto } from "@splitsies/shared-models";
+import { IExpense, IExpenseDto, IExpenseMapper } from "@splitsies/shared-models";
 import { IExpenseDao } from "./expense-dao-interface";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
-import { DaoBase, IExpenseMapper, ILogger } from "@splitsies/utils";
+import { DaoBase, ILogger } from "@splitsies/utils";
 import { ExecuteStatementCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { IExpenseStatements } from "./expense-statements-interface";
 
 @injectable()
 export class ExpenseDao extends DaoBase<IExpense, IExpenseDto> implements IExpenseDao {
     constructor(
         @inject(ILogger) logger: ILogger,
-        @inject(IDbConfiguration) private readonly dbConfiguration: IDbConfiguration,
+        @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
         @inject(IExpenseMapper) mapper: IExpenseMapper,
+        @inject(IExpenseStatements) private readonly _expenseStatements: IExpenseStatements,
     ) {
         const keySelector = (e: IExpense) => ({ id: e.id });
         super(logger, dbConfiguration, dbConfiguration.tableName, keySelector, mapper);
     }
 
-    async getExpensesForUser(userId: string): Promise<IExpense[]> {
-        // TODO: Remove and use the UserExpenseDao
+    async getExpenses(expenseIds: string[]): Promise<IExpense[]> {
+        const placeholders = `[${expenseIds.map((_) => "?").join(",")}]`;
+        const statement = this._expenseStatements.GetExpenses.replace("?", placeholders);
         const result = await this._client.send(
             new ExecuteStatementCommand({
-                Statement: `SELECT * FROM "${this.dbConfiguration.tableName}"`,
+                Statement: statement,
+                Parameters: expenseIds.map((id) => ({ S: id })),
             }),
         );
 
-        return result.Items?.length ? result.Items.map((i) => unmarshall(i) as IExpense) : [];
+        return result.Items?.length
+            ? result.Items.map((i) => this._mapper.toDomainModel(unmarshall(i) as IExpenseDto))
+            : [];
     }
 }

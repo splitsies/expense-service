@@ -1,9 +1,9 @@
 import { inject, injectable } from "inversify";
-import { IExpense, IExpenseUpdate, NotFoundError } from "@splitsies/shared-models";
+import { IExpense, IExpenseMapper, IExpenseUpdate, NotFoundError } from "@splitsies/shared-models";
 import { IExpenseService } from "./expense-service-interface";
 import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client-interface";
 import { ImageProcessingError } from "src/models/error/image-processing-error";
-import { IExpenseMapper, ILogger } from "@splitsies/utils";
+import { ILogger } from "@splitsies/utils";
 import { IExpenseManager } from "src/managers/expense-manager/expense-manager-interface";
 import { IOcrApiClient } from "src/api/ocr-api-client/ocr-api-client-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
