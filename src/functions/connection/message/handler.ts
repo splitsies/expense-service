@@ -4,10 +4,12 @@ import { ExpectedError, ILogger, SplitsiesFunctionHandlerFactory } from "@splits
 import { container } from "src/di/inversify.config";
 import {
     DataResponse,
+    ExpenseUserDetails,
     HttpStatusCode,
     IExpense,
     IExpenseMapper,
     IExpenseUpdate,
+    IExpenseUserDetails,
     InvalidArgumentsError,
 } from "@splitsies/shared-models";
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
@@ -46,7 +48,23 @@ export const main = middyfyWs(
                 case "addItem":
                     if (!event.body.item) throw new InvalidArgumentsError();
                     const { name, price, owners, isProportional } = event.body.item;
-                    updated = await add(event.body.id, name, price, owners, isProportional);
+
+                    updated = await add(
+                        event.body.id,
+                        name,
+                        price,
+                        owners.map(
+                            (o) =>
+                                new ExpenseUserDetails(
+                                    o.isRegistered,
+                                    o.id,
+                                    o.givenName,
+                                    o.familyName ?? "",
+                                    o.phoneNumber ?? "",
+                                ),
+                        ),
+                        isProportional,
+                    );
                     break;
                 default:
                     throw new MethodNotSupportedError();
@@ -71,6 +89,12 @@ const update = (id: string, update: IExpenseUpdate): Promise<IExpense> => {
     return expenseService.updateExpense(id, update);
 };
 
-const add = (id: string, name: string, price: number, owners: string[], isProportional: boolean): Promise<IExpense> => {
+const add = (
+    id: string,
+    name: string,
+    price: number,
+    owners: IExpenseUserDetails[],
+    isProportional: boolean,
+): Promise<IExpense> => {
     return expenseService.addItemToExpense(name, price, owners, isProportional, id);
 };

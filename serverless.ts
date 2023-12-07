@@ -14,6 +14,7 @@ import getForUser from "@functions/expense/get-for-user";
 import addUserToExpense from "@functions/expense/add-user-to-expense";
 import getExpense from "@functions/expense/get";
 import verifyToken from "@functions/auth/verify-token";
+import getUsersForExpense from "@functions/expense/get-users-for-expense";
 
 const serverlessConfiguration: AWS = {
     org: "splitsies",
@@ -59,6 +60,7 @@ const serverlessConfiguration: AWS = {
         getForUser,
         addUserToExpense,
         getExpense,
+        getUsersForExpense,
     },
     package: { individually: true },
     custom: {

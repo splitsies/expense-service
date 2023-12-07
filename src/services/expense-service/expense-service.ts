@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { IExpense, IExpenseMapper, IExpenseUpdate, NotFoundError } from "@splitsies/shared-models";
+import { IExpense, IExpenseMapper, IExpenseUpdate, IExpenseUserDetails, NotFoundError } from "@splitsies/shared-models";
 import { IExpenseService } from "./expense-service-interface";
 import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client-interface";
 import { ImageProcessingError } from "src/models/error/image-processing-error";
@@ -58,14 +58,22 @@ export class ExpenseService implements IExpenseService {
         return await this._expenseManager.getExpensesForUser(userId);
     }
 
+    async getUsersForExpense(expenseId: string): Promise<string[]> {
+        return await this._expenseManager.getUsersForExpense(expenseId);
+    }
+
     addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
         return this._expenseManager.addUserToExpense(userExpense, requestingUserId);
+    }
+
+    removeUserFromExpense(expenseId: string, userId: string): Promise<void> {
+        return this._expenseManager.removeUserFromExpense(expenseId, userId);
     }
 
     addItemToExpense(
         name: string,
         price: number,
-        owners: string[],
+        owners: IExpenseUserDetails[],
         isProportional: boolean,
         expenseId: string,
     ): Promise<IExpense> {
