@@ -1,5 +1,12 @@
 import { inject, injectable } from "inversify";
-import { IExpense, IExpenseMapper, IExpenseUpdate, IExpenseUserDetails, NotFoundError } from "@splitsies/shared-models";
+import {
+    IExpense,
+    IExpenseMapper,
+    IExpenseUpdate,
+    IExpenseUserDetails,
+    IExpenseUserDetailsMapper,
+    NotFoundError,
+} from "@splitsies/shared-models";
 import { IExpenseService } from "./expense-service-interface";
 import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client-interface";
 import { ImageProcessingError } from "src/models/error/image-processing-error";
@@ -8,6 +15,7 @@ import { IExpenseManager } from "src/managers/expense-manager/expense-manager-in
 import { IOcrApiClient } from "src/api/ocr-api-client/ocr-api-client-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { IUsersApiClient } from "src/api/users-api-client/users-api-client-interface";
+import { ApiCommunicationError } from "src/models/error/api-communication-error";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -18,6 +26,7 @@ export class ExpenseService implements IExpenseService {
         @inject(IAlgorithmsApiClient) private readonly _algorithsmApiClient: IAlgorithmsApiClient,
         @inject(IUsersApiClient) private readonly _usersApiClient: IUsersApiClient,
         @inject(IExpenseMapper) private readonly _mapper: IExpenseMapper,
+        @inject(IExpenseUserDetailsMapper) private readonly _expenseUserDetailsMapper: IExpenseUserDetailsMapper,
     ) {}
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
@@ -60,6 +69,19 @@ export class ExpenseService implements IExpenseService {
 
     async getUsersForExpense(expenseId: string): Promise<string[]> {
         return await this._expenseManager.getUsersForExpense(expenseId);
+    }
+
+    async getExpenseUserDetailsForExpense(expenseId: string): Promise<IExpenseUserDetails[]> {
+        const ids = await this.getUsersForExpense(expenseId);
+
+        try {
+            const response = await this._usersApiClient.findUsersById(ids);
+            if (!response.success) throw new Error(`${response.data}`);
+            return response.data.map((u) => this._expenseUserDetailsMapper.fromUserDto(u));
+        } catch (e) {
+            this._logger.error(e);
+            throw new ApiCommunicationError();
+        }
     }
 
     addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {

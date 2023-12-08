@@ -41,7 +41,14 @@ import { IEmulatedJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/emula
 import { EmulatedJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/emulated-jwt-auth-strategy/emulated-jwt-auth-strategy";
 import { IFirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy-interface";
 import { FirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy";
-import { ExpenseMapper, ExpenseUpdateMapper, IExpenseMapper, IExpenseUpdateMapper } from "@splitsies/shared-models";
+import {
+    ExpenseMapper,
+    ExpenseUpdateMapper,
+    ExpenseUserDetailsMapper,
+    IExpenseMapper,
+    IExpenseUpdateMapper,
+    IExpenseUserDetailsMapper,
+} from "@splitsies/shared-models";
 import { IExpenseStatements } from "src/dao/expense-dao/expense-statements-interface";
 import { ExpenseStatements } from "src/dao/expense-dao/expense-statements";
 
@@ -76,4 +83,5 @@ container.bind<IJwtStrategyProvider>(IJwtStrategyProvider).to(JwtStrategyProvide
 container.bind<IEmulatedJwtAuthStrategy>(IEmulatedJwtAuthStrategy).to(EmulatedJwtAuthStrategy).inSingletonScope();
 container.bind<IFirebaseJwtAuthStrategy>(IFirebaseJwtAuthStrategy).to(FirebaseJwtAuthStrategy).inSingletonScope();
 container.bind<IExpenseStatements>(IExpenseStatements).to(ExpenseStatements).inSingletonScope();
+container.bind<IExpenseUserDetailsMapper>(IExpenseUserDetailsMapper).to(ExpenseUserDetailsMapper).inSingletonScope();
 export { container };
