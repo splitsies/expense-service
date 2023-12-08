@@ -11,6 +11,7 @@ export interface IExpenseService {
     getUsersForExpense(expenseId: string): Promise<string[]>;
     addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<void>;
+    getExpenseUserDetailsForExpense(expenseId: string): Promise<IExpenseUserDetails[]>;
     addItemToExpense(
         name: string,
         price: number,
