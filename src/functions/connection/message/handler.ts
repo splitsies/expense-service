@@ -4,6 +4,7 @@ import { ExpectedError, ILogger, SplitsiesFunctionHandlerFactory } from "@splits
 import { container } from "src/di/inversify.config";
 import {
     DataResponse,
+    ExpenseMessage,
     ExpenseUserDetails,
     HttpStatusCode,
     IExpense,
@@ -76,7 +77,11 @@ export const main = middyfyWs(
 
             await Promise.all(
                 relatedConnectionIds.map((id) =>
-                    sendMessage(connectionConfiguration.gatewayUrl, id, expenseMapper.toDtoModel(updated)),
+                    sendMessage(
+                        connectionConfiguration.gatewayUrl,
+                        id,
+                        new ExpenseMessage("expense", expenseMapper.toDtoModel(updated)),
+                    ),
                 ),
             );
             return new DataResponse(HttpStatusCode.OK, updated).toJson();
