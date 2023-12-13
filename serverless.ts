@@ -66,9 +66,9 @@ const serverlessConfiguration: AWS = {
         getExpense,
         getUsersForExpense,
         getJoinRequests,
-        addJoinRequest,
+        addJoinRequest: addJoinRequest,
         removeJoinRequest,
-        getJoinRequestsForExpense
+        getJoinRequestsForExpense,
     },
     package: { individually: true },
     custom: {

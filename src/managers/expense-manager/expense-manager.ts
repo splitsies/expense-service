@@ -66,19 +66,6 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
-        // make sure the requesting user is actually on the expense
-        const original = { userId: requestingUserId, expenseId: userExpense.expenseId } as IUserExpense;
-        const key = this._userExpenseDao.key(original);
-        const exists = !!(await this._userExpenseDao.read(key));
-        if (!exists) throw new UnauthorizedUserError();
-
-        if (!!(await this._userExpenseDao.read(this._userExpenseDao.key(userExpense)))) {
-            this._logger.warn(
-                `Attempted to add user ${userExpense.userId} to expense ${userExpense.expenseId}, but the entry already exists`,
-            );
-            return;
-        }
-
         await this._userExpenseDao.create(userExpense);
     }
 
@@ -96,7 +83,7 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void> {
-        const request = new ExpenseJoinRequest(userId, expenseId, requestUserId);
+        const request = new ExpenseJoinRequest(userId, expenseId, requestUserId, new Date());
 
         if (!!(await this._expenseJoinRequestDao.read(this._expenseJoinRequestDao.key(request)))) {
             this._logger.log(`User ${userId} already has a request for expense ${expenseId}. Skipping the insert.`);
@@ -107,7 +94,7 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     removeExpenseJoinRequest(userId: string, expenseId: string): Promise<void> {
-        const key = this._expenseJoinRequestDao.key({ userId, expenseId, requestingUserId: "" });
+        const key = this._expenseJoinRequestDao.key({ userId, expenseId, requestingUserId: "", createdAt: new Date() });
         return this._expenseJoinRequestDao.delete(key);
     }
 

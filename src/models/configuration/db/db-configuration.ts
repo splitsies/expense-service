@@ -21,7 +21,7 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.connectionTableName, "db table name was undefined");
         assert(!!process.env.dbEndpoint, "db endpoint was undefined");
         assert(!!process.env.userExpenseTableName, "DB_USER_EXPENSE_TABLE_NAME was undefined");
-        assert(!!process.env.expenseJoinRequestTableName, "DB_EXPENSE_JOIN_REQUEST_TABLE_NAME was undefined")
+        assert(!!process.env.expenseJoinRequestTableName, "DB_EXPENSE_JOIN_REQUEST_TABLE_NAME was undefined");
 
         this._dbAccessKeyId = process.env.dbAccessKeyId;
         this._dbSecretAccessKey = process.env.dbSecretAccessKey;

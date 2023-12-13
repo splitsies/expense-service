@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import {
     ExpenseJoinRequestDto,
+    ExpensePayload,
     IExpense,
     IExpenseJoinRequest,
     IExpenseJoinRequestDto,
@@ -19,6 +20,8 @@ import { IOcrApiClient } from "src/api/ocr-api-client/ocr-api-client-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { IUsersApiClient } from "src/api/users-api-client/users-api-client-interface";
 import { ApiCommunicationError } from "src/models/error/api-communication-error";
+import { InvalidStateError } from "src/models/error/invalid-state-error";
+import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -30,7 +33,7 @@ export class ExpenseService implements IExpenseService {
         @inject(IUsersApiClient) private readonly _usersApiClient: IUsersApiClient,
         @inject(IExpenseMapper) private readonly _mapper: IExpenseMapper,
         @inject(IExpenseUserDetailsMapper) private readonly _expenseUserDetailsMapper: IExpenseUserDetailsMapper,
-        @inject(IExpenseMapper) private readonly _expenseMapper: IExpenseMapper
+        @inject(IExpenseMapper) private readonly _expenseMapper: IExpenseMapper,
     ) {}
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
@@ -88,7 +91,36 @@ export class ExpenseService implements IExpenseService {
         }
     }
 
-    addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
+    async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
+        const response = await this._usersApiClient.getById(userExpense.userId);
+
+        if (!response.success) {
+            throw new ApiCommunicationError(`Could not fetch user for ${userExpense.userId}`);
+        }
+
+        if (!response.data) {
+            throw new InvalidStateError("User for the corresponding request was not found");
+        }
+
+        const user = this._expenseUserDetailsMapper.fromUserDto(response.data);
+        if (user.isRegistered && userExpense.userId !== requestingUserId) {
+            // if the user is registered, then only that user can decide to be added to an expense
+            // i.e. this request is accepting a join request and must be initiated by that user themselves
+            const message = `User ${requestingUserId} is not authorized to add user ${userExpense.userId} to expense ${userExpense.expenseId}`;
+            this._logger.warn(message);
+            throw new UnauthorizedUserError(message);
+        }
+
+        if (!user.isRegistered) {
+            // Then ensure that this user is authorized to add a guest to this expense
+            const exists = !!this._expenseManager.getUserExpense(requestingUserId, userExpense.expenseId);
+            if (!exists) {
+                const message = `User ${requestingUserId} is not authorized to add user ${userExpense.userId} to expense ${userExpense.expenseId}`;
+                this._logger.warn(message);
+                throw new UnauthorizedUserError(message);
+            }
+        }
+
         return this._expenseManager.addUserToExpense(userExpense, requestingUserId);
     }
 
@@ -108,33 +140,44 @@ export class ExpenseService implements IExpenseService {
 
     async getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequestDto[]> {
         const joinRequests = await this._expenseManager.getExpenseJoinRequestsForUser(userId);
-        const response = await this._usersApiClient.findUsersById(joinRequests.map(r => r.requestingUserId));
-        if (!response.success) throw new ApiCommunicationError(`Error requesting users: status=${response.statusCode} - ${response.data}`);
+        if (joinRequests.length === 0) return [];
+
+        const response = await this._usersApiClient.findUsersById(joinRequests.map((r) => r.requestingUserId));
+        if (!response.success)
+            throw new ApiCommunicationError(`Error requesting users: status=${response.statusCode} - ${response.data}`);
         const requestingUsers = response.data;
 
         const mappedJoinRequests: IExpenseJoinRequestDto[] = [];
 
         for (const request of joinRequests) {
-            const requestingUser = requestingUsers.find(r => r.id === request.requestingUserId);
+            const requestingUser = requestingUsers.find((r) => r.id === request.requestingUserId);
 
             if (!requestingUser) {
-                this._logger.warn(`ExpenseJoinRequest for userId=${request.userId}, expenseId=${request.expenseId} from user ${request.requestingUserId} that does not exist`);
+                this._logger.warn(
+                    `ExpenseJoinRequest for userId=${request.userId}, expenseId=${request.expenseId} from user ${request.requestingUserId} that does not exist`,
+                );
                 await this._expenseManager.removeExpenseJoinRequest(request.userId, request.expenseId);
                 continue;
             }
 
             const expense = await this.getExpense(request.expenseId);
             if (!expense) {
-                this._logger.warn(`ExpenseJoinRequest for userId=${request.userId}, expenseId=${request.expenseId} - Expense does not exist`);
+                this._logger.warn(
+                    `ExpenseJoinRequest for userId=${request.userId}, expenseId=${request.expenseId} - Expense does not exist`,
+                );
                 await this._expenseManager.removeExpenseJoinRequest(request.userId, request.expenseId);
                 continue;
             }
 
-            mappedJoinRequests.push(new ExpenseJoinRequestDto(
-                request.userId,
-                this._expenseMapper.toDtoModel(expense),
-                requestingUser
-            ));
+            const expenseUsers = await this.getExpenseUserDetailsForExpense(request.expenseId);
+            mappedJoinRequests.push(
+                new ExpenseJoinRequestDto(
+                    request.userId,
+                    new ExpensePayload(this._expenseMapper.toDtoModel(expense), expenseUsers),
+                    requestingUser,
+                    request.createdAt.toISOString(),
+                ),
+            );
         }
 
         return mappedJoinRequests;
@@ -143,7 +186,7 @@ export class ExpenseService implements IExpenseService {
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]> {
         return this._expenseManager.getJoinRequestsForExpense(expenseId);
     }
-    
+
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void> {
         return this._expenseManager.addExpenseJoinRequest(userId, expenseId, requestUserId);
     }

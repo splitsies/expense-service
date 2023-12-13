@@ -17,7 +17,6 @@ export const main = middyfy(
     SplitsiesFunctionHandlerFactory.create<typeof schema, IExpenseJoinRequestDto[] | string>(
         logger,
         async (event) => {
-
             const userId = event.pathParameters.userId;
             const tokenUserId = event.requestContext.authorizer.userId;
 
