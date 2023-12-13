@@ -1,6 +1,9 @@
 import { inject, injectable } from "inversify";
 import {
+    ExpenseJoinRequestDto,
     IExpense,
+    IExpenseJoinRequest,
+    IExpenseJoinRequestDto,
     IExpenseMapper,
     IExpenseUpdate,
     IExpenseUserDetails,
@@ -27,6 +30,7 @@ export class ExpenseService implements IExpenseService {
         @inject(IUsersApiClient) private readonly _usersApiClient: IUsersApiClient,
         @inject(IExpenseMapper) private readonly _mapper: IExpenseMapper,
         @inject(IExpenseUserDetailsMapper) private readonly _expenseUserDetailsMapper: IExpenseUserDetailsMapper,
+        @inject(IExpenseMapper) private readonly _expenseMapper: IExpenseMapper
     ) {}
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
@@ -100,5 +104,51 @@ export class ExpenseService implements IExpenseService {
         expenseId: string,
     ): Promise<IExpense> {
         return this._expenseManager.addItemToExpense(name, price, owners, isProportional, expenseId);
+    }
+
+    async getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequestDto[]> {
+        const joinRequests = await this._expenseManager.getExpenseJoinRequestsForUser(userId);
+        const response = await this._usersApiClient.findUsersById(joinRequests.map(r => r.requestingUserId));
+        if (!response.success) throw new ApiCommunicationError(`Error requesting users: status=${response.statusCode} - ${response.data}`);
+        const requestingUsers = response.data;
+
+        const mappedJoinRequests: IExpenseJoinRequestDto[] = [];
+
+        for (const request of joinRequests) {
+            const requestingUser = requestingUsers.find(r => r.id === request.requestingUserId);
+
+            if (!requestingUser) {
+                this._logger.warn(`ExpenseJoinRequest for userId=${request.userId}, expenseId=${request.expenseId} from user ${request.requestingUserId} that does not exist`);
+                await this._expenseManager.removeExpenseJoinRequest(request.userId, request.expenseId);
+                continue;
+            }
+
+            const expense = await this.getExpense(request.expenseId);
+            if (!expense) {
+                this._logger.warn(`ExpenseJoinRequest for userId=${request.userId}, expenseId=${request.expenseId} - Expense does not exist`);
+                await this._expenseManager.removeExpenseJoinRequest(request.userId, request.expenseId);
+                continue;
+            }
+
+            mappedJoinRequests.push(new ExpenseJoinRequestDto(
+                request.userId,
+                this._expenseMapper.toDtoModel(expense),
+                requestingUser
+            ));
+        }
+
+        return mappedJoinRequests;
+    }
+
+    getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]> {
+        return this._expenseManager.getJoinRequestsForExpense(expenseId);
+    }
+    
+    addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void> {
+        return this._expenseManager.addExpenseJoinRequest(userId, expenseId, requestUserId);
+    }
+
+    removeExpenseJoinRequest(userId: string, expenseId: string): Promise<void> {
+        return this._expenseManager.removeExpenseJoinRequest(userId, expenseId);
     }
 }

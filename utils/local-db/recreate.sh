@@ -14,7 +14,6 @@ aws dynamodb create-table \
     --table-class STANDARD \
     --endpoint-url http://localhost:8000
 
-
 aws dynamodb create-table \
     --table-name ExpenseConnection-local \
     --attribute-definitions \
@@ -35,6 +34,18 @@ aws dynamodb create-table \
     --key-schema \
         AttributeName=expenseId,KeyType=HASH \
         AttributeName=userId,KeyType=RANGE \
+    --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+    --table-class STANDARD \
+    --endpoint-url http://localhost:8000
+
+aws dynamodb create-table \
+    --table-name Splitsies-ExpenseJoinRequest-local \
+    --attribute-definitions \
+        AttributeName=userId,AttributeType=S \
+        AttributeName=expenseId,AttributeType=S \
+    --key-schema \
+        AttributeName=userId,KeyType=HASH \
+        AttributeName=expenseId,KeyType=RANGE \
     --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
     --table-class STANDARD \
     --endpoint-url http://localhost:8000

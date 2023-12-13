@@ -5,6 +5,7 @@ export interface IDbConfiguration {
     readonly tableName: string;
     readonly connectionTableName: string;
     readonly userExpenseTableName: string;
+    readonly expenseJoinRequestTableName: string;
     readonly endpoint: string;
 }
 

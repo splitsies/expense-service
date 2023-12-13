@@ -51,6 +51,10 @@ import {
 } from "@splitsies/shared-models";
 import { IExpenseStatements } from "src/dao/expense-dao/expense-statements-interface";
 import { ExpenseStatements } from "src/dao/expense-dao/expense-statements";
+import { IExpenseJoinRequestDao } from "src/dao/expense-join-request-dao/expense-join-request-dao-interface";
+import { ExpenseJoinRequestDao } from "src/dao/expense-join-request-dao/expense-join-request-dao";
+import { IExpenseJoinRequestStatements } from "src/dao/expense-join-request-dao/expense-join-request-statements-interface";
+import { ExpenseJoinRequestStatements } from "src/dao/expense-join-request-dao/expense-join-request-statements";
 
 const container = new Container();
 
@@ -84,4 +88,6 @@ container.bind<IEmulatedJwtAuthStrategy>(IEmulatedJwtAuthStrategy).to(EmulatedJw
 container.bind<IFirebaseJwtAuthStrategy>(IFirebaseJwtAuthStrategy).to(FirebaseJwtAuthStrategy).inSingletonScope();
 container.bind<IExpenseStatements>(IExpenseStatements).to(ExpenseStatements).inSingletonScope();
 container.bind<IExpenseUserDetailsMapper>(IExpenseUserDetailsMapper).to(ExpenseUserDetailsMapper).inSingletonScope();
+container.bind<IExpenseJoinRequestDao>(IExpenseJoinRequestDao).to(ExpenseJoinRequestDao).inSingletonScope();
+container.bind<IExpenseJoinRequestStatements>(IExpenseJoinRequestStatements).to(ExpenseJoinRequestStatements).inSingletonScope();
 export { container };

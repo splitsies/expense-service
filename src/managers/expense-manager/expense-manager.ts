@@ -7,6 +7,8 @@ import {
     ExpenseItem,
     IExpenseUpdateMapper,
     IExpenseUserDetails,
+    IExpenseJoinRequest,
+    ExpenseJoinRequest,
 } from "@splitsies/shared-models";
 import { IExpenseManager } from "./expense-manager-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
@@ -14,6 +16,7 @@ import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-inter
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 import { ILogger } from "@splitsies/utils";
+import { IExpenseJoinRequestDao } from "src/dao/expense-join-request-dao/expense-join-request-dao-interface";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -21,6 +24,7 @@ export class ExpenseManager implements IExpenseManager {
         @inject(ILogger) private readonly _logger: ILogger,
         @inject(IExpenseDao) private readonly _expenseDao: IExpenseDao,
         @inject(IUserExpenseDao) private readonly _userExpenseDao: IUserExpenseDao,
+        @inject(IExpenseJoinRequestDao) private readonly _expenseJoinRequestDao: IExpenseJoinRequestDao,
         @inject(IExpenseUpdateMapper) private readonly _expenseUpdateMapper: IExpenseUpdateMapper,
     ) {}
 
@@ -81,6 +85,30 @@ export class ExpenseManager implements IExpenseManager {
     async removeUserFromExpense(expenseId: string, userId: string): Promise<void> {
         const key = this._userExpenseDao.key({ expenseId, userId });
         return this._userExpenseDao.delete(key);
+    }
+
+    async getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequest[]> {
+        return this._expenseJoinRequestDao.getForUser(userId);
+    }
+
+    async getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]> {
+        return this._expenseJoinRequestDao.getForExpense(expenseId);
+    }
+
+    async addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void> {
+        const request = new ExpenseJoinRequest(userId, expenseId, requestUserId);
+
+        if (!!(await this._expenseJoinRequestDao.read(this._expenseJoinRequestDao.key(request)))) {
+            this._logger.log(`User ${userId} already has a request for expense ${expenseId}. Skipping the insert.`);
+            return;
+        }
+
+        await this._expenseJoinRequestDao.create(request);
+    }
+
+    removeExpenseJoinRequest(userId: string, expenseId: string): Promise<void> {
+        const key = this._expenseJoinRequestDao.key({ userId, expenseId, requestingUserId: "" });
+        return this._expenseJoinRequestDao.delete(key);
     }
 
     async addItemToExpense(
