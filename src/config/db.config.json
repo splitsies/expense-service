@@ -5,5 +5,6 @@
     "dbTableName": "${param:DB_TABLE_NAME}",
     "connectionTableName": "${param:CONNECTION_TABLE_NAME}",
     "userExpenseTableName": "${param:DB_USER_EXPENSE_TABLE_NAME}",
+    "expenseJoinRequestTableName": "${param:DB_EXPENSE_JOIN_REQUEST_TABLE_NAME}",
     "dbEndpoint": "${param:DB_ENDPOINT}"
 }

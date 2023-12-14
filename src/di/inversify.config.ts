@@ -42,15 +42,23 @@ import { EmulatedJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/emulat
 import { IFirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy-interface";
 import { FirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy";
 import {
+    ExpenseJoinRequestDaMapper,
     ExpenseMapper,
     ExpenseUpdateMapper,
     ExpenseUserDetailsMapper,
+    IExpenseJoinRequestDaMapper,
     IExpenseMapper,
     IExpenseUpdateMapper,
     IExpenseUserDetailsMapper,
 } from "@splitsies/shared-models";
 import { IExpenseStatements } from "src/dao/expense-dao/expense-statements-interface";
 import { ExpenseStatements } from "src/dao/expense-dao/expense-statements";
+import { IExpenseJoinRequestDao } from "src/dao/expense-join-request-dao/expense-join-request-dao-interface";
+import { ExpenseJoinRequestDao } from "src/dao/expense-join-request-dao/expense-join-request-dao";
+import { IExpenseJoinRequestStatements } from "src/dao/expense-join-request-dao/expense-join-request-statements-interface";
+import { ExpenseJoinRequestStatements } from "src/dao/expense-join-request-dao/expense-join-request-statements";
+import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
+import { ExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster";
 
 const container = new Container();
 
@@ -84,4 +92,14 @@ container.bind<IEmulatedJwtAuthStrategy>(IEmulatedJwtAuthStrategy).to(EmulatedJw
 container.bind<IFirebaseJwtAuthStrategy>(IFirebaseJwtAuthStrategy).to(FirebaseJwtAuthStrategy).inSingletonScope();
 container.bind<IExpenseStatements>(IExpenseStatements).to(ExpenseStatements).inSingletonScope();
 container.bind<IExpenseUserDetailsMapper>(IExpenseUserDetailsMapper).to(ExpenseUserDetailsMapper).inSingletonScope();
+container.bind<IExpenseJoinRequestDao>(IExpenseJoinRequestDao).to(ExpenseJoinRequestDao).inSingletonScope();
+container
+    .bind<IExpenseJoinRequestStatements>(IExpenseJoinRequestStatements)
+    .to(ExpenseJoinRequestStatements)
+    .inSingletonScope();
+container
+    .bind<IExpenseJoinRequestDaMapper>(IExpenseJoinRequestDaMapper)
+    .to(ExpenseJoinRequestDaMapper)
+    .inSingletonScope();
+container.bind<IExpenseBroadcaster>(IExpenseBroadcaster).to(ExpenseBroadcaster).inSingletonScope();
 export { container };
