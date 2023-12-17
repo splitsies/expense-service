@@ -119,6 +119,11 @@ export class ExpenseService implements IExpenseService {
                 this._logger.warn(message);
                 throw new UnauthorizedUserError(message);
             }
+        } else {
+            // If the user is registered, an expense join request must exist
+            if (!(await this._expenseManager.joinRequestExists(userExpense.userId, userExpense.expenseId))) {
+                throw new UnauthorizedUserError("Join request does not exist");
+            }
         }
 
         return this._expenseManager.addUserToExpense(userExpense, requestingUserId);
@@ -191,7 +196,7 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.addExpenseJoinRequest(userId, expenseId, requestUserId);
     }
 
-    removeExpenseJoinRequest(userId: string, expenseId: string): Promise<void> {
-        return this._expenseManager.removeExpenseJoinRequest(userId, expenseId);
+    removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
+        return this._expenseManager.removeExpenseJoinRequest(userId, expenseId, requestingUserId);
     }
 }

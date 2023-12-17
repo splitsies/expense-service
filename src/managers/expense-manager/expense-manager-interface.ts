@@ -13,8 +13,9 @@ export interface IExpenseManager {
     removeUserFromExpense(expenseId: string, userId: string): Promise<void>;
     getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequest[]>;
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
-    removeExpenseJoinRequest(userId: string, expenseId: string): Promise<void>;
+    removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]>;
+    joinRequestExists(userId: string, expenseId: string): Promise<boolean>;
     addItemToExpense(
         name: string,
         price: number,

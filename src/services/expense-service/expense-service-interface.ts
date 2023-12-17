@@ -20,7 +20,7 @@ export interface IExpenseService {
     getExpenseUserDetailsForExpense(expenseId: string): Promise<IExpenseUserDetails[]>;
     getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequestDto[]>;
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
-    removeExpenseJoinRequest(userId: string, expenseId: string): Promise<void>;
+    removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]>;
     addItemToExpense(
         name: string,
