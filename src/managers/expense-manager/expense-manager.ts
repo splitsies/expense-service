@@ -65,7 +65,11 @@ export class ExpenseManager implements IExpenseManager {
         return await this._userExpenseDao.getUsersForExpense(expenseId);
     }
 
-    async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
+    async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {        
+        if (await this._userExpenseDao.read(this._userExpenseDao.key(userExpense))) {
+            return;
+        }
+
         await this._userExpenseDao.create(userExpense);
     }
 
@@ -93,8 +97,14 @@ export class ExpenseManager implements IExpenseManager {
         await this._expenseJoinRequestDao.create(request);
     }
 
-    removeExpenseJoinRequest(userId: string, expenseId: string): Promise<void> {
+    async removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
         const key = this._expenseJoinRequestDao.key({ userId, expenseId, requestingUserId: "", createdAt: new Date() });
+        const joinRequest = await this._expenseJoinRequestDao.read(key);
+
+        if (userId !== requestingUserId && joinRequest.requestingUserId !== requestingUserId) {
+            throw new UnauthorizedUserError();
+        }
+
         return this._expenseJoinRequestDao.delete(key);
     }
 
@@ -109,5 +119,10 @@ export class ExpenseManager implements IExpenseManager {
         const expense = await this.getExpense(expenseId);
         expense.items.push(item);
         return this.updateExpense(expense.id, this._expenseUpdateMapper.toDtoModel(expense));
+    }
+
+    async joinRequestExists(userId: string, expenseId: string): Promise<boolean> {
+        const key = this._expenseJoinRequestDao.key({ userId, expenseId, requestingUserId: "", createdAt: new Date() });
+        return !!(await this._expenseJoinRequestDao.read(key));
     }
 }
