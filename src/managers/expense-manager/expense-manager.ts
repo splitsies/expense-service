@@ -65,7 +65,7 @@ export class ExpenseManager implements IExpenseManager {
         return await this._userExpenseDao.getUsersForExpense(expenseId);
     }
 
-    async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {        
+    async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
         if (await this._userExpenseDao.read(this._userExpenseDao.key(userExpense))) {
             return;
         }
@@ -100,6 +100,10 @@ export class ExpenseManager implements IExpenseManager {
     async removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
         const key = this._expenseJoinRequestDao.key({ userId, expenseId, requestingUserId: "", createdAt: new Date() });
         const joinRequest = await this._expenseJoinRequestDao.read(key);
+
+        if (!joinRequest) {
+            return;
+        }
 
         if (userId !== requestingUserId && joinRequest.requestingUserId !== requestingUserId) {
             throw new UnauthorizedUserError();
