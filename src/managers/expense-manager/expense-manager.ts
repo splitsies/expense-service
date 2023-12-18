@@ -101,6 +101,10 @@ export class ExpenseManager implements IExpenseManager {
         const key = this._expenseJoinRequestDao.key({ userId, expenseId, requestingUserId: "", createdAt: new Date() });
         const joinRequest = await this._expenseJoinRequestDao.read(key);
 
+        if (!joinRequest) {
+            return;
+        }
+
         if (userId !== requestingUserId && joinRequest.requestingUserId !== requestingUserId) {
             throw new UnauthorizedUserError();
         }
