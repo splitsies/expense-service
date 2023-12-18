@@ -25,7 +25,7 @@ export const main = middyfy(
 
             await expenseService.removeExpenseJoinRequest(userId, expenseId, tokenUserId);
             const allJoinRequests = await expenseService.getJoinRequestsForExpense(expenseId);
-            expenseBroadcaster.broadcast(expenseId, new ExpenseMessage("joinRequests", allJoinRequests));
+            await expenseBroadcaster.broadcast(expenseId, new ExpenseMessage("joinRequests", allJoinRequests));
             return new DataResponse(HttpStatusCode.OK, null).toJson();
         },
         expectedErrors,
