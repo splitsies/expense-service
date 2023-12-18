@@ -161,7 +161,7 @@ export class ExpenseService implements IExpenseService {
                 this._logger.warn(
                     `ExpenseJoinRequest for userId=${request.userId}, expenseId=${request.expenseId} from user ${request.requestingUserId} that does not exist`,
                 );
-                await this._expenseManager.removeExpenseJoinRequest(request.userId, request.expenseId);
+                await this._expenseManager.removeExpenseJoinRequest(request.userId, request.expenseId, request.userId);
                 continue;
             }
 
@@ -170,7 +170,7 @@ export class ExpenseService implements IExpenseService {
                 this._logger.warn(
                     `ExpenseJoinRequest for userId=${request.userId}, expenseId=${request.expenseId} - Expense does not exist`,
                 );
-                await this._expenseManager.removeExpenseJoinRequest(request.userId, request.expenseId);
+                await this._expenseManager.removeExpenseJoinRequest(request.userId, request.expenseId, request.userId);
                 continue;
             }
 

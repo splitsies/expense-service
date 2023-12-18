@@ -65,7 +65,7 @@ export class ExpenseManager implements IExpenseManager {
         return await this._userExpenseDao.getUsersForExpense(expenseId);
     }
 
-    async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {        
+    async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
         if (await this._userExpenseDao.read(this._userExpenseDao.key(userExpense))) {
             return;
         }
