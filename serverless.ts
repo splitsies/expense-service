@@ -88,6 +88,7 @@ const serverlessConfiguration: AWS = {
             websocketPort: 14624,
             lambdaPort: 14625,
             ignoreJWTSignature: true,
+            host: "0.0.0.0"
         },
     },
 };
