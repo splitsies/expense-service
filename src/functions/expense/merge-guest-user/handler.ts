@@ -16,8 +16,10 @@ export const main = middyfy(
     SplitsiesFunctionHandlerFactory.create<typeof schema, void | string>(
         logger,
         async (event) => {
+            console.log("got request");
             const guestId = decodeURIComponent(event.pathParameters.guestId);
             const registeredUser = event.body.registeredUser as IExpenseUserDetails;
+            console.log({ guestId, registeredUser });
 
             const payloads = await expenseService.replaceGuestUserInfo(guestId, registeredUser);
 
