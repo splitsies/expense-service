@@ -6,6 +6,7 @@ import {
     IExpenseJoinRequest,
     IExpenseJoinRequestDto,
     IExpenseMapper,
+    IExpensePayload,
     IExpenseUpdate,
     IExpenseUserDetails,
     IExpenseUserDetailsMapper,
@@ -198,5 +199,17 @@ export class ExpenseService implements IExpenseService {
 
     removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
         return this._expenseManager.removeExpenseJoinRequest(userId, expenseId, requestingUserId);
+    }
+
+    async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpensePayload[]> {
+        const updatedExpenses = await this._expenseManager.replaceGuestUserInfo(guestUserId, registeredUser);
+
+        const payloads = [];
+        for (const expense of updatedExpenses) {
+            const users = await this.getExpenseUserDetailsForExpense(expense.id);
+            payloads.push(new ExpensePayload(this._expenseMapper.toDtoModel(expense), users));
+        }
+
+        return payloads;
     }
 }

@@ -2,6 +2,7 @@ import {
     IExpense,
     IExpenseJoinRequest,
     IExpenseJoinRequestDto,
+    IExpensePayload,
     IExpenseUpdate,
     IExpenseUserDetails,
 } from "@splitsies/shared-models";
@@ -29,6 +30,7 @@ export interface IExpenseService {
         isProportional: boolean,
         expenseId: string,
     ): Promise<IExpense>;
+    replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpensePayload[]>;
 }
 
 export const IExpenseService: symbol = Symbol.for("IExpenseService");

@@ -14,11 +14,13 @@ import getForUser from "@functions/expense/get-for-user";
 import addUserToExpense from "@functions/expense/add-user-to-expense";
 import getExpense from "@functions/expense/get";
 import verifyToken from "@functions/auth/verify-token";
+import verifyApiKey from "@functions/auth/verify-api-key";
 import getUsersForExpense from "@functions/expense/get-users-for-expense";
 import getJoinRequests from "@functions/expense/get-join-requests";
 import addJoinRequest from "@functions/expense/add-join-request";
 import removeJoinRequest from "@functions/expense/remove-join-request";
 import getJoinRequestsForExpense from "@functions/expense/get-join-requests-for-expense";
+import mergeGuestUser from "@functions/expense/merge-guest-user";
 
 const serverlessConfiguration: AWS = {
     org: "splitsies",
@@ -56,6 +58,7 @@ const serverlessConfiguration: AWS = {
     // import the function via paths
     functions: {
         verifyToken,
+        verifyApiKey,
         create,
         connect,
         disconnect,
@@ -69,6 +72,7 @@ const serverlessConfiguration: AWS = {
         addJoinRequest: addJoinRequest,
         removeJoinRequest,
         getJoinRequestsForExpense,
+        mergeGuestUser,
     },
     package: { individually: true },
     custom: {
@@ -87,7 +91,7 @@ const serverlessConfiguration: AWS = {
             httpPort: 14623,
             websocketPort: 14624,
             lambdaPort: 14625,
-            ignoreJWTSignature: true
+            ignoreJWTSignature: true,
         },
     },
 };
