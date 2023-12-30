@@ -112,6 +112,41 @@ export class ExpenseManager implements IExpenseManager {
         return this._expenseJoinRequestDao.delete(key);
     }
 
+    async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpense[]> {
+        const ues = await this._userExpenseDao.getForUser(guestUserId);
+        const userExpenses = await this.getExpensesForUser(guestUserId);
+
+        if (ues.length === 0 || userExpenses.length === 0) return [];
+
+        await Promise.all(ues.map((ue) => this._userExpenseDao.delete(this._userExpenseDao.key(ue))));
+        await Promise.all(
+            ues.map((ue) => this._userExpenseDao.create({ expenseId: ue.expenseId, userId: registeredUser.id })),
+        );
+
+        const updatedExpenses: IExpense[] = [];
+        for (const expense of userExpenses) {
+            let shouldUpdate = false;
+            for (const item of expense.items) {
+                const idx = item.owners.findIndex((e) => e.id === guestUserId);
+                if (idx === -1) {
+                    continue;
+                }
+
+                shouldUpdate = true;
+                item.owners.splice(idx, 1);
+                item.owners.push(registeredUser);
+            }
+
+            if (shouldUpdate) {
+                updatedExpenses.push(
+                    await this.updateExpense(expense.id, this._expenseUpdateMapper.toDtoModel(expense)),
+                );
+            }
+        }
+
+        return updatedExpenses;
+    }
+
     async addItemToExpense(
         name: string,
         price: number,

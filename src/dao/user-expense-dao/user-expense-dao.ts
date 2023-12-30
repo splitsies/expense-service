@@ -21,6 +21,17 @@ export class UserExpenseDao extends DaoBase<IUserExpense> implements IUserExpens
         this.key = keySelector;
     }
 
+    async getForUser(userId: string): Promise<IUserExpense[]> {
+        const result = await this._client.send(
+            new ExecuteStatementCommand({
+                Statement: this._statements.GetExpenseIdsForUser,
+                Parameters: [{ S: userId }],
+            }),
+        );
+
+        return result.Items?.length ? result.Items.map((i) => unmarshall(i) as IUserExpense) : [];
+    }
+
     async getExpenseIdsForUser(userId: string): Promise<string[]> {
         const result = await this._client.send(
             new ExecuteStatementCommand({

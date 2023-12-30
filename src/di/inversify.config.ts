@@ -3,7 +3,7 @@ import { Container } from "inversify";
 import { IExpenseService } from "../services/expense-service/expense-service-interface";
 import { ExpenseService } from "../services/expense-service/expense-service";
 import { IExpenseManager } from "../managers/expense-manager/expense-manager-interface";
-import { ILogger, Logger } from "@splitsies/utils";
+import { ApiKeyConfiguration, IApiKeyConfiguration, ILogger, Logger } from "@splitsies/utils";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { DbConfiguration } from "src/models/configuration/db/db-configuration";
 import { ExpenseDao } from "src/dao/expense-dao/expense-dao";
@@ -102,4 +102,5 @@ container
     .to(ExpenseJoinRequestDaMapper)
     .inSingletonScope();
 container.bind<IExpenseBroadcaster>(IExpenseBroadcaster).to(ExpenseBroadcaster).inSingletonScope();
+container.bind<IApiKeyConfiguration>(IApiKeyConfiguration).to(ApiKeyConfiguration).inSingletonScope();
 export { container };

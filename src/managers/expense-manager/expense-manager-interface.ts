@@ -23,6 +23,7 @@ export interface IExpenseManager {
         isProportional: boolean,
         expenseId: string,
     ): Promise<IExpense>;
+    replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpense[]>;
 }
 
 export const IExpenseManager = Symbol.for("IExpenseManager");
