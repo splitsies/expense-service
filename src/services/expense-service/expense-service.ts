@@ -93,40 +93,6 @@ export class ExpenseService implements IExpenseService {
     }
 
     async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
-        const response = await this._usersApiClient.getById(userExpense.userId);
-
-        if (!response.success) {
-            throw new ApiCommunicationError(`Could not fetch user for ${userExpense.userId}`);
-        }
-
-        if (!response.data) {
-            throw new InvalidStateError("User for the corresponding request was not found");
-        }
-
-        const user = this._expenseUserDetailsMapper.fromUserDto(response.data);
-        if (user.isRegistered && userExpense.userId !== requestingUserId) {
-            // if the user is registered, then only that user can decide to be added to an expense
-            // i.e. this request is accepting a join request and must be initiated by that user themselves
-            const message = `User ${requestingUserId} is not authorized to add user ${userExpense.userId} to expense ${userExpense.expenseId}`;
-            this._logger.warn(message);
-            throw new UnauthorizedUserError(message);
-        }
-
-        if (!user.isRegistered) {
-            // Then ensure that this user is authorized to add a guest to this expense
-            const exists = !!this._expenseManager.getUserExpense(requestingUserId, userExpense.expenseId);
-            if (!exists) {
-                const message = `User ${requestingUserId} is not authorized to add user ${userExpense.userId} to expense ${userExpense.expenseId}`;
-                this._logger.warn(message);
-                throw new UnauthorizedUserError(message);
-            }
-        } else {
-            // If the user is registered, an expense join request must exist
-            if (!(await this._expenseManager.joinRequestExists(userExpense.userId, userExpense.expenseId))) {
-                throw new UnauthorizedUserError("Join request does not exist");
-            }
-        }
-
         return this._expenseManager.addUserToExpense(userExpense, requestingUserId);
     }
 

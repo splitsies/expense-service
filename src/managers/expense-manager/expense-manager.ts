@@ -70,6 +70,13 @@ export class ExpenseManager implements IExpenseManager {
             return;
         }
 
+        if (!(await this._userExpenseDao.read({ userId: requestingUserId, expenseId: userExpense.expenseId }))) {
+            this._logger.warn(
+                `User ${requestingUserId} not authorized to add users to expense ${userExpense.expenseId}`,
+            );
+            return;
+        }
+
         await this._userExpenseDao.create(userExpense);
     }
 
