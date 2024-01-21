@@ -1,5 +1,5 @@
-import { IExpenseDto, IExpenseMessage } from "@splitsies/shared-models";
-import { ApiGatewayManagementApi } from "aws-sdk";
+import { IExpenseMessage } from "@splitsies/shared-models";
+import { ApiGatewayManagementApi } from "@aws-sdk/client-apigatewaymanagementapi";
 
 export async function sendMessage(endpoint: string, connectionId: string, body: IExpenseMessage): Promise<void> {
     try {
