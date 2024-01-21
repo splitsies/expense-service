@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { ILogger } from "@splitsies/utils";
 import { container } from "src/di/inversify.config";
 import { IJwtStrategyProvider } from "src/providers/jwt-strategy-provider/jwt-strategy-provider-interface";
-import { APIGatewayTokenAuthorizerEvent, AuthResponse } from "aws-lambda";
+import { APIGatewayTokenAuthorizerEvent, AuthResponse } from "aws-lambda/trigger/api-gateway-authorizer";
 
 const logger = container.get<ILogger>(ILogger);
 const jwtStrategyProvider = container.get<IJwtStrategyProvider>(IJwtStrategyProvider);
