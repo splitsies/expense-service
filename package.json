@@ -1,6 +1,6 @@
 {
   "name": "expense-service",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
@@ -17,6 +17,7 @@
   },
   "prettier": "@splitsies/formatting",
   "dependencies": {
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.496.0",
     "@aws-sdk/client-dynamodb": "^3.321.1",
     "@aws-sdk/util-dynamodb": "^3.321.1",
     "@middy/core": "^3.4.0",

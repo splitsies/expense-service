@@ -1,5 +1,5 @@
-import { IExpenseDto, IExpenseMessage } from "@splitsies/shared-models";
-import { ApiGatewayManagementApi } from "aws-sdk";
+import { IExpenseMessage } from "@splitsies/shared-models";
+import { ApiGatewayManagementApi } from "@aws-sdk/client-apigatewaymanagementapi";
 
 export async function sendMessage(endpoint: string, connectionId: string, body: IExpenseMessage): Promise<void> {
     try {
@@ -11,8 +11,7 @@ export async function sendMessage(endpoint: string, connectionId: string, body: 
             .postToConnection({
                 ConnectionId: connectionId,
                 Data: JSON.stringify(body),
-            })
-            .promise();
+            });
     } catch (err) {
         // Ignore if connection no longer exists
         if (err.statusCode !== 400 && err.statusCode !== 410) {

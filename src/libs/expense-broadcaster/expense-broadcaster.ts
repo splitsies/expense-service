@@ -16,8 +16,11 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
         this._connectionConfiguration.gatewayUrl;
         const connectionIds = await this._connectionService.getConnectionsForExpenseId(expenseId);
 
+        const promises: Promise<void>[] = [];
         for (const id of connectionIds) {
-            sendMessage(this._connectionConfiguration.gatewayUrl, id, message);
+            promises.push(sendMessage(this._connectionConfiguration.gatewayUrl, id, message));
         }
+
+        await Promise.all(promises);
     }
 }
