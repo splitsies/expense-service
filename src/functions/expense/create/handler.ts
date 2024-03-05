@@ -30,8 +30,6 @@ export const main = middyfy(
                 : await expenseService.createExpense(event.body.userId);
 
             return new DataResponse(HttpStatusCode.CREATED, expenseMapper.toDtoModel(result)).toJson();
-
-            // return new DataResponse(HttpStatusCode.BAD_REQUEST, null).toJson();
         },
         expectedErrors,
     ),
