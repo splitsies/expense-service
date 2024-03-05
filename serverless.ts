@@ -84,7 +84,7 @@ const serverlessConfiguration: AWS = {
             sourcemap: true,
             sourcesContent: false,
             keepNames: false,
-            outputFileExtension: '.mjs',
+            outputFileExtension: ".mjs",
             exclude: ["aws-sdk"],
             target: "node18",
             define: { "require.resolve": undefined },
@@ -93,8 +93,7 @@ const serverlessConfiguration: AWS = {
             banner: {
                 // https://github.com/evanw/esbuild/issues/1921
                 js: "import { createRequire } from 'module';const require = createRequire(import.meta.url);",
-            }
-    
+            },
         },
         "serverless-offline": {
             httpPort: 14623,

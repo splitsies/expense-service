@@ -39,7 +39,7 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async createExpense(userId: string): Promise<IExpense> {
-        const created = await this._expenseDao.create(new Expense(randomUUID(), "", new Date(), []));
+        const created = await this._expenseDao.create(new Expense(randomUUID(), "Untitled", new Date(), []));
         await this._userExpenseDao.create({ expenseId: created.id, userId });
         return created;
     }
