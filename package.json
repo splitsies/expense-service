@@ -1,6 +1,6 @@
 {
   "name": "expense-service",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
@@ -10,7 +10,8 @@
     "lint": "tslint -p tsconfig.json",
     "start-db": "cd utils/local-db && docker-compose -p splitsies-expense-db up",
     "recreate-db": "./utils/local-db/recreate.sh",
-    "kill-db": "docker kill splitsies-expense-db-local"
+    "kill-db": "docker kill splitsies-expense-db-local",
+    "debug": "node --inspect node_modules/serverless/bin/serverless offline -s dev"
   },
   "engines": {
     "node": ">=14.15.0"

@@ -7,11 +7,10 @@ export async function sendMessage(endpoint: string, connectionId: string, body: 
             apiVersion: "2018-11-29",
             endpoint,
         });
-        await apig
-            .postToConnection({
-                ConnectionId: connectionId,
-                Data: JSON.stringify(body),
-            });
+        await apig.postToConnection({
+            ConnectionId: connectionId,
+            Data: JSON.stringify(body),
+        });
     } catch (err) {
         // Ignore if connection no longer exists
         if (err.statusCode !== 400 && err.statusCode !== 410) {

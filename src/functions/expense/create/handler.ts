@@ -21,7 +21,6 @@ export const main = middyfy(
     SplitsiesFunctionHandlerFactory.create<typeof schema, IExpenseDto>(
         logger,
         async (event) => {
-            logger.log(event);
             if (event.body.userId !== event.requestContext.authorizer.userId) {
                 throw new UnauthorizedUserError();
             }
@@ -31,6 +30,8 @@ export const main = middyfy(
                 : await expenseService.createExpense(event.body.userId);
 
             return new DataResponse(HttpStatusCode.CREATED, expenseMapper.toDtoModel(result)).toJson();
+
+            // return new DataResponse(HttpStatusCode.BAD_REQUEST, null).toJson();
         },
         expectedErrors,
     ),
