@@ -6,6 +6,7 @@ const expenseUserDetailsSchema = {
         givenName: { type: "string" },
         familyName: { type: "string" },
         phoneNumber: { type: "string" },
+        username: { type: "string" },
     },
     required: ["isRegistered", "id", "givenName"],
 } as const;
@@ -19,13 +20,31 @@ const expenseItemSchema = {
         owners: { type: "array", items: expenseUserDetailsSchema },
         isProportional: { type: "boolean" },
     },
+    required: ["id", "name", "price", "owners"],
+} as const;
+
+const expenseMessageParamsSchema = {
+    type: "object",
+    properties: {
+        expenseId: { type: "string" },
+        expenseName: { type: "string" },
+        item: expenseItemSchema,
+        user: expenseUserDetailsSchema,
+        itemName: { type: "string" },
+        itemPrice: { type: "number" },
+        itemOwners: { type: "array", items: expenseUserDetailsSchema },
+        selectedItemIds: { type: "array", items: { type: "string" } },
+        isItemProportional: { type: "boolean" },
+        transactionDate: { type: "string" },
+    },
+    required: ["expenseId"],
 } as const;
 
 export default {
     type: "object",
     properties: {
-        id: { type: "string" },
         method: { type: "string" },
+        params: expenseMessageParamsSchema,
         expense: {
             type: "object",
             properties: {
@@ -34,7 +53,6 @@ export default {
                 items: { type: "array", items: expenseItemSchema },
             },
         },
-        item: expenseItemSchema,
     },
-    required: ["id", "method"],
+    required: ["params", "method"],
 } as const;

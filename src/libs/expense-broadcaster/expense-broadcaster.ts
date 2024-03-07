@@ -13,12 +13,19 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
     ) {}
 
     async broadcast(expenseId: string, message: IExpenseMessage): Promise<void> {
+        console.log("broadcasting...");
         this._connectionConfiguration.gatewayUrl;
         const connectionIds = await this._connectionService.getConnectionsForExpenseId(expenseId);
 
         const promises: Promise<void>[] = [];
         for (const id of connectionIds) {
-            promises.push(sendMessage(this._connectionConfiguration.gatewayUrl, id, message));
+            console.log({ id });
+
+            try {
+                promises.push(sendMessage(this._connectionConfiguration.gatewayUrl, id, message));
+            } catch (e) {
+                console.log(`the error is ${e}`);
+            }
         }
 
         await Promise.all(promises);

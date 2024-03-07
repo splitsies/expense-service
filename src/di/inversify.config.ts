@@ -44,10 +44,13 @@ import { FirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/fireba
 import {
     ExpenseJoinRequestDaMapper,
     ExpenseMapper,
+    ExpenseMessageParametersMapper,
     ExpenseUpdateMapper,
     ExpenseUserDetailsMapper,
     IExpenseJoinRequestDaMapper,
     IExpenseMapper,
+    IExpenseMessageParameters,
+    IExpenseMessageParametersMapper,
     IExpenseUpdateMapper,
     IExpenseUserDetailsMapper,
 } from "@splitsies/shared-models";
@@ -59,6 +62,8 @@ import { IExpenseJoinRequestStatements } from "src/dao/expense-join-request-dao/
 import { ExpenseJoinRequestStatements } from "src/dao/expense-join-request-dao/expense-join-request-statements";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
 import { ExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster";
+import { IExpenseMessageStrategy } from "src/strategies/expense-message-strategy/expense-message-strategy-interface";
+import { ExpenseMessageStrategy } from "src/strategies/expense-message-strategy/expense-message-strategy";
 
 const container = new Container();
 
@@ -103,4 +108,10 @@ container
     .inSingletonScope();
 container.bind<IExpenseBroadcaster>(IExpenseBroadcaster).to(ExpenseBroadcaster).inSingletonScope();
 container.bind<IApiKeyConfiguration>(IApiKeyConfiguration).to(ApiKeyConfiguration).inSingletonScope();
+
+container.bind<IExpenseMessageStrategy>(IExpenseMessageStrategy).to(ExpenseMessageStrategy).inSingletonScope();
+container
+    .bind<IExpenseMessageParametersMapper>(IExpenseMessageParametersMapper)
+    .to(ExpenseMessageParametersMapper)
+    .inSingletonScope();
 export { container };

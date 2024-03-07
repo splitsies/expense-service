@@ -10,7 +10,8 @@
     "lint": "tslint -p tsconfig.json",
     "start-db": "cd utils/local-db && docker-compose -p splitsies-expense-db up",
     "recreate-db": "./utils/local-db/recreate.sh",
-    "kill-db": "docker kill splitsies-expense-db-local"
+    "kill-db": "docker kill splitsies-expense-db-local",
+    "clear-shared-models": "npm cache clean --force && rm -rf ./node_modules/@splitsies/shared-models && rm -rf ./package-lock.json"
   },
   "engines": {
     "node": ">=14.15.0"
@@ -23,7 +24,7 @@
     "@middy/core": "^3.4.0",
     "@middy/http-json-body-parser": "^3.4.0",
     "@middy/ws-json-body-parser": "^4.4.0",
-    "@splitsies/shared-models": "^0.0.21",
+    "@splitsies/shared-models": "^0.0.24",
     "@splitsies/utils": "^0.0.25",
     "firebase-admin": "^11.11.0",
     "inversify": "6.0.1",
