@@ -58,7 +58,21 @@ export class ExpenseManager implements IExpenseManager {
         const expenseIds = await this._userExpenseDao.getExpenseIdsForUser(userId);
         if (expenseIds.length === 0) return [];
 
-        return await this._expenseDao.getExpenses(expenseIds);
+        const pendingJoins: IExpenseJoinRequest[] = [];
+        let lastEvaluatedKey = undefined;
+
+        do {
+            const result = await this._expenseJoinRequestDao.getForExpensesIncludingUser(
+                expenseIds,
+                userId,
+                lastEvaluatedKey,
+            );
+            pendingJoins.push(...result.result);
+            lastEvaluatedKey = result.lastEvaluatedKey;
+        } while (lastEvaluatedKey);
+
+        const filteredIds = expenseIds.filter((id) => !!!pendingJoins.find((pj) => pj.expenseId === id));
+        return await this._expenseDao.getExpenses(filteredIds);
     }
 
     async getUsersForExpense(expenseId: string): Promise<string[]> {
