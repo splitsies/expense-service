@@ -1,11 +1,18 @@
 import { DaoBase, ILogger } from "@splitsies/utils";
 import { inject, injectable } from "inversify";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
-import { ExecuteStatementCommand } from "@aws-sdk/client-dynamodb";
+import { ExecuteStatementCommand, ScanCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { IExpenseJoinRequestDao } from "./expense-join-request-dao-interface";
 import { IExpenseJoinRequestStatements } from "./expense-join-request-statements-interface";
-import { IExpenseJoinRequest, IExpenseJoinRequestDa, IExpenseJoinRequestDaMapper } from "@splitsies/shared-models";
+import {
+    IExpenseJoinRequest,
+    IExpenseJoinRequestDa,
+    IExpenseJoinRequestDaMapper,
+    IScanResult,
+    ScanResult,
+} from "@splitsies/shared-models";
+import { AttributeValue } from "@aws-sdk/client-dynamodb/dist-types/models/models_0";
 
 @injectable()
 export class ExpenseJoinRequestDao
@@ -16,7 +23,7 @@ export class ExpenseJoinRequestDao
 
     constructor(
         @inject(ILogger) logger: ILogger,
-        @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
+        @inject(IDbConfiguration) private readonly dbConfiguration: IDbConfiguration,
         @inject(IExpenseJoinRequestDaMapper) protected readonly _mapper: IExpenseJoinRequestDaMapper,
         @inject(IExpenseJoinRequestStatements) private readonly _statements: IExpenseJoinRequestStatements,
     ) {
@@ -49,5 +56,45 @@ export class ExpenseJoinRequestDao
         return result.Items?.length
             ? result.Items.map((i) => this._mapper.toDomainModel(unmarshall(i) as IExpenseJoinRequestDa))
             : [];
+    }
+
+    async getForExpensesIncludingUser(
+        expenseIds: string[],
+        userId: string,
+        lastKey: Record<string, AttributeValue> | undefined,
+    ): Promise<IScanResult<IExpenseJoinRequest>> {
+        if (expenseIds.length === 0) new ScanResult([], null);
+
+        const expressionAttributeValues = {};
+        const expenseIdParams = expenseIds
+            .map((id, i) => {
+                const expenseId = `:id${i}`;
+                expressionAttributeValues[expenseId] = { S: id };
+                return expenseId;
+            })
+            .join(",");
+
+        const result = await this._client.send(
+            new ScanCommand({
+                TableName: this.dbConfiguration.expenseJoinRequestTableName,
+                ExclusiveStartKey: lastKey,
+                FilterExpression: `#userId = :userId AND #expenseId IN (${expenseIdParams})`,
+                ExpressionAttributeNames: {
+                    "#expenseId": "expenseId",
+                    "#userId": "userId",
+                },
+                ExpressionAttributeValues: {
+                    ":userId": { S: userId },
+                    ...expressionAttributeValues,
+                },
+            }),
+        );
+
+        const scan = new ScanResult(
+            result.Items.map((i) => this._mapper.toDomainModel(unmarshall(i) as IExpenseJoinRequestDa)),
+            result.LastEvaluatedKey ?? null,
+        );
+
+        return scan;
     }
 }

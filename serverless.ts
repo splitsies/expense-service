@@ -21,6 +21,7 @@ import addJoinRequest from "@functions/expense/add-join-request";
 import removeJoinRequest from "@functions/expense/remove-join-request";
 import getJoinRequestsForExpense from "@functions/expense/get-join-requests-for-expense";
 import mergeGuestUser from "@functions/expense/merge-guest-user";
+import removeUserFromExpense from "@functions/expense/delete-user-from-expense";
 
 const serverlessConfiguration: AWS = {
     org: "splitsies",
@@ -73,6 +74,7 @@ const serverlessConfiguration: AWS = {
         removeJoinRequest,
         getJoinRequestsForExpense,
         mergeGuestUser,
+        removeUserFromExpense,
     },
     package: { individually: true },
     custom: {
