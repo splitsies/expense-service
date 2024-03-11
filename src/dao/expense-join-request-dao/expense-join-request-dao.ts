@@ -21,6 +21,8 @@ export class ExpenseJoinRequestDao
 {
     readonly key: (model: IExpenseJoinRequest) => Record<string, string | number>;
 
+    private readonly _chunkSize = 100;
+
     constructor(
         @inject(ILogger) logger: ILogger,
         @inject(IDbConfiguration) private readonly dbConfiguration: IDbConfiguration,
@@ -66,19 +68,23 @@ export class ExpenseJoinRequestDao
         if (expenseIds.length === 0) new ScanResult([], null);
 
         const expressionAttributeValues = {};
-        const expenseIdParams = expenseIds
-            .map((id, i) => {
-                const expenseId = `:id${i}`;
-                expressionAttributeValues[expenseId] = { S: id };
-                return expenseId;
-            })
-            .join(",");
+        const expenseIdParams = expenseIds.map((id, i) => {
+            const expenseId = `:id${i}`;
+            expressionAttributeValues[expenseId] = { S: id };
+            return expenseId;
+        });
 
+        const expressionPieces: string[] = [];
+        for (let i = 0; i < expenseIdParams.length; i += this._chunkSize) {
+            expressionPieces.push(`#expenseId in (${expenseIdParams.slice(i, i + this._chunkSize).join(",")})`);
+        }
+        // Max 100 operands in IN operator, need to split up if more
+        const filterExpression = `(${expressionPieces.join(" OR ")})`;
         const result = await this._client.send(
             new ScanCommand({
                 TableName: this.dbConfiguration.expenseJoinRequestTableName,
                 ExclusiveStartKey: lastKey,
-                FilterExpression: `#userId = :userId AND #expenseId IN (${expenseIdParams})`,
+                FilterExpression: `#userId = :userId AND ${filterExpression}`,
                 ExpressionAttributeNames: {
                     "#expenseId": "expenseId",
                     "#userId": "userId",
