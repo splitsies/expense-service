@@ -20,6 +20,8 @@ export class ExpenseDao extends DaoBase<IExpense, IExpenseDto> implements IExpen
     }
 
     async getExpenses(expenseIds: string[]): Promise<IExpense[]> {
+        if (expenseIds.length === 0) return [];
+
         const placeholders = `[${expenseIds.map((_) => "?").join(",")}]`;
         const statement = this._expenseStatements.GetExpenses.replace("?", placeholders);
         const result = await this._client.send(

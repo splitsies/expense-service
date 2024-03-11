@@ -21,8 +21,6 @@ import { IOcrApiClient } from "src/api/ocr-api-client/ocr-api-client-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { IUsersApiClient } from "src/api/users-api-client/users-api-client-interface";
 import { ApiCommunicationError } from "src/models/error/api-communication-error";
-import { InvalidStateError } from "src/models/error/invalid-state-error";
-import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -96,7 +94,7 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.addUserToExpense(userExpense, requestingUserId);
     }
 
-    removeUserFromExpense(expenseId: string, userId: string): Promise<void> {
+    removeUserFromExpense(expenseId: string, userId: string): Promise<IExpense> {
         return this._expenseManager.removeUserFromExpense(expenseId, userId);
     }
 

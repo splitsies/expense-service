@@ -61,7 +61,13 @@ export class ExpenseManager implements IExpenseManager {
         const pendingJoins: IExpenseJoinRequest[] = [];
         let lastEvaluatedKey = undefined;
 
+        // 30 second max timeout as a preventative measure in case this yields an infinite loop
+        const timeout = Date.now() + 30000;
         do {
+            if (Date.now() > timeout) {
+                throw new Error(`Timed out scanning expense join requests for ${userId}`);
+            }
+
             const result = await this._expenseJoinRequestDao.getForExpensesIncludingUser(
                 expenseIds,
                 userId,
@@ -97,9 +103,26 @@ export class ExpenseManager implements IExpenseManager {
         await this._userExpenseDao.create(userExpense);
     }
 
-    async removeUserFromExpense(expenseId: string, userId: string): Promise<void> {
+    async removeUserFromExpense(expenseId: string, userId: string): Promise<IExpense> {
+        const expense = await this._expenseDao.read({ id: expenseId });
+
+        for (const item of expense.items) {
+            const userIndex = item.owners.findIndex((o) => o.id === userId);
+            if (userIndex !== -1) item.owners.splice(userIndex, 1);
+        }
+
+        const updatedExpense = await this.updateExpense(expenseId, this._expenseUpdateMapper.toDtoModel(expense));
         const key = this._userExpenseDao.key({ expenseId, userId });
-        return this._userExpenseDao.delete(key);
+        await this._userExpenseDao.delete(key);
+
+        const userExpenses = await this._userExpenseDao.getUsersForExpense(expenseId);
+        if (userExpenses.length === 0) {
+            // If the last user was deleted, delete the expense as well
+            await this._expenseDao.delete({ id: expenseId });
+        }
+
+        this.removeExpenseJoinRequest(userId, expenseId, userId);
+        return updatedExpense;
     }
 
     async getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequest[]> {

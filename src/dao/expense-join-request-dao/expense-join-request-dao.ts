@@ -63,6 +63,8 @@ export class ExpenseJoinRequestDao
         userId: string,
         lastKey: Record<string, AttributeValue> | undefined,
     ): Promise<IScanResult<IExpenseJoinRequest>> {
+        if (expenseIds.length === 0) new ScanResult([], null);
+
         const expressionAttributeValues = {};
         const expenseIdParams = expenseIds
             .map((id, i) => {

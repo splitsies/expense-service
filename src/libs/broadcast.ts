@@ -13,7 +13,12 @@ export async function sendMessage(endpoint: string, connectionId: string, body: 
         });
     } catch (err) {
         // Ignore if connection no longer exists
-        if (err.statusCode !== 400 && err.statusCode !== 410) {
+        if (
+            err.statusCode === 400 ||
+            err.statusCode === 410 ||
+            err.httpStatusCode === 400 ||
+            err.httpStatusCode === 410
+        ) {
             throw err;
         }
     }
@@ -30,7 +35,12 @@ export async function deleteConnection(endpoint: string, connectionId: string): 
         });
     } catch (err) {
         // Ignore if connection no longer exists
-        if (err.statusCode !== 400 && err.statusCode !== 410) {
+        if (
+            err.statusCode === 400 ||
+            err.statusCode === 410 ||
+            err.httpStatusCode === 400 ||
+            err.httpStatusCode === 410
+        ) {
             throw err;
         }
     }
