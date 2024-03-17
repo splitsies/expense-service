@@ -6,8 +6,8 @@ sls offline start \
     --param='DB_ENDPOINT=http://localhost:8000/' \
     --param='APIG_URL=http://0.0.0.0:14624/' \
     --param='DELETE_EXPIRED_INTERVAL_MIN=2' \
-    --param='CONNECTION_TABLE_NAME=ExpenseConnection-local' \
-    --param='DB_TABLE_NAME=Expense-local' \
+    --param='CONNECTION_TABLE_NAME=Splitsies-ExpenseConnection-local' \
+    --param='DB_TABLE_NAME=Splitsies-Expense-local' \
     --param='DB_USER_EXPENSE_TABLE_NAME=Splitsies-UserExpense-local' \
     --param='DB_ACCESS_KEY_ID=null' \
     --param='DB_SECRET_ACCESS_KEY=null' \

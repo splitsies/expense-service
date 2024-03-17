@@ -12,6 +12,7 @@ export class DbConfiguration implements IDbConfiguration {
     private readonly _endpoint: string;
     readonly expenseJoinRequestTableName: string;
     readonly userExpenseTableName: string;
+    readonly transactionDateIndexName: string;
 
     constructor() {
         assert(!!process.env.dbAccessKeyId, "db access key was undefined");
@@ -22,6 +23,7 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.dbEndpoint, "db endpoint was undefined");
         assert(!!process.env.userExpenseTableName, "DB_USER_EXPENSE_TABLE_NAME was undefined");
         assert(!!process.env.expenseJoinRequestTableName, "DB_EXPENSE_JOIN_REQUEST_TABLE_NAME was undefined");
+        assert(!!process.env.transactionDateIndexName, "TRANSACTION_DATE_INDEX_NAME was undefined");
 
         this._dbAccessKeyId = process.env.dbAccessKeyId;
         this._dbSecretAccessKey = process.env.dbSecretAccessKey;
@@ -31,6 +33,7 @@ export class DbConfiguration implements IDbConfiguration {
         this._endpoint = process.env.dbEndpoint;
         this.userExpenseTableName = process.env.userExpenseTableName;
         this.expenseJoinRequestTableName = process.env.expenseJoinRequestTableName;
+        this.transactionDateIndexName = process.env.transactionDateIndexName;
     }
 
     get dbAccessKeyId(): string {
