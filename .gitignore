@@ -12,3 +12,5 @@ jspm_packages
 **/local-db/docker/**
 
 .DS_Store
+
+**/startup-dev-pr.sh

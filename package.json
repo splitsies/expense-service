@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "./utils/local-startup/startup.sh",
+    "serve:dev-pr": "./utils/local-startup/startup-dev-pr.sh",
     "format": "prettier --write \"./**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
     "start-db": "cd utils/local-db && docker-compose -p splitsies-expense-db up",
