@@ -3,7 +3,7 @@ import { IExpense, IExpenseDto, IExpenseMapper } from "@splitsies/shared-models"
 import { IExpenseDao } from "./expense-dao-interface";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { DaoBase, ILogger } from "@splitsies/utils";
-import { ExecuteStatementCommand } from "@aws-sdk/client-dynamodb";
+import { ExecuteStatementCommand, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { IExpenseStatements } from "./expense-statements-interface";
 
@@ -36,12 +36,11 @@ export class ExpenseDao extends DaoBase<IExpense, IExpenseDto> implements IExpen
                 }),
             );
 
-            if (result.Items?.length) { expenses.push(...result.Items.map((i) => this._mapper.toDomainModel(unmarshall(i) as IExpenseDto))); }
+            if (result.Items?.length) {
+                expenses.push(...result.Items.map((i) => this._mapper.toDomainModel(unmarshall(i) as IExpenseDto)));
+            }
             nextToken = result.NextToken;
-        } while (nextToken && Date.now() < timeout)
-
-        console.log({ expenses });
-
+        } while (nextToken && Date.now() < timeout);
         return expenses;
     }
 }

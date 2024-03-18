@@ -7,6 +7,6 @@ export class ExpenseStatements implements IExpenseStatements {
     readonly GetExpenses: string;
 
     constructor(@inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
-        this.GetExpenses = `SELECT * FROM "${dbConfiguration.tableName}"."${dbConfiguration.transactionDateIndexName}" WHERE id IN ? ORDER BY transactionDate DESC`;
+        this.GetExpenses = `SELECT * FROM "${dbConfiguration.tableName}"."${dbConfiguration.transactionDateIndexName}" WHERE id IN ? ORDER BY transactionDate,id DESC`;
     }
 }
