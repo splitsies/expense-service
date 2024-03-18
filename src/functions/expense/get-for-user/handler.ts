@@ -6,7 +6,6 @@ import {
     HttpStatusCode,
     DataResponse,
     InvalidArgumentsError,
-    IExpenseDto,
     IExpenseMapper,
     IExpensePayload,
     ExpensePayload,
@@ -39,9 +38,11 @@ export const main = middyfy(
 
             const payloads: IExpensePayload[] = [];
 
-            for (const expense of result) {
-                const users = await expenseService.getExpenseUserDetailsForExpense(expense.id);
-                payloads.push(new ExpensePayload(expenseMapper.toDtoModel(expense), users));
+            const userPairings = await expenseService.getExpenseUserDetailsForExpenses(result.map((e) => e.id));
+
+            for (const [expenseId, users] of userPairings) {
+                const expense = expenseMapper.toDtoModel(result.find((e) => e.id === expenseId));
+                payloads.push(new ExpensePayload(expense, users));
             }
 
             return new DataResponse(HttpStatusCode.OK, payloads).toJson();

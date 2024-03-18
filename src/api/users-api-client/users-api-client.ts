@@ -31,7 +31,7 @@ export class UsersApiClient extends SplitsiesApiClientBase implements IUsersApiC
     }
 
     async findUsersById(ids: string[]): Promise<IDataResponse<IUserDto[]>> {
-        try {            
+        try {
             const url = `${this._apiConfiguration.uri.users}?ids=${ids.join(",")}`;
             const timeout = Date.now() + this._timeout;
             const users: IUserDto[] = [];
@@ -40,15 +40,17 @@ export class UsersApiClient extends SplitsiesApiClientBase implements IUsersApiC
 
             do {
                 response = await this.get<IScanResult<IUserDto>>(url + (lastKey ? `&lastKey=${lastKey}` : ""));
-                lastKey = response?.data?.lastEvaluatedKey ? encodeURIComponent(JSON.stringify(response.data.lastEvaluatedKey)) : undefined;
+                lastKey = response?.data?.lastEvaluatedKey
+                    ? encodeURIComponent(JSON.stringify(response.data.lastEvaluatedKey))
+                    : undefined;
 
                 if (!response?.success) {
                     this._logger.error(`Error on request: ${response.data}`);
                     continue;
                 }
 
-                users.push(...response.data.result);                
-            } while (response?.data?.lastEvaluatedKey && (Date.now() < timeout))
+                users.push(...response.data.result);
+            } while (response?.data?.lastEvaluatedKey && Date.now() < timeout);
 
             return new DataResponse(HttpStatusCode.OK, users);
         } catch (e) {

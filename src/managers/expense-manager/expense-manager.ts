@@ -54,6 +54,7 @@ export class ExpenseManager implements IExpenseManager {
         return await this._expenseDao.update(this._expenseUpdateMapper.toDomainModel(updated, id));
     }
 
+    // TODO: Make this take in a lastEvaluatedKey and make the front-end infinite scrolling
     async getExpensesForUser(userId: string): Promise<IExpense[]> {
         const expenseIds = await this._userExpenseDao.getExpenseIdsForUser(userId);
         if (expenseIds.length === 0) return [];

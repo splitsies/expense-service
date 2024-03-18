@@ -37,7 +37,8 @@ export const main = middyfy(
             ]);
             const updatedJoinRequests = await expenseService.getJoinRequestsForExpense(event.body.expenseId);
             const expense = await expenseService.getExpense(event.body.expenseId);
-            const users = await expenseService.getExpenseUserDetailsForExpense(event.body.expenseId);
+            const result = await expenseService.getExpenseUserDetailsForExpenses([event.body.expenseId]);
+            const users = result.get(event.body.expenseId);
             const payload = new ExpensePayload(expenseMapper.toDtoModel(expense), users);
 
             await Promise.all([

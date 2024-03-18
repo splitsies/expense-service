@@ -25,7 +25,8 @@ export const main = middyfy(
             }
 
             const updatedExpense = await expenseService.removeUserFromExpense(expenseId, userId);
-            const expenseUsers = await expenseService.getExpenseUserDetailsForExpense(expenseId);
+            const result = await expenseService.getExpenseUserDetailsForExpenses([expenseId]);
+            const expenseUsers = result.get(expenseId);
             const joinRequests = await expenseService.getJoinRequestsForExpense(expenseId);
 
             await Promise.all([

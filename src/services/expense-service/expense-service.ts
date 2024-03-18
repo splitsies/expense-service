@@ -77,13 +77,31 @@ export class ExpenseService implements IExpenseService {
         return await this._expenseManager.getUsersForExpense(expenseId);
     }
 
-    async getExpenseUserDetailsForExpense(expenseId: string): Promise<IExpenseUserDetails[]> {
-        const ids = await this.getUsersForExpense(expenseId);
+    async getExpenseUserDetailsForExpenses(expenseIds: string[]): Promise<Map<string, IExpenseUserDetails[]>> {
+        const userIds = new Set<string>();
+        const usersIdsForExpenseId = new Map<string, string[]>();
+        const usersForExpenseId = new Map<string, IExpenseUserDetails[]>();
+
+        for (const expenseId of expenseIds) {
+            const ids = await this.getUsersForExpense(expenseId);
+            ids.forEach((id) => userIds.add(id));
+            usersIdsForExpenseId.set(expenseId, ids);
+        }
 
         try {
-            const response = await this._usersApiClient.findUsersById(ids);
+            const response = await this._usersApiClient.findUsersById(Array.from(userIds));
             if (!response.success) throw new Error(`${response.data}`);
-            return response.data.map((u) => this._expenseUserDetailsMapper.fromUserDto(u));
+
+            const userDetails = response.data.map((u) => this._expenseUserDetailsMapper.fromUserDto(u));
+
+            for (const [expenseId, ids] of usersIdsForExpenseId) {
+                usersForExpenseId.set(
+                    expenseId,
+                    userDetails.filter((ud) => ids.includes(ud.id)),
+                );
+            }
+
+            return usersForExpenseId;
         } catch (e) {
             this._logger.error(e);
             throw new ApiCommunicationError();

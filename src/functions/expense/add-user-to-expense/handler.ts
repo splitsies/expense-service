@@ -25,7 +25,8 @@ export const main = middyfy(
             await expenseService.addUserToExpense(newUserExpense, event.requestContext.authorizer.userId);
 
             const expense = await expenseService.getExpense(expenseId);
-            const users = await expenseService.getExpenseUserDetailsForExpense(expenseId);
+            const result = await expenseService.getExpenseUserDetailsForExpenses([expenseId]);
+            const users = result.get(expenseId);
             const payload = new ExpensePayload(expenseMapper.toDtoModel(expense), users);
 
             await expenseBroadcaster.broadcast(expenseId, new ExpenseMessage("payload", payload));
