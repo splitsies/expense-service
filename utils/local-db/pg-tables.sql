@@ -1,6 +1,6 @@
 CREATE TABLE Expense (
     id              VARCHAR(36) PRIMARY KEY,
-    transactionDate DATE NOT NULL,
+    transactionDate TIMESTAMPTZ NOT NULL,
     name            VARCHAR(60) NOT NULL
 );
 

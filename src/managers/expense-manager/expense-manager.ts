@@ -56,6 +56,7 @@ export class ExpenseManager implements IExpenseManager {
 
     // TODO: Make this take in a lastEvaluatedKey and make the front-end infinite scrolling
     async getExpensesForUser(userId: string): Promise<IExpense[]> {
+        console.log({ userId });
         const expenseIds = await this._userExpenseDao.getExpenseIdsForUser(userId);
         if (expenseIds.length === 0) return [];
 
@@ -79,6 +80,7 @@ export class ExpenseManager implements IExpenseManager {
         } while (lastEvaluatedKey);
 
         const filteredIds = expenseIds.filter((id) => !!!pendingJoins.find((pj) => pj.expenseId === id));
+        console.log({ filteredIds });
         return await this._expenseDao.getExpenses(filteredIds);
     }
 

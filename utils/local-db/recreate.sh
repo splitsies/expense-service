@@ -5,7 +5,7 @@ rm -rf utils/local-db/docker
 
 cd utils/local-db
 
-docker-compose -p splitsies-expense-db up
+docker-compose -p splitsies-expense-db up -d
 
 aws dynamodb create-table \
     --table-name Splitsies-Expense-local \
@@ -53,7 +53,10 @@ aws dynamodb create-table \
                 \"Projection\":{
                     \"ProjectionType\":\"ALL\"
                 },
-                \"BillingMode\": \"PAY_PER_REQUEST\"
+                \"ProvisionedThroughput\": {
+                    \"ReadCapacityUnits\": 5,
+                    \"WriteCapacityUnits\": 5
+                }
             }
         ]"
 

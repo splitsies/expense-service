@@ -64,6 +64,8 @@ import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcast
 import { ExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster";
 import { IExpenseMessageStrategy } from "src/strategies/expense-message-strategy/expense-message-strategy-interface";
 import { ExpenseMessageStrategy } from "src/strategies/expense-message-strategy/expense-message-strategy";
+import { IExpenseDaMapper } from "src/mappers/expense-da-mapper-interface";
+import { ExpenseDaMapper } from "src/mappers/expense-da-mapper";
 
 const container = new Container();
 
@@ -114,4 +116,6 @@ container
     .bind<IExpenseMessageParametersMapper>(IExpenseMessageParametersMapper)
     .to(ExpenseMessageParametersMapper)
     .inSingletonScope();
+
+container.bind<IExpenseDaMapper>(IExpenseDaMapper).to(ExpenseDaMapper).inSingletonScope();
 export { container };
