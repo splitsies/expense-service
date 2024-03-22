@@ -88,10 +88,10 @@ aws dynamodb create-table \
     --table-name Splitsies-ExpenseItem-local \
     --attribute-definitions \
         AttributeName=expenseId,AttributeType=S \
-        AttributeName=itemId,AttributeType=S \
+        AttributeName=id,AttributeType=S \
     --key-schema \
         AttributeName=expenseId,KeyType=HASH \
-        AttributeName=itemId,KeyType=RANGE \
+        AttributeName=id,KeyType=RANGE \
     --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
     --table-class STANDARD \
     --endpoint-url http://localhost:8000
