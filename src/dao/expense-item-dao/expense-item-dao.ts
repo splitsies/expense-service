@@ -13,7 +13,7 @@ export class ExpenseItemDao extends DaoBase<IExpenseItem> implements IExpenseIte
         @inject(ILogger) logger: ILogger,
         @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
     ) {
-        const keySelector = (c: IExpenseItem) => ({ expenseId: c.expenseId, itemId: c.id });
+        const keySelector = (c: IExpenseItem) => ({ expenseId: c.expenseId, id: c.id });
         super(logger, dbConfiguration, "Splitsies-ExpenseItem-local", keySelector);
     }    
 
@@ -40,6 +40,5 @@ export class ExpenseItemDao extends DaoBase<IExpenseItem> implements IExpenseIte
         } while (next && Date.now() < timeout);
 
         return items;
-    }
-    
+    }    
 }

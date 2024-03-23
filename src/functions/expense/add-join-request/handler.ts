@@ -28,13 +28,13 @@ export const main = middyfy(
                 throw new UnauthorizedUserError();
             }
 
-            await Promise.all([
-                expenseService.addExpenseJoinRequest(event.body.userId, event.body.expenseId, tokenUserId),
-                expenseService.addUserToExpense(
-                    { userId: event.body.userId, expenseId: event.body.expenseId },
-                    tokenUserId,
-                ),
-            ]);
+            // await Promise.all([
+            await expenseService.addExpenseJoinRequest(event.body.userId, event.body.expenseId, tokenUserId);
+                // expenseService.addUserToExpense(
+                //     { userId: event.body.userId, expenseId: event.body.expenseId, pendingJoin: true },
+                //     tokenUserId,
+                // ),
+            // ]);
             const updatedJoinRequests = await expenseService.getJoinRequestsForExpense(event.body.expenseId);
             const expense = await expenseService.getExpense(event.body.expenseId);
             const result = await expenseService.getExpenseUserDetailsForExpenses([event.body.expenseId]);

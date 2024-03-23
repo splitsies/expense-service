@@ -6,7 +6,9 @@ CREATE TABLE Expense (
 
 CREATE TABLE UserExpense (
     expenseId       VARCHAR(36) REFERENCES Expense (id),
-    userId          VARCHAR(36) NOT NULL,
+    userId          VARCHAR(52) NOT NULL,
     pendingJoin     BOOLEAN NOT NULL,
+    requestingUserId VARCHAR(36), 
+    createdAt       TIMESTAMPTZ,
     PRIMARY KEY(expenseId, userId)
 );

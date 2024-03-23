@@ -21,7 +21,7 @@ export const main = middyfy(
         async (event) => {
             const expenseId = event.pathParameters.expenseId;
             const userId = event.body.userId;
-            const newUserExpense = { expenseId, userId } as IUserExpense;
+            const newUserExpense = { expenseId, userId, pendingJoin: true } as IUserExpense;
             await expenseService.addUserToExpense(newUserExpense, event.requestContext.authorizer.userId);
 
             const expense = await expenseService.getExpense(expenseId);

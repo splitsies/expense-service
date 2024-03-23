@@ -1,5 +1,4 @@
 import {
-    ExpenseItem,
     ExpenseOperation,
     IExpense,
     IExpenseItem,
@@ -10,7 +9,6 @@ import {
 import { IExpenseMessageStrategy } from "./expense-message-strategy-interface";
 import { inject, injectable } from "inversify";
 import { IExpenseService } from "src/services/expense-service/expense-service-interface";
-import { randomUUID } from "crypto";
 
 @injectable()
 export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
@@ -46,8 +44,6 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
             case "updateTransactionDate":
                 return this.updateExpenseTransactionDate(params.expenseId, params.transactionDate);
         }
-
-        throw new Error("Method not allowed");
     }
 
     private async addItem(
@@ -57,19 +53,11 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         owners: IExpenseUserDetails[],
         isProportional: boolean,
     ): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            const item = new ExpenseItem(randomUUID(), name, price, owners, isProportional);
-            e.items.push(item);
-            return e;
-        });
+        return this._expenseService.addExpenseItem(name, price, owners, isProportional, expenseId);
     }
 
     private async removeItem(expenseId: string, item: IExpenseItem): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            const itemIndex = e.items.findIndex((i) => i.id === item.id);
-            if (itemIndex !== -1) e.items.splice(itemIndex, 1);
-            return e;
-        });
+        return await this._expenseService.removeExpenseItem(item.id, expenseId);
     }
 
     private async updateItemSelections(
@@ -77,21 +65,27 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         user: IExpenseUserDetails,
         selectedItemIds: string[],
     ): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            for (const item of e.items) {
-                const itemSelected = selectedItemIds.includes(item.id);
-                const userOwnsItem = !!item.owners.find((o) => o.id === user.id);
+        const expenseItems = await this._expenseService.getExpenseItems(expenseId);
+        const updated: IExpenseItem[] = [];
 
-                if (itemSelected && !userOwnsItem) {
-                    item.owners.push(user);
-                } else if (!itemSelected && userOwnsItem) {
-                    const index = item.owners.findIndex((o) => o.id === user.id);
-                    if (index !== -1) item.owners.splice(index, 1);
-                }
+        for (const item of expenseItems) {
+            const itemSelected = selectedItemIds.includes(item.id);
+            const userOwnsItem = !!item.owners.find((o) => o.id === user.id);
+
+            if (itemSelected && !userOwnsItem) {
+                item.owners.push(user);
+            } else if (!itemSelected && userOwnsItem) {
+                const index = item.owners.findIndex((o) => o.id === user.id);
+                if (index !== -1) item.owners.splice(index, 1);
+            } else {
+                continue;
             }
 
-            return e;
-        });
+            updated.push(item);
+        }
+        
+        await this._expenseService.saveUpdatedItems(updated);
+        return this._expenseService.getExpense(expenseId);
     }
 
     private async updateItemDetails(
@@ -101,14 +95,13 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         price: number,
         isProportional: boolean,
     ): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            const itemIndex = e.items.findIndex((i) => i.id === itemId);
-            if (itemIndex === -1) return e;
+        const expenseItems = await this._expenseService.getExpenseItems(expenseId);
+        const itemIndex = expenseItems.findIndex((i) => i.id === itemId);
+        if (itemIndex === -1) throw new Error("Item not found for expense");
 
-            const updatedItem = { ...e.items[itemIndex], name, price, isProportional };
-            e.items[itemIndex] = updatedItem;
-            return e;
-        });
+        const updatedItem = { ...expenseItems[itemIndex], name, price, isProportional };
+        await this._expenseService.saveUpdatedItems([updatedItem]);
+        return this._expenseService.getExpense(expenseId);
     }
 
     private async updateExpenseName(expenseId: string, expenseName: string): Promise<IExpense> {

@@ -1,4 +1,4 @@
-import { IExpense, IExpenseJoinRequest, IExpenseUpdate, IExpenseUserDetails } from "@splitsies/shared-models";
+import { IExpense, IExpenseItem, IExpenseJoinRequest, IExpenseUpdate, IExpenseUserDetails } from "@splitsies/shared-models";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 
 export interface IExpenseManager {
@@ -16,13 +16,16 @@ export interface IExpenseManager {
     removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]>;
     joinRequestExists(userId: string, expenseId: string): Promise<boolean>;
-    addItemToExpense(
+    addExpenseItem(
         name: string,
         price: number,
         owners: IExpenseUserDetails[],
         isProportional: boolean,
         expenseId: string,
     ): Promise<IExpense>;
+    removeExpenseItem(itemId: string, expenseId: string): Promise<IExpense>;
+    getExpenseItems(expenseId: string): Promise<IExpenseItem[]>;
+    saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]>;
     replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpense[]>;
 }
 

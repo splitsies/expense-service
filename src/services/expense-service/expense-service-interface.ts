@@ -1,5 +1,6 @@
 import {
     IExpense,
+    IExpenseItem,
     IExpenseJoinRequest,
     IExpenseJoinRequestDto,
     IExpensePayload,
@@ -23,13 +24,16 @@ export interface IExpenseService {
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
     removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]>;
-    addItemToExpense(
+    addExpenseItem(
         name: string,
         price: number,
         owners: IExpenseUserDetails[],
         isProportional: boolean,
         expenseId: string,
     ): Promise<IExpense>;
+    removeExpenseItem(itemId: string, expenseId: string): Promise<IExpense>;
+    getExpenseItems(expenseId: string): Promise<IExpenseItem[]>;
+    saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]>;
     replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpensePayload[]>;
 }
 

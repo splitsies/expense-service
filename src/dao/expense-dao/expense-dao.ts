@@ -27,7 +27,7 @@ export class ExpenseDao implements IExpenseDao {
                 (id, name, transactionDate)
             VALUES
                 (${model.id}, ${model.name}, ${model.transactionDate}) 
-            RETURNING *;
+            RETURNING id, name, transactionDate as "transactionDate";
         `;
 
         return model;
@@ -35,29 +35,44 @@ export class ExpenseDao implements IExpenseDao {
 
     async read(key: Record<string, string | number>): Promise<IExpense> {
         const id = key.id;
+        console.log({ id });
         const res = await this._client<IExpense[]>`
-            SELECT *
+            SELECT id, name, transactionDate as "transactionDate"
               FROM Expense
              WHERE id = ${id};
         `;
 
+        console.log({ readResult: res });
+
         return res.length ? res[0] : undefined;
     }
     
-    update(updated: IExpense): Promise<IExpense> {
-        throw new Error("Method not implemented.");
+    async update(updated: IExpense): Promise<IExpense> {
+        const res = await this._client<IExpense[]>`
+            UPDATE Expense
+               SET transactionDate = ${updated.transactionDate},
+                   name = ${updated.name}                   
+             WHERE id = ${updated.id}
+             RETURNING id, name, transactionDate as "transactionDate";
+        `;
+
+        return res.length ? res[0] : undefined;
     }
 
-    delete(key: Record<string, string | number>): Promise<void> {
-        throw new Error("Method not implemented.");
+    async delete(key: Record<string, string | number>): Promise<void> {
+        await this._client`
+            DELETE FROM Expense
+            WHERE id = ${key.id};
+        `;
     }
 
     async getExpensesForUser(userId: string): Promise<IExpenseDa[]> {
         const res = await this._client<IExpenseDa[]>`
-            SELECT e.* FROM Expense e, UserExpense ue
-              WHERE e.id = ue.expenseId
-                AND ue.userId = ${userId}
-            ORDER BY e.transactionDate DESC;
+            SELECT e.id, e.name, e.transactionDate as "transactionDate" 
+              FROM Expense e, UserExpense ue
+             WHERE e.id = ue.expenseId
+               AND ue.userId = ${userId}
+          ORDER BY e.transactionDate DESC;
         `;
 
         return res.length ? res : [];
@@ -65,7 +80,10 @@ export class ExpenseDao implements IExpenseDao {
 
     async getExpenses(expenseIds: string[]): Promise<IExpense[]> {
         const res = await this._client<IExpense[]>`
-            SELECT * FROM Expense WHERE id IN (${expenseIds.join(",")}) ORDER BY transactionDate DESC
+            SELECT id, name, transactionDate as "transactionDate"
+              FROM Expense
+             WHERE id IN (${expenseIds.join(",")}) 
+          ORDER BY transactionDate DESC
         `;
 
         return res.length ? res : [];

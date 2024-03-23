@@ -3,6 +3,7 @@ import {
     ExpenseJoinRequestDto,
     ExpensePayload,
     IExpense,
+    IExpenseItem,
     IExpenseJoinRequest,
     IExpenseJoinRequestDto,
     IExpenseMapper,
@@ -116,14 +117,26 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.removeUserFromExpense(expenseId, userId);
     }
 
-    addItemToExpense(
+    addExpenseItem(
         name: string,
         price: number,
         owners: IExpenseUserDetails[],
         isProportional: boolean,
         expenseId: string,
     ): Promise<IExpense> {
-        return this._expenseManager.addItemToExpense(name, price, owners, isProportional, expenseId);
+        return this._expenseManager.addExpenseItem(name, price, owners, isProportional, expenseId);
+    }
+
+    async removeExpenseItem(itemId: string, expenseId: string): Promise<IExpense> {
+        return this._expenseManager.removeExpenseItem(itemId, expenseId);
+    }
+
+    async getExpenseItems(expenseId: string): Promise<IExpenseItem[]> {
+        return this._expenseManager.getExpenseItems(expenseId);
+    }
+
+    async saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]> {
+        return this._expenseManager.saveUpdatedItems(updatedItems);
     }
 
     async getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequestDto[]> {
@@ -157,11 +170,11 @@ export class ExpenseService implements IExpenseService {
                 continue;
             }
 
-            const expenseUsers = await this.getExpenseUserDetailsForExpense(request.expenseId);
+            const expenseUsers = await this.getExpenseUserDetailsForExpenses([request.expenseId]);
             mappedJoinRequests.push(
                 new ExpenseJoinRequestDto(
                     request.userId,
-                    new ExpensePayload(this._expenseMapper.toDtoModel(expense), expenseUsers),
+                    new ExpensePayload(this._expenseMapper.toDtoModel(expense), expenseUsers.get(request.expenseId)),
                     requestingUser,
                     request.createdAt.toISOString(),
                 ),
@@ -188,8 +201,8 @@ export class ExpenseService implements IExpenseService {
 
         const payloads = [];
         for (const expense of updatedExpenses) {
-            const users = await this.getExpenseUserDetailsForExpense(expense.id);
-            payloads.push(new ExpensePayload(this._expenseMapper.toDtoModel(expense), users));
+            const users = await this.getExpenseUserDetailsForExpenses([expense.id]);
+            payloads.push(new ExpensePayload(this._expenseMapper.toDtoModel(expense), users.get(expense.id)));
         }
 
         return payloads;
