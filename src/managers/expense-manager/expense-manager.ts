@@ -8,19 +8,18 @@ import {
     IExpenseUpdateMapper,
     IExpenseUserDetails,
     IExpenseJoinRequest,
-    ExpenseJoinRequest,
     IExpenseItem,
 } from "@splitsies/shared-models";
 import { IExpenseManager } from "./expense-manager-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
-import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 import { ILogger } from "@splitsies/utils";
 import { IExpenseJoinRequestDao } from "src/dao/expense-join-request-dao/expense-join-request-dao-interface";
 import { IExpenseDaMapper } from "src/mappers/expense-da-mapper-interface";
 import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-interface";
 import { IExpenseDa } from "src/models/expense/expense-da-interface";
+import { UserExpense } from "src/models/user-expense/user-expense";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -81,22 +80,24 @@ export class ExpenseManager implements IExpenseManager {
         return await this._userExpenseDao.getUsersForExpense(expenseId);
     }
 
-    async addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void> {
-        if (await this._userExpenseDao.read(this._userExpenseDao.key(userExpense))) {
+    async addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
+        if (await this._userExpenseDao.read({ userId, expenseId })) {
             return;
         }
 
         if (
-            userExpense.userId !== requestingUserId &&
-            !(await this._userExpenseDao.read({ userId: requestingUserId, expenseId: userExpense.expenseId }))
+            userId !== requestingUserId &&
+            !(await this._userExpenseDao.read({ userId: requestingUserId, expenseId: expenseId }))
         ) {
             this._logger.warn(
-                `User ${requestingUserId} not authorized to add users to expense ${userExpense.expenseId}`,
+                `User ${requestingUserId} not authorized to add users to expense ${expenseId}`,
             );
             return;
         }
 
-        await this._userExpenseDao.create(userExpense);
+        await this._userExpenseDao.create(
+            new UserExpense(expenseId, userId, userId !== requestingUserId, requestingUserId, new Date(Date.now()))
+        );
     }
 
     async removeUserFromExpense(expenseId: string, userId: string): Promise<IExpense> {
@@ -132,8 +133,9 @@ export class ExpenseManager implements IExpenseManager {
 
     async addExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
         const request = { userId, expenseId, pendingJoin: true, requestingUserId, createdAt: new Date(Date.now()) } as IUserExpense;
+        const existing = await this._userExpenseDao.read({ userId: userId, expenseId: expenseId });
 
-        if (this._userExpenseDao.read({ userId: userId, expenseId: expenseId })) {
+        if (existing) {
             throw new Error("This user expense already exists");
         }
 

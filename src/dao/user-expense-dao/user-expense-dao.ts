@@ -101,7 +101,7 @@ export class UserExpenseDao implements IUserExpenseDao {
     }
 
     async getJoinRequestsForUser(userId: string): Promise<IUserExpense[]> {
-        const res = await this._client <IUserExpense[]>`
+        const res = await this._client<IUserExpense[]>`
             SELECT expenseId as "expenseId", userId as "userId", pendingJoin as "pendingJoin", requestingUserId as "requestingUserId", createdAt as "createdAt"
               FROM UserExpense
              WHERE userId = ${userId}
@@ -112,7 +112,7 @@ export class UserExpenseDao implements IUserExpenseDao {
     }
 
     async getJoinRequestsForExpense(expenseId: string): Promise<IUserExpense[]> {
-        const res = await this._client <IUserExpense[]>`
+        const res = await this._client<IUserExpense[]>`
             SELECT expenseId as "expenseId", userId as "userId", pendingJoin as "pendingJoin", requestingUserId as "requestingUserId", createdAt as "createdAt"
               FROM UserExpense
              WHERE expenseId = ${expenseId}

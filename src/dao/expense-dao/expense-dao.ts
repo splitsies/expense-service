@@ -72,6 +72,7 @@ export class ExpenseDao implements IExpenseDao {
               FROM Expense e, UserExpense ue
              WHERE e.id = ue.expenseId
                AND ue.userId = ${userId}
+               AND ue.pendingJoin = FALSE
           ORDER BY e.transactionDate DESC;
         `;
 

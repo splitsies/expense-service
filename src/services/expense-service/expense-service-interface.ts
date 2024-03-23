@@ -17,7 +17,7 @@ export interface IExpenseService {
     updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense>;
     getExpensesForUser(userId: string): Promise<IExpense[]>;
     getUsersForExpense(expenseId: string): Promise<string[]>;
-    addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void>;
+    addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpense>;
     getExpenseUserDetailsForExpenses(expenseIds: string[]): Promise<Map<string, IExpenseUserDetails[]>>;
     getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequestDto[]>;

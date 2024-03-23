@@ -9,7 +9,7 @@ export interface IExpenseManager {
     updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense>;
     getExpensesForUser(userId: string): Promise<IExpense[]>;
     getUsersForExpense(expenseId: string): Promise<string[]>;
-    addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void>;
+    addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpense>;
     getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequest[]>;
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
