@@ -26,7 +26,7 @@ export const main = middyfy(
     SplitsiesFunctionHandlerFactory.create<typeof schema, IExpensePayload[] | string>(
         logger,
         async (event) => {
-            console.log(event.queryStringParameters);
+            logger.log(event.queryStringParameters);
             if (!event.queryStringParameters.userId) {
                 throw new InvalidArgumentsError();
             }
