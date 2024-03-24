@@ -9,7 +9,6 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./docker/postgres:/home/postgres/data
       - ./pg-tables.sql:/docker-entrypoint-initdb.d/init.sql
   dynamodb-local:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"

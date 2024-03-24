@@ -8,6 +8,8 @@ export interface IDbConfiguration {
     readonly userExpenseTableName: string;
     readonly expenseJoinRequestTableName: string;
     readonly endpoint: string;
+    readonly pgHost: string;
+    readonly pgPort: number;
 }
 
 export const IDbConfiguration = Symbol.for("IDbConfiguration");

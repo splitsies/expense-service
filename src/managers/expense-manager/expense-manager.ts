@@ -42,7 +42,7 @@ export class ExpenseManager implements IExpenseManager {
     async getExpense(id: string): Promise<IExpense> {
         const expenseDa = await this._expenseDao.read({ id });
         const items = await this._expenseItemDao.getForExpense(id);
-        return this._expenseDaMapper.fromDa(expenseDa, items);
+        return expenseDa ? this._expenseDaMapper.fromDa(expenseDa, items) : null;
     }
 
     async createExpense(userId: string): Promise<IExpense> {
@@ -114,13 +114,14 @@ export class ExpenseManager implements IExpenseManager {
         const key = this._userExpenseDao.key({ expenseId, userId, pendingJoin: false });
         await this._userExpenseDao.delete(key);
 
+        const expense = this.getExpense(expenseId);
         const userExpenses = await this._userExpenseDao.getUsersForExpense(expenseId);
         if (userExpenses.length === 0) {
             // If the last user was deleted, delete the expense as well
             await this._expenseDao.delete({ id: expenseId });
         }
 
-        return this.getExpense(expenseId);
+        return expense;
     }
 
     async getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequest[]> {
@@ -189,8 +190,7 @@ export class ExpenseManager implements IExpenseManager {
         isProportional: boolean,
         expenseId: string,
     ): Promise<IExpense> {
-        const item = new ExpenseItem(randomUUID(), expenseId, name, price, owners, isProportional);
-        console.log({ item });
+        const item = new ExpenseItem(randomUUID(), expenseId, name, price, owners, isProportional, Date.now());
         await this._expenseItemDao.create(item);
 
         console.log("created the item");

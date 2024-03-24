@@ -7,5 +7,9 @@
     "connectionTableName": "${param:CONNECTION_TABLE_NAME}",
     "userExpenseTableName": "${param:DB_USER_EXPENSE_TABLE_NAME}",
     "expenseJoinRequestTableName": "${param:DB_EXPENSE_JOIN_REQUEST_TABLE_NAME}",
-    "dbEndpoint": "${param:DB_ENDPOINT}"
+    "dbEndpoint": "${param:DB_ENDPOINT}",
+    "PGUSERNAME": "${param:PGUSERNAME}",
+    "PGPASSWORD": "${param:PGPASSWORD}",
+    "pgHost": "${param:PG_HOST}",
+    "pgPort": "${param:PG_PORT}"
 }

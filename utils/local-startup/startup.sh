@@ -12,5 +12,9 @@ sls offline start \
     --param='DB_ACCESS_KEY_ID=null' \
     --param='DB_SECRET_ACCESS_KEY=null' \
     --param='DB_REGION=us-east-1' \
-    --param='DB_EXPENSE_JOIN_REQUEST_TABLE_NAME=Splitsies-ExpenseJoinRequest-local'
+    --param='DB_EXPENSE_JOIN_REQUEST_TABLE_NAME=Splitsies-ExpenseJoinRequest-local' \
+    --param='PGUSERNAME=postgres' \
+    --param='PGPASSWORD=postgres' \
+    --param='PG_HOST=127.0.0.1' \
+    --param='PG_PORT=5432'
     
