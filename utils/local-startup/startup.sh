@@ -9,6 +9,7 @@ sls offline start \
     --param='CONNECTION_TABLE_NAME=Splitsies-ExpenseConnection-local' \
     --param='DB_TABLE_NAME=Expense' \
     --param='DB_USER_EXPENSE_TABLE_NAME=Splitsies-UserExpense-local' \
+    --param='EXPENSE_ITEM_TABLE_NAME=Splitsies-ExpenseItem-local' \
     --param='DB_ACCESS_KEY_ID=null' \
     --param='DB_SECRET_ACCESS_KEY=null' \
     --param='DB_REGION=us-east-1' \

@@ -70,7 +70,9 @@ export class ExpenseManager implements IExpenseManager {
         const expenses = await this._expenseDao.getExpensesForUser(userId);
 
         await Promise.all(
-            expenses.map(e => this._expenseItemDao.getForExpense(e.id).then(items => expenseToItems.set(e.id, items)))
+            expenses.map(e => this._expenseItemDao.getForExpense(e.id)
+                .then(items => expenseToItems.set(e.id, items))
+                .catch(e => this._logger.error(e)))
         );
 
         return expenses.map(e => this._expenseDaMapper.fromDa(e, expenseToItems.get(e.id)));

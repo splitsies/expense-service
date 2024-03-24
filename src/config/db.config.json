@@ -6,6 +6,7 @@
     "transactionDateIndexName": "${param:TRANSACTION_DATE_INDEX_NAME}",
     "connectionTableName": "${param:CONNECTION_TABLE_NAME}",
     "userExpenseTableName": "${param:DB_USER_EXPENSE_TABLE_NAME}",
+    "expenseItemTableName": "${param:EXPENSE_ITEM_TABLE_NAME}",
     "expenseJoinRequestTableName": "${param:DB_EXPENSE_JOIN_REQUEST_TABLE_NAME}",
     "dbEndpoint": "${param:DB_ENDPOINT}",
     "PGUSERNAME": "${param:PGUSERNAME}",

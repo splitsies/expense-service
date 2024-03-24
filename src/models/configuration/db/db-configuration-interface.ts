@@ -3,6 +3,7 @@ export interface IDbConfiguration {
     readonly dbSecretAccessKey: string;
     readonly dbRegion: string;
     readonly tableName: string;
+    readonly expenseItemTableName: string;
     readonly transactionDateIndexName: string;
     readonly connectionTableName: string;
     readonly userExpenseTableName: string;
