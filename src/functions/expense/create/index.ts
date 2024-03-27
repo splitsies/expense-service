@@ -18,4 +18,12 @@ export default {
             },
         },
     ],
+    vpc: {
+        securityGroupIds: [
+            "sg-0c856a69027cbbe51"
+        ],
+        subnetIds: [
+            "subnet-0ca030cb2990146fd",
+        ]
+    }
 };
