@@ -17,8 +17,8 @@ export class UsersApiClient extends SplitsiesApiClientBase implements IUsersApiC
 
     async getById(id: string): Promise<IDataResponse<IUserDto>> {
         try {
+            console.log({ url: `${this._apiConfiguration.uri.users}${id}` });
             const result = await this.get<IUserDto>(`${this._apiConfiguration.uri.users}${id}`);
-
             if (!result?.success) {
                 this._logger.error(`Error on request: ${result.data}`);
             }
@@ -33,6 +33,7 @@ export class UsersApiClient extends SplitsiesApiClientBase implements IUsersApiC
     async findUsersById(ids: string[]): Promise<IDataResponse<IUserDto[]>> {
         try {
             const url = `${this._apiConfiguration.uri.users}?ids=${ids.join(",")}`;
+            console.log({ url });
             const timeout = Date.now() + this._timeout;
             const users: IUserDto[] = [];
             let response: IDataResponse<IScanResult<IUserDto>> = undefined;

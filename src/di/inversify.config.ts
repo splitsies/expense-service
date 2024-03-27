@@ -49,7 +49,6 @@ import {
     ExpenseUserDetailsMapper,
     IExpenseJoinRequestDaMapper,
     IExpenseMapper,
-    IExpenseMessageParameters,
     IExpenseMessageParametersMapper,
     IExpenseUpdateMapper,
     IExpenseUserDetailsMapper,
@@ -64,6 +63,10 @@ import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcast
 import { ExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster";
 import { IExpenseMessageStrategy } from "src/strategies/expense-message-strategy/expense-message-strategy-interface";
 import { ExpenseMessageStrategy } from "src/strategies/expense-message-strategy/expense-message-strategy";
+import { IExpenseDaMapper } from "src/mappers/expense-da-mapper-interface";
+import { ExpenseDaMapper } from "src/mappers/expense-da-mapper";
+import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-interface";
+import { ExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao";
 
 const container = new Container();
 
@@ -114,4 +117,7 @@ container
     .bind<IExpenseMessageParametersMapper>(IExpenseMessageParametersMapper)
     .to(ExpenseMessageParametersMapper)
     .inSingletonScope();
+
+container.bind<IExpenseDaMapper>(IExpenseDaMapper).to(ExpenseDaMapper).inSingletonScope();
+container.bind<IExpenseItemDao>(IExpenseItemDao).to(ExpenseItemDao).inSingletonScope();
 export { container };

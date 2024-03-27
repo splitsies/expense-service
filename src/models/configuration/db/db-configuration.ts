@@ -13,6 +13,10 @@ export class DbConfiguration implements IDbConfiguration {
     readonly expenseJoinRequestTableName: string;
     readonly userExpenseTableName: string;
     readonly transactionDateIndexName: string;
+    readonly expenseItemTableName: string;
+    readonly pgPort: number;
+    readonly pgHost: string;
+    readonly pgDatabaseName: string;
 
     constructor() {
         assert(!!process.env.dbAccessKeyId, "db access key was undefined");
@@ -23,7 +27,11 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.dbEndpoint, "db endpoint was undefined");
         assert(!!process.env.userExpenseTableName, "DB_USER_EXPENSE_TABLE_NAME was undefined");
         assert(!!process.env.expenseJoinRequestTableName, "DB_EXPENSE_JOIN_REQUEST_TABLE_NAME was undefined");
+        assert(!!process.env.expenseItemTableName, "EXPENSE_ITEM_TABLE_NAME was undefined");
         assert(!!process.env.transactionDateIndexName, "TRANSACTION_DATE_INDEX_NAME was undefined");
+        assert(!!process.env.pgPort, "PG_PORT was undefined");
+        assert(!!process.env.pgHost, "PG_HOST was undefined");
+        assert(!!process.env.pgDatabaseName, "PG_DATABASE_NAME was undefined");
 
         this._dbAccessKeyId = process.env.dbAccessKeyId;
         this._dbSecretAccessKey = process.env.dbSecretAccessKey;
@@ -33,7 +41,11 @@ export class DbConfiguration implements IDbConfiguration {
         this._endpoint = process.env.dbEndpoint;
         this.userExpenseTableName = process.env.userExpenseTableName;
         this.expenseJoinRequestTableName = process.env.expenseJoinRequestTableName;
+        this.expenseItemTableName = process.env.expenseItemTableName;
         this.transactionDateIndexName = process.env.transactionDateIndexName;
+        this.pgPort = parseInt(process.env.pgPort);
+        this.pgHost = process.env.pgHost;
+        this.pgDatabaseName = process.env.pgDatabaseName;
     }
 
     get dbAccessKeyId(): string {

@@ -1,4 +1,5 @@
-docker kill splitsies-expense-db-local
+docker kill splitsies-pg-expense-local
+docker kill splitsies-ddb-expense-local
 
 rm -rf utils/local-db/docker
 
@@ -40,7 +41,24 @@ aws dynamodb create-table \
         AttributeName=expenseId,KeyType=RANGE \
     --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
     --table-class STANDARD \
-    --endpoint-url http://localhost:8000
+    --endpoint-url http://localhost:8000 \
+    --global-secondary-indexes \
+        "[
+            {
+                \"IndexName\": \"ExpenseIndex\",
+                \"KeySchema\": [
+                    {\"AttributeName\":\"expenseId\",\"KeyType\":\"HASH\"},
+                    {\"AttributeName\":\"connectionId\",\"KeyType\":\"RANGE\"}
+                ],
+                \"Projection\":{
+                    \"ProjectionType\":\"ALL\"
+                },
+                \"ProvisionedThroughput\": {
+                    \"ReadCapacityUnits\": 5,
+                    \"WriteCapacityUnits\": 5
+                }
+            }
+        ]"
 
 aws dynamodb create-table \
     --table-name Splitsies-UserExpense-local \
@@ -52,7 +70,7 @@ aws dynamodb create-table \
         AttributeName=userId,KeyType=RANGE \
     --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
     --table-class STANDARD \
-    --endpoint-url http://localhost:8000
+    --endpoint-url http://localhost:8000 
 
 aws dynamodb create-table \
     --table-name Splitsies-ExpenseJoinRequest-local \
@@ -66,4 +84,17 @@ aws dynamodb create-table \
     --table-class STANDARD \
     --endpoint-url http://localhost:8000
 
-docker kill splitsies-expense-db-local
+aws dynamodb create-table \
+    --table-name Splitsies-ExpenseItem-local \
+    --attribute-definitions \
+        AttributeName=expenseId,AttributeType=S \
+        AttributeName=id,AttributeType=S \
+    --key-schema \
+        AttributeName=expenseId,KeyType=HASH \
+        AttributeName=id,KeyType=RANGE \
+    --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+    --table-class STANDARD \
+    --endpoint-url http://localhost:8000
+
+docker kill splitsies-ddb-expense-local
+docker kill splitsies-pg-expense-local
