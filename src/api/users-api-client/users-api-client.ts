@@ -33,6 +33,7 @@ export class UsersApiClient extends SplitsiesApiClientBase implements IUsersApiC
     async findUsersById(ids: string[]): Promise<IDataResponse<IUserDto[]>> {
         try {
             const url = `${this._apiConfiguration.uri.users}?ids=${ids.join(",")}`;
+            console.log({ url });
             const timeout = Date.now() + this._timeout;
             const users: IUserDto[] = [];
             let response: IDataResponse<IScanResult<IUserDto>> = undefined;
