@@ -15,7 +15,7 @@ export class UserExpenseDao implements IUserExpenseDao {
     ) {
         const keySelector = (e: IUserExpense) => ({ expenseId: e.expenseId, userId: e.userId });
         this.key = keySelector;
-        this._client = postgres({ hostname: dbConfiguration.pgHost, port: dbConfiguration.pgPort });
+        this._client = postgres({ hostname: dbConfiguration.pgHost, port: dbConfiguration.pgPort, database: dbConfiguration.pgDatabaseName });
     }
     key: (model: IUserExpense) => Record<string, string | number>;
 

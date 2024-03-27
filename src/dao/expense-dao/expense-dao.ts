@@ -15,7 +15,7 @@ export class ExpenseDao implements IExpenseDao {
         @inject(ILogger) logger: ILogger,
         @inject(IDbConfiguration) _dbConfiguration: IDbConfiguration,
     ) {    
-        this._client = postgres({ hostname: _dbConfiguration.pgHost, port:_dbConfiguration.pgPort });        
+        this._client = postgres({ hostname: _dbConfiguration.pgHost, port:_dbConfiguration.pgPort, database: _dbConfiguration.pgDatabaseName });        
     }
 
     async create(model: IExpense): Promise<IExpenseDa> {

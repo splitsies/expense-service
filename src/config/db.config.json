@@ -12,5 +12,6 @@
     "PGUSERNAME": "${param:PGUSERNAME}",
     "PGPASSWORD": "${param:PGPASSWORD}",
     "pgHost": "${param:PG_HOST}",
-    "pgPort": "${param:PG_PORT}"
+    "pgPort": "${param:PG_PORT}",
+    "pgDatabaseName": "${param:PG_DATABASE_NAME}"
 }

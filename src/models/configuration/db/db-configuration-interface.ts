@@ -11,6 +11,7 @@ export interface IDbConfiguration {
     readonly endpoint: string;
     readonly pgHost: string;
     readonly pgPort: number;
+    readonly pgDatabaseName: string;
 }
 
 export const IDbConfiguration = Symbol.for("IDbConfiguration");

@@ -17,5 +17,6 @@ sls offline start \
     --param='PGUSERNAME=postgres' \
     --param='PGPASSWORD=postgres' \
     --param='PG_HOST=127.0.0.1' \
-    --param='PG_PORT=5432'
+    --param='PG_PORT=5432' \
+    --param='PG_DATABASE_NAME=postgres'
     
