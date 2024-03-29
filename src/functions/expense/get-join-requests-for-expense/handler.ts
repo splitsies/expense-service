@@ -25,7 +25,6 @@ export const main = middyfy(
             }
 
             const result = await expenseService.getJoinRequestsForExpense(expenseId);
-            logger.log({ result });
             return new DataResponse(HttpStatusCode.OK, result).toJson();
         },
         expectedErrors,

@@ -1,9 +1,8 @@
 import {
     ExpenseOperation,
-    IExpense,
+    IExpenseDto,
     IExpenseItem,
     IExpenseMessageParameters,
-    IExpenseUpdateMapper,
     IExpenseUserDetails,
 } from "@splitsies/shared-models";
 import { IExpenseMessageStrategy } from "./expense-message-strategy-interface";
@@ -13,11 +12,10 @@ import { IExpenseService } from "src/services/expense-service/expense-service-in
 @injectable()
 export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
     constructor(
-        @inject(IExpenseService) private readonly _expenseService: IExpenseService,
-        @inject(IExpenseUpdateMapper) private readonly _expenseUpdateMapper: IExpenseUpdateMapper,
+        @inject(IExpenseService) private readonly _expenseService: IExpenseService
     ) {}
 
-    async execute(operationName: ExpenseOperation, params: IExpenseMessageParameters): Promise<IExpense> {
+    async execute(operationName: ExpenseOperation, params: IExpenseMessageParameters): Promise<IExpenseDto> {
         switch (operationName) {
             case "addItem":
                 return this.addItem(
@@ -52,11 +50,11 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         price: number,
         owners: IExpenseUserDetails[],
         isProportional: boolean,
-    ): Promise<IExpense> {
+    ): Promise<IExpenseDto> {
         return this._expenseService.addExpenseItem(name, price, owners, isProportional, expenseId);
     }
 
-    private async removeItem(expenseId: string, item: IExpenseItem): Promise<IExpense> {
+    private async removeItem(expenseId: string, item: IExpenseItem): Promise<IExpenseDto> {
         return await this._expenseService.removeExpenseItem(item.id, expenseId);
     }
 
@@ -64,7 +62,7 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         expenseId: string,
         user: IExpenseUserDetails,
         selectedItemIds: string[],
-    ): Promise<IExpense> {
+    ): Promise<IExpenseDto> {
         const expenseItems = await this._expenseService.getExpenseItems(expenseId);
         const updated: IExpenseItem[] = [];
 
@@ -94,7 +92,7 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         name: string,
         price: number,
         isProportional: boolean,
-    ): Promise<IExpense> {
+    ): Promise<IExpenseDto> {
         const expenseItems = await this._expenseService.getExpenseItems(expenseId);
         const itemIndex = expenseItems.findIndex((i) => i.id === itemId);
         if (itemIndex === -1) throw new Error("Item not found for expense");
@@ -104,22 +102,17 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         return this._expenseService.getExpense(expenseId);
     }
 
-    private async updateExpenseName(expenseId: string, expenseName: string): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            const expense = { ...e, name: expenseName } as IExpense;
-            return expense;
-        });
+    private async updateExpenseName(expenseId: string, expenseName: string): Promise<IExpenseDto> {
+        return this.updateExpense(expenseId, (e) => ({ ...e, name: expenseName } as IExpenseDto));
     }
 
-    private async updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            const expense = { ...e, transactionDate } as IExpense;
-            return expense;
-        });
+    private async updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<IExpenseDto> {
+        return this.updateExpense(expenseId, (e) => ({ ...e, transactionDate: transactionDate.toISOString() } as IExpenseDto));
     }
 
-    private async updateExpense(expenseId: string, update: (expense: IExpense) => IExpense): Promise<IExpense> {
+    private async updateExpense(expenseId: string, update: (expense: IExpenseDto) => IExpenseDto): Promise<IExpenseDto> {
         const expense = await this._expenseService.getExpense(expenseId);
-        return this._expenseService.updateExpense(expense.id, this._expenseUpdateMapper.toDtoModel(update(expense)));
+        const updated = update(expense);
+        return this._expenseService.updateExpense(expense.id, updated);
     }
 }

@@ -2,7 +2,7 @@ import schema from "./schema";
 import { middyfy } from "../../../libs/lambda";
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
-import { HttpStatusCode, DataResponse, IExpenseJoinRequestDto } from "@splitsies/shared-models";
+import { HttpStatusCode, DataResponse, IExpenseJoinRequest } from "@splitsies/shared-models";
 import { SplitsiesFunctionHandlerFactory, ILogger, ExpectedError, IExpectedError } from "@splitsies/utils";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 
@@ -14,7 +14,7 @@ const expectedErrors: IExpectedError[] = [
 ];
 
 export const main = middyfy(
-    SplitsiesFunctionHandlerFactory.create<typeof schema, IExpenseJoinRequestDto[] | string>(
+    SplitsiesFunctionHandlerFactory.create<typeof schema, IExpenseJoinRequest[] | string>(
         logger,
         async (event) => {
             const userId = event.pathParameters.userId;
@@ -23,7 +23,10 @@ export const main = middyfy(
             if (userId !== tokenUserId) throw new UnauthorizedUserError();
 
             const result = await expenseService.getExpenseJoinRequestsForUser(userId);
-            return new DataResponse(HttpStatusCode.OK, result).toJson();
+            return new DataResponse(
+                HttpStatusCode.OK,
+                result
+            ).toJson();
         },
         expectedErrors,
     ),

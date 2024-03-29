@@ -18,10 +18,10 @@ export const main = middyfy(
         async (event) => {
             const guestId = decodeURIComponent(event.pathParameters.guestId);
             const registeredUser = event.body.registeredUser as IExpenseUserDetails;
-            const payloads = await expenseService.replaceGuestUserInfo(guestId, registeredUser);
+            const expenses = await expenseService.replaceGuestUserInfo(guestId, registeredUser);
 
-            for (const payload of payloads) {
-                expenseBroadcaster.broadcast(payload.expense.id, new ExpenseMessage("payload", payload));
+            for (const expense of expenses) {
+                expenseBroadcaster.broadcast(expense.expense.id, new ExpenseMessage("expense", expense));
             }
 
             return new DataResponse(HttpStatusCode.OK, null).toJson();

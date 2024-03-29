@@ -1,16 +1,16 @@
-import { IExpense, IExpenseItem, IExpenseJoinRequest, IExpenseUpdate, IExpenseUserDetails } from "@splitsies/shared-models";
+import { IExpenseDto, IExpenseItem, IExpenseJoinRequest, IExpenseUpdate, IExpenseUserDetails } from "@splitsies/shared-models";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 
 export interface IExpenseManager {
     getUserExpense(userId: string, expenseId: string): Promise<IUserExpense>;
-    getExpense(id: string): Promise<IExpense>;
-    createExpense(userId: string): Promise<IExpense>;
-    createExpenseFromImage(expense: IExpense, userId: string): Promise<IExpense>;
-    updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense>;
-    getExpensesForUser(userId: string): Promise<IExpense[]>;
+    getExpense(id: string): Promise<IExpenseDto>;
+    createExpense(userId: string): Promise<IExpenseDto>;
+    createExpenseFromImage(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
+    updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
+    getExpensesForUser(userId: string): Promise<IExpenseDto[]>;
     getUsersForExpense(expenseId: string): Promise<string[]>;
     addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
-    removeUserFromExpense(expenseId: string, userId: string): Promise<IExpense>;
+    removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;
     getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequest[]>;
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
     removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
@@ -22,11 +22,11 @@ export interface IExpenseManager {
         owners: IExpenseUserDetails[],
         isProportional: boolean,
         expenseId: string,
-    ): Promise<IExpense>;
-    removeExpenseItem(itemId: string, expenseId: string): Promise<IExpense>;
+    ): Promise<IExpenseDto>;
+    removeExpenseItem(itemId: string, expenseId: string): Promise<IExpenseDto>;
     getExpenseItems(expenseId: string): Promise<IExpenseItem[]>;
     saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]>;
-    replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpense[]>;
+    replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]>;
 }
 
 export const IExpenseManager = Symbol.for("IExpenseManager");

@@ -1,14 +1,11 @@
 import { inject, injectable } from "inversify";
 import { randomUUID } from "crypto";
 import {
-    IExpense,
-    Expense,
-    IExpenseUpdate,
     ExpenseItem,
-    IExpenseUpdateMapper,
     IExpenseUserDetails,
     IExpenseJoinRequest,
     IExpenseItem,
+    IExpenseDto,
 } from "@splitsies/shared-models";
 import { IExpenseManager } from "./expense-manager-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
@@ -16,10 +13,11 @@ import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-inter
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { ILogger } from "@splitsies/utils";
 import { IExpenseJoinRequestDao } from "src/dao/expense-join-request-dao/expense-join-request-dao-interface";
-import { IExpenseDaMapper } from "src/mappers/expense-da-mapper-interface";
 import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-interface";
 import { IExpenseDa } from "src/models/expense/expense-da-interface";
 import { UserExpense } from "src/models/user-expense/user-expense";
+import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper.ts/expense-dto-mapper-interface";
+import { ExpenseDa } from "src/models/expense/expense-da";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -29,8 +27,7 @@ export class ExpenseManager implements IExpenseManager {
         @inject(IUserExpenseDao) private readonly _userExpenseDao: IUserExpenseDao,
         @inject(IExpenseJoinRequestDao) private readonly _expenseJoinRequestDao: IExpenseJoinRequestDao,
         @inject(IExpenseItemDao) private readonly _expenseItemDao: IExpenseItemDao,
-        @inject(IExpenseUpdateMapper) private readonly _expenseUpdateMapper: IExpenseUpdateMapper,
-        @inject(IExpenseDaMapper) private readonly _expenseDaMapper: IExpenseDaMapper
+        @inject(IExpenseDtoMapper) private readonly _dtoMapper: IExpenseDtoMapper
     ) {}
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
@@ -39,43 +36,58 @@ export class ExpenseManager implements IExpenseManager {
         return await this._userExpenseDao.read(key);
     }
 
-    async getExpense(id: string): Promise<IExpense> {
-        const expenseDa = await this._expenseDao.read({ id });
-        const items = await this._expenseItemDao.getForExpense(id);
-        return expenseDa ? this._expenseDaMapper.fromDa(expenseDa, items) : null;
+    async getExpense(id: string): Promise<IExpenseDto> {
+        let expenseDa: IExpenseDa;
+        let items: IExpenseItem[];
+        let userIds: string[];
+
+        await Promise.all([
+            this._expenseDao.read({ id }).then(e => expenseDa = e),
+            this._userExpenseDao.getUsersForExpense(id).then(u => userIds = u),
+            this._expenseItemDao.getForExpense(id).then(e => items = e)
+        ]).catch(e => this._logger.error(`Error fetching expense ${id}`, e));
+
+        return (expenseDa !== undefined && items !== undefined && userIds !== undefined)
+            ? this._dtoMapper.toDto(expenseDa, userIds, items)
+            : null;
     }
 
-    async createExpense(userId: string): Promise<IExpense> {
-        const created = await this._expenseDao.create(new Expense(randomUUID(), "Untitled", new Date(), []));
+    async createExpense(userId: string): Promise<IExpenseDto> {
+        const created = await this._expenseDao.create(new ExpenseDa(randomUUID(), "Untitled", new Date()));
         await this._userExpenseDao.create({ expenseId: created.id, userId, pendingJoin: false });
-        return this._expenseDaMapper.fromDa(created, []);
+        return this.getExpense(userId);
     }
 
-    async createExpenseFromImage(expense: IExpense, userId: string): Promise<IExpense> {
-        const created = await this._expenseDao.create(expense);
-        await Promise.all(expense.items.map(i => this._expenseItemDao.create(i)));
-        await this._userExpenseDao.create({ expenseId: created.id, userId, pendingJoin: false });
-        return expense;
+    async createExpenseFromImage(expense: IExpenseDto, userId: string): Promise<IExpenseDto> {
+        await this._expenseDao.create(new ExpenseDa(expense.id, expense.name, new Date(expense.transactionDate)));
+        await Promise.all(expense.items.map(i => this._expenseItemDao.create(i)))
+            .catch(e => this._logger.error(`Error creating expense item`, e));
+        await this._userExpenseDao.create(new UserExpense(expense.id, userId, false));
+
+        return this.getExpense(expense.id);
     }
 
-    async updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense> {
-        const expenseDa = await this._expenseDao.update(this._expenseUpdateMapper.toDomainModel(updated, id));
-        const items = await this._expenseItemDao.getForExpense(id);
-        return this._expenseDaMapper.fromDa(expenseDa, items);
+    async updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto> {
+        await this._expenseDao.update(new ExpenseDa(updated.id, updated.name, new Date(updated.transactionDate)));
+        return this.getExpense(id);
     }
 
     // TODO: Make this take in a lastEvaluatedKey and make the front-end infinite scrolling
-    async getExpensesForUser(userId: string): Promise<IExpense[]> {
+    async getExpensesForUser(userId: string): Promise<IExpenseDto[]> {
         const expenseToItems = new Map<string, IExpenseItem[]>;
+        const expenseToUsers = new Map<string, string[]>;
         const expenses = await this._expenseDao.getExpensesForUser(userId);
 
         await Promise.all(
-            expenses.map(e => this._expenseItemDao.getForExpense(e.id)
-                .then(items => expenseToItems.set(e.id, items))
-                .catch(e => this._logger.error(e)))
+            expenses.map(async e => {
+                const items = await this._expenseItemDao.getForExpense(e.id)
+                expenseToItems.set(e.id, items);
+                const users = await this._userExpenseDao.getUsersForExpense(e.id);
+                expenseToUsers.set(e.id, users);
+            })
         );
 
-        return expenses.map(e => this._expenseDaMapper.fromDa(e, expenseToItems.get(e.id)));
+        return expenses.map(e => this._dtoMapper.toDto(e, expenseToUsers.get(e.id), expenseToItems.get(e.id)));
     }
 
     async getUsersForExpense(expenseId: string): Promise<string[]> {
@@ -102,7 +114,7 @@ export class ExpenseManager implements IExpenseManager {
         );
     }
 
-    async removeUserFromExpense(expenseId: string, userId: string): Promise<IExpense> {
+    async removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {
         const items = await this._expenseItemDao.getForExpense(expenseId);
 
         for (const item of items) {
@@ -150,7 +162,7 @@ export class ExpenseManager implements IExpenseManager {
         await this._userExpenseDao.update(updatedUserExpense);
     }
 
-    async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpense[]> {
+    async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]> {
         const ues = await this._userExpenseDao.getForUser(guestUserId);
         const userExpenses = await this.getExpensesForUser(guestUserId);
 
@@ -161,7 +173,7 @@ export class ExpenseManager implements IExpenseManager {
             ues.map((ue) => this._userExpenseDao.create({ expenseId: ue.expenseId, userId: registeredUser.id, pendingJoin: false })),
         );
 
-        const updatedExpenses: IExpense[] = [];
+        const updatedExpenses: IExpenseDto[] = [];
         for (const expense of userExpenses) {
             let shouldUpdate = false;
             for (const item of expense.items) {
@@ -177,8 +189,7 @@ export class ExpenseManager implements IExpenseManager {
 
             if (shouldUpdate) {
                 updatedExpenses.push(
-                    await this.updateExpense(expense.id, this._expenseUpdateMapper.toDtoModel(expense)),
-                );
+                    await this.updateExpense(expense.id, expense));
             }
         }
 
@@ -191,35 +202,15 @@ export class ExpenseManager implements IExpenseManager {
         owners: IExpenseUserDetails[],
         isProportional: boolean,
         expenseId: string,
-    ): Promise<IExpense> {
+    ): Promise<IExpenseDto> {
         const item = new ExpenseItem(randomUUID(), expenseId, name, price, owners, isProportional, Date.now());
         await this._expenseItemDao.create(item);
-
-        console.log("created the item");
-
-        let expense: IExpenseDa;
-        let items: IExpenseItem[];
-
-        await Promise.all([
-            this._expenseDao.read({ id: expenseId }).then(e => expense = e),
-            this._expenseItemDao.getForExpense(expenseId).then(i => items = i)
-        ]);
-
-        return this._expenseDaMapper.fromDa(expense, items);
+        return this.getExpense(expenseId);
     }
 
-    async removeExpenseItem(itemId: string, expenseId: string): Promise<IExpense> {
+    async removeExpenseItem(itemId: string, expenseId: string): Promise<IExpenseDto> {
         await this._expenseItemDao.delete({ expenseId, id: itemId });
-
-        let expense: IExpenseDa;
-        let items: IExpenseItem[];
-
-        await Promise.all([
-            this._expenseDao.read({ id: expenseId }).then(e => expense = e),
-            this._expenseItemDao.getForExpense(expenseId).then(i => items = i)
-        ]);
-
-        return this._expenseDaMapper.fromDa(expense, items);
+        return this.getExpense(expenseId);
     }
 
     async getExpenseItems(expenseId: string): Promise<IExpenseItem[]> {

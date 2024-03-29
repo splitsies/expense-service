@@ -2,14 +2,13 @@ import schema from "./schema";
 import { middyfy } from "../../../libs/lambda";
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
-import { HttpStatusCode, DataResponse, ExpenseMessage, ExpensePayload, IExpenseMapper } from "@splitsies/shared-models";
+import { HttpStatusCode, DataResponse, ExpenseMessage } from "@splitsies/shared-models";
 import { SplitsiesFunctionHandlerFactory, ILogger, ExpectedError } from "@splitsies/utils";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
 
 const logger = container.get<ILogger>(ILogger);
 const expenseService = container.get<IExpenseService>(IExpenseService);
-const expenseMapper = container.get<IExpenseMapper>(IExpenseMapper);
 const broadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
 
 export const main = middyfy(
@@ -25,18 +24,10 @@ export const main = middyfy(
             }
 
             const updatedExpense = await expenseService.removeUserFromExpense(expenseId, userId);
-            const result = await expenseService.getExpenseUserDetailsForExpenses([expenseId]);
-            const expenseUsers = result.get(expenseId);
             const joinRequests = await expenseService.getJoinRequestsForExpense(expenseId);
 
             await Promise.all([
-                broadcaster.broadcast(
-                    expenseId,
-                    new ExpenseMessage(
-                        "payload",
-                        new ExpensePayload(expenseMapper.toDtoModel(updatedExpense), expenseUsers),
-                    ),
-                ),
+                broadcaster.broadcast(expenseId, new ExpenseMessage("expense", updatedExpense)),
                 broadcaster.broadcast(expenseId, new ExpenseMessage("joinRequests", joinRequests)),
             ]);
 

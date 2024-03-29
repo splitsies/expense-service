@@ -43,14 +43,10 @@ import { IFirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/fireb
 import { FirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy";
 import {
     ExpenseJoinRequestDaMapper,
-    ExpenseMapper,
     ExpenseMessageParametersMapper,
-    ExpenseUpdateMapper,
     ExpenseUserDetailsMapper,
     IExpenseJoinRequestDaMapper,
-    IExpenseMapper,
     IExpenseMessageParametersMapper,
-    IExpenseUpdateMapper,
     IExpenseUserDetailsMapper,
 } from "@splitsies/shared-models";
 import { IExpenseStatements } from "src/dao/expense-dao/expense-statements-interface";
@@ -67,6 +63,8 @@ import { IExpenseDaMapper } from "src/mappers/expense-da-mapper-interface";
 import { ExpenseDaMapper } from "src/mappers/expense-da-mapper";
 import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-interface";
 import { ExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao";
+import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper.ts/expense-dto-mapper-interface";
+import { ExpenseDtoMapper } from "src/mappers/expense-dto-mapper.ts/expense-dto-mapper";
 
 const container = new Container();
 
@@ -82,8 +80,6 @@ container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSinglet
 container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(ConnectionConfiguration).inSingletonScope();
 container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao).inSingletonScope();
 
-container.bind<IExpenseMapper>(IExpenseMapper).to(ExpenseMapper).inSingletonScope();
-container.bind<IExpenseUpdateMapper>(IExpenseUpdateMapper).to(ExpenseUpdateMapper).inSingletonScope();
 
 container.bind<IConnectionService>(IConnectionService).to(ConnectionService).inSingletonScope();
 container.bind<IConnectionManager>(IConnectionManager).to(ConnectionManager).inSingletonScope();
@@ -120,4 +116,5 @@ container
 
 container.bind<IExpenseDaMapper>(IExpenseDaMapper).to(ExpenseDaMapper).inSingletonScope();
 container.bind<IExpenseItemDao>(IExpenseItemDao).to(ExpenseItemDao).inSingletonScope();
+container.bind<IExpenseDtoMapper>(IExpenseDtoMapper).to(ExpenseDtoMapper).inSingletonScope();
 export { container };

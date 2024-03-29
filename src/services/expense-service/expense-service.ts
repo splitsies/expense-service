@@ -1,14 +1,8 @@
 import { inject, injectable } from "inversify";
 import {
-    ExpenseJoinRequestDto,
-    ExpensePayload,
-    IExpense,
+    IExpenseDto,
     IExpenseItem,
     IExpenseJoinRequest,
-    IExpenseJoinRequestDto,
-    IExpenseMapper,
-    IExpensePayload,
-    IExpenseUpdate,
     IExpenseUserDetails,
     IExpenseUserDetailsMapper,
     NotFoundError,
@@ -31,26 +25,24 @@ export class ExpenseService implements IExpenseService {
         @inject(IOcrApiClient) private readonly _ocrApiClient: IOcrApiClient,
         @inject(IAlgorithmsApiClient) private readonly _algorithsmApiClient: IAlgorithmsApiClient,
         @inject(IUsersApiClient) private readonly _usersApiClient: IUsersApiClient,
-        @inject(IExpenseMapper) private readonly _mapper: IExpenseMapper,
         @inject(IExpenseUserDetailsMapper) private readonly _expenseUserDetailsMapper: IExpenseUserDetailsMapper,
-        @inject(IExpenseMapper) private readonly _expenseMapper: IExpenseMapper,
     ) {}
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
         return this._expenseManager.getUserExpense(userId, expenseId);
     }
 
-    async getExpense(id: string): Promise<IExpense> {
+    async getExpense(id: string): Promise<IExpenseDto> {
         return this._expenseManager.getExpense(id);
     }
 
-    async createExpense(userId: string): Promise<IExpense> {
+    async createExpense(userId: string): Promise<IExpenseDto> {
         const user = await this._usersApiClient.getById(userId);
         if (!user.data) throw new NotFoundError("User could not be found");
         return await this._expenseManager.createExpense(user.data.id);
     }
 
-    async createExpenseFromImage(base64Image: string, userId: string): Promise<IExpense> {
+    async createExpenseFromImage(base64Image: string, userId: string): Promise<IExpenseDto> {
         const user = await this._usersApiClient.getById(userId);
         if (!user.data) throw new NotFoundError("User could not be found");
 
@@ -61,16 +53,16 @@ export class ExpenseService implements IExpenseService {
         if (!expenseResult.success) throw new ImageProcessingError("Could not create expense from image");
 
         return this._expenseManager.createExpenseFromImage(
-            this._mapper.toDomainModel(expenseResult.data),
+            expenseResult.data,
             user.data.id,
         );
     }
 
-    async updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense> {
+    async updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto> {
         return await this._expenseManager.updateExpense(id, updated);
     }
 
-    async getExpensesForUser(userId: string): Promise<IExpense[]> {
+    async getExpensesForUser(userId: string): Promise<IExpenseDto[]> {
         return await this._expenseManager.getExpensesForUser(userId);
     }
 
@@ -113,7 +105,7 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.addUserToExpense(userId, expenseId, requestingUserId);
     }
 
-    removeUserFromExpense(expenseId: string, userId: string): Promise<IExpense> {
+    removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {
         return this._expenseManager.removeUserFromExpense(expenseId, userId);
     }
 
@@ -123,11 +115,11 @@ export class ExpenseService implements IExpenseService {
         owners: IExpenseUserDetails[],
         isProportional: boolean,
         expenseId: string,
-    ): Promise<IExpense> {
+    ): Promise<IExpenseDto> {
         return this._expenseManager.addExpenseItem(name, price, owners, isProportional, expenseId);
     }
 
-    async removeExpenseItem(itemId: string, expenseId: string): Promise<IExpense> {
+    async removeExpenseItem(itemId: string, expenseId: string): Promise<IExpenseDto> {
         return this._expenseManager.removeExpenseItem(itemId, expenseId);
     }
 
@@ -139,49 +131,8 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.saveUpdatedItems(updatedItems);
     }
 
-    async getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequestDto[]> {
-        const joinRequests = await this._expenseManager.getExpenseJoinRequestsForUser(userId);
-        if (joinRequests.length === 0) return [];
-
-        const response = await this._usersApiClient.findUsersById(joinRequests.map((r) => r.requestingUserId));
-        if (!response.success)
-            throw new ApiCommunicationError(`Error requesting users: status=${response.statusCode} - ${response.data}`);
-        const requestingUsers = response.data;
-
-        const mappedJoinRequests: IExpenseJoinRequestDto[] = [];
-
-        for (const request of joinRequests) {
-            const requestingUser = requestingUsers.find((r) => r.id === request.requestingUserId);
-
-            if (!requestingUser) {
-                this._logger.warn(
-                    `ExpenseJoinRequest for userId=${request.userId}, expenseId=${request.expenseId} from user ${request.requestingUserId} that does not exist`,
-                );
-                await this._expenseManager.removeExpenseJoinRequest(request.userId, request.expenseId, request.userId);
-                continue;
-            }
-
-            const expense = await this.getExpense(request.expenseId);
-            if (!expense) {
-                this._logger.warn(
-                    `ExpenseJoinRequest for userId=${request.userId}, expenseId=${request.expenseId} - Expense does not exist`,
-                );
-                await this._expenseManager.removeExpenseJoinRequest(request.userId, request.expenseId, request.userId);
-                continue;
-            }
-
-            const expenseUsers = await this.getExpenseUserDetailsForExpenses([request.expenseId]);
-            mappedJoinRequests.push(
-                new ExpenseJoinRequestDto(
-                    request.userId,
-                    new ExpensePayload(this._expenseMapper.toDtoModel(expense), expenseUsers.get(request.expenseId)),
-                    requestingUser,
-                    request.createdAt.toISOString(),
-                ),
-            );
-        }
-
-        return mappedJoinRequests;
+    async getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequest[]> {
+        return await this._expenseManager.getExpenseJoinRequestsForUser(userId);
     }
 
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]> {
@@ -196,15 +147,7 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.removeExpenseJoinRequest(userId, expenseId, requestingUserId);
     }
 
-    async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpensePayload[]> {
-        const updatedExpenses = await this._expenseManager.replaceGuestUserInfo(guestUserId, registeredUser);
-
-        const payloads = [];
-        for (const expense of updatedExpenses) {
-            const users = await this.getExpenseUserDetailsForExpenses([expense.id]);
-            payloads.push(new ExpensePayload(this._expenseMapper.toDtoModel(expense), users.get(expense.id)));
-        }
-
-        return payloads;
+    async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]> {
+        return this._expenseManager.replaceGuestUserInfo(guestUserId, registeredUser);
     }
 }
