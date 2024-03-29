@@ -6,6 +6,7 @@ import { HttpStatusCode, DataResponse, ExpenseMessage } from "@splitsies/shared-
 import { SplitsiesFunctionHandlerFactory, ILogger, ExpectedError } from "@splitsies/utils";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
+import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 
 const logger = container.get<ILogger>(ILogger);
 const expenseService = container.get<IExpenseService>(IExpenseService);

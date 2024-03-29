@@ -5,7 +5,7 @@ export interface IExpenseManager {
     getUserExpense(userId: string, expenseId: string): Promise<IUserExpense>;
     getExpense(id: string): Promise<IExpenseDto>;
     createExpense(userId: string): Promise<IExpenseDto>;
-    createExpenseFromImage(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
+    createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
     getExpensesForUser(userId: string): Promise<IExpenseDto[]>;
     getUsersForExpense(expenseId: string): Promise<string[]>;

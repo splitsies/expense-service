@@ -24,8 +24,8 @@ export const main = middyfy(
                 throw new UnauthorizedUserError();
             }
 
-            const result = !!event.body.image
-                ? await expenseService.createExpenseFromImage(event.body.image, event.body.userId)
+            const result = !!event.body.expense
+                ? await expenseService.createExpenseFromScan(event.body.expense as IExpenseDto, event.body.userId)
                 : await expenseService.createExpense(event.body.userId);
 
             return new DataResponse(HttpStatusCode.CREATED, result).toJson();

@@ -58,7 +58,7 @@ export class ExpenseManager implements IExpenseManager {
         return this.getExpense(userId);
     }
 
-    async createExpenseFromImage(expense: IExpenseDto, userId: string): Promise<IExpenseDto> {
+    async createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto> {
         await this._expenseDao.create(new ExpenseDa(expense.id, expense.name, new Date(expense.transactionDate)));
         await Promise.all(expense.items.map(i => this._expenseItemDao.create(i)))
             .catch(e => this._logger.error(`Error creating expense item`, e));
