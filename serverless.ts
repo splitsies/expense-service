@@ -23,6 +23,7 @@ import getJoinRequestsForExpense from "@functions/expense/get-join-requests-for-
 import mergeGuestUser from "@functions/expense/merge-guest-user";
 import removeUserFromExpense from "@functions/expense/delete-user-from-expense";
 import createConnectionToken from "@functions/connection/create-connection-token";
+import broadcast from "@functions/connection/broadcast";
 
 const serverlessConfiguration: AWS = {
     org: "splitsies",
@@ -89,7 +90,8 @@ const serverlessConfiguration: AWS = {
         getJoinRequestsForExpense,
         mergeGuestUser,
         removeUserFromExpense,
-        createConnectionToken
+        createConnectionToken,
+        broadcast
     },
     package: { individually: true },
     custom: {

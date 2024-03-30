@@ -13,6 +13,7 @@ export interface IDbConfiguration {
     readonly pgPort: number;
     readonly pgDatabaseName: string;
     readonly connectionTokenTableName: string;
+    readonly expenseUpdateTableName: string;
 }
 
 export const IDbConfiguration = Symbol.for("IDbConfiguration");

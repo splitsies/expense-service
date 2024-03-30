@@ -18,6 +18,8 @@ import { IExpenseDa } from "src/models/expense/expense-da-interface";
 import { UserExpense } from "src/models/user-expense/user-expense";
 import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper.ts/expense-dto-mapper-interface";
 import { ExpenseDa } from "src/models/expense/expense-da";
+import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
+import { IExpenseUpdateDao } from "src/dao/expense-update-dao/expense-update-dao-interface";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -27,8 +29,18 @@ export class ExpenseManager implements IExpenseManager {
         @inject(IUserExpenseDao) private readonly _userExpenseDao: IUserExpenseDao,
         @inject(IExpenseJoinRequestDao) private readonly _expenseJoinRequestDao: IExpenseJoinRequestDao,
         @inject(IExpenseItemDao) private readonly _expenseItemDao: IExpenseItemDao,
-        @inject(IExpenseDtoMapper) private readonly _dtoMapper: IExpenseDtoMapper
-    ) {}
+        @inject(IExpenseDtoMapper) private readonly _dtoMapper: IExpenseDtoMapper,
+        @inject(IExpenseUpdateDao) private readonly _expenseUpdateDao: IExpenseUpdateDao
+    ) { }
+    
+    async queueExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void> {
+        console.log({ creating: expenseUpdate });
+        await this._expenseUpdateDao.create(expenseUpdate);
+    }
+
+    async deleteExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void> {
+        await this._expenseUpdateDao.delete(this._expenseUpdateDao.key(expenseUpdate));
+    }
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
         const userExpense = { userId, expenseId } as IUserExpense;

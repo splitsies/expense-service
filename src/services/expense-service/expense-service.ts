@@ -9,6 +9,7 @@ import { IExpenseService } from "./expense-service-interface";
 import { ILogger } from "@splitsies/utils";
 import { IExpenseManager } from "src/managers/expense-manager/expense-manager-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
+import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -16,6 +17,14 @@ export class ExpenseService implements IExpenseService {
         @inject(ILogger) private readonly _logger: ILogger,
         @inject(IExpenseManager) private readonly _expenseManager: IExpenseManager
     ) {}
+    
+    async queueExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void> {
+        await this._expenseManager.queueExpenseUpdate(expenseUpdate);
+    }
+
+    async deleteExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void> {
+        await this._expenseManager.deleteExpenseUpdate(expenseUpdate);
+    }
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
         return this._expenseManager.getUserExpense(userId, expenseId);

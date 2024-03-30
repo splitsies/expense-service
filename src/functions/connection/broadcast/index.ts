@@ -1,0 +1,17 @@
+import { VpcConfig } from "src/config/vpc.config";
+import { handlerPath } from "../../../libs/handler-resolver";
+
+export default {
+    handler: `${handlerPath(__dirname)}/handler.main`,
+    events: [
+        {
+            stream: {
+                type: "dynamodb",
+                arn: "arn:aws:dynamodb:us-east-1:975049909936:table/Splitsies-ExpenseUpdate-dev-pr/stream/2024-03-30T21:45:35.401",
+                batchSize: 1,
+                startingPosition: "LATEST"
+            }            
+        },
+    ],
+    vpc: VpcConfig.vpc
+};

@@ -1,4 +1,5 @@
-import { IExpenseDto, IExpenseItem, IExpenseJoinRequest, IExpenseUpdate, IExpenseUserDetails } from "@splitsies/shared-models";
+import { IExpenseDto, IExpenseItem, IExpenseJoinRequest, IExpenseUserDetails } from "@splitsies/shared-models";
+import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 
 export interface IExpenseManager {
@@ -27,6 +28,8 @@ export interface IExpenseManager {
     getExpenseItems(expenseId: string): Promise<IExpenseItem[]>;
     saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]>;
     replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]>;
+    queueExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void>;
+    deleteExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void>;
 }
 
 export const IExpenseManager = Symbol.for("IExpenseManager");

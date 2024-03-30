@@ -72,5 +72,17 @@ aws dynamodb create-table \
     --table-class STANDARD \
     --endpoint-url http://localhost:8000
 
+aws dynamodb create-table \
+    --table-name Splitsies-ExpenseUpdate-local \
+    --attribute-definitions \
+        AttributeName=id,AttributeType=S \
+        AttributeName=timestamp,AttributeType=N \
+    --key-schema \
+        AttributeName=id,KeyType=HASH \
+        AttributeName=timestamp,KeyType=RANGE \
+    --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+    --stream-specification StreamEnabled=true,StreamViewType=NEW_IMAGE \
+    --endpoint-url http://localhost:8000
+
 docker kill splitsies-ddb-expense-local
 docker kill splitsies-pg-expense-local
