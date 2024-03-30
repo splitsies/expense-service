@@ -8,10 +8,9 @@ import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 @injectable()
 export class ExpenseItemDao extends DaoBase<IExpenseItem> implements IExpenseItemDao {
-
     constructor(
         @inject(ILogger) logger: ILogger,
-        @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
+        @inject(IDbConfiguration) private readonly dbConfiguration: IDbConfiguration,
     ) {
         const keySelector = (c: IExpenseItem) => ({ expenseId: c.expenseId, id: c.id });
         super(logger, dbConfiguration, dbConfiguration.expenseItemTableName, keySelector);
@@ -24,7 +23,7 @@ export class ExpenseItemDao extends DaoBase<IExpenseItem> implements IExpenseIte
 
         do {
             const response = await this._client.send(new QueryCommand({
-                TableName: "Splitsies-ExpenseItem-local",
+                TableName: this.dbConfiguration.expenseItemTableName,
                 ExclusiveStartKey: next,
                 KeyConditionExpression: "#expenseId = :expenseId",
                 ExpressionAttributeNames: {
