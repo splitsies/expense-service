@@ -1,8 +1,8 @@
+import "reflect-metadata";
 import { AttributeValue } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { ExpenseDto, IExpenseDto } from "@splitsies/shared-models";
 import { Context, DynamoDBStreamEvent, DynamoDBStreamHandler } from "aws-lambda";
-import "reflect-metadata";
 import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 // import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 // import schema from "./schema";
@@ -41,8 +41,10 @@ export const main: DynamoDBStreamHandler = (event, context, callback) => {
     const broadcasts: Promise<void>[] = [];
     const deletes: Promise<void>[] = [];
     const cache = new Map<string, IExpenseUpdate>();
+    
 
     for (const record of event.Records) {
+        console.log({ eventName: record.eventName });
         if (!record.dynamodb?.NewImage) continue;
         console.log(record.dynamodb.NewImage);
 
