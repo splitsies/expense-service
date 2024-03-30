@@ -5,33 +5,41 @@ import { IConnectionManager } from "src/managers/connection-manager/connection-m
 
 @injectable()
 export class ConnectionService implements IConnectionService {
-    constructor(@inject(IConnectionManager) private readonly _connectionManager: IConnectionManager) {}
+    constructor(@inject(IConnectionManager) private readonly _connectionManager: IConnectionManager) { }
 
-    async create(id: string, expenseId: string): Promise<IConnection> {
-        return await this._connectionManager.createConnection(id, expenseId);
+    create(id: string, expenseId: string): Promise<IConnection> {
+        return this._connectionManager.createConnection(id, expenseId);
     }
 
-    async refreshTtl(id: string): Promise<IConnection> {
-        return await this._connectionManager.refreshTtl(id);
+    refreshTtl(id: string): Promise<IConnection> {
+        return this._connectionManager.refreshTtl(id);
     }
 
-    async delete(id: string): Promise<void> {
-        return await this._connectionManager.deleteConnection(id);
+    delete(id: string): Promise<void> {
+        return this._connectionManager.deleteConnection(id);
     }
 
-    async deleteExpired(): Promise<void> {
-        return await this._connectionManager.deleteExpired();
+    deleteExpired(): Promise<void> {
+        return this._connectionManager.deleteExpired();
     }
 
-    async getRelatedConnections(connectionId: string): Promise<string[]> {
-        return await this._connectionManager.getRelatedConnections(connectionId);
+    getRelatedConnections(connectionId: string): Promise<string[]> {
+        return this._connectionManager.getRelatedConnections(connectionId);
     }
 
-    async getExpenseIdForConnection(connectionId: string): Promise<string> {
-        return await this._connectionManager.getExpenseIdForConnection(connectionId);
+    getExpenseIdForConnection(connectionId: string): Promise<string> {
+        return this._connectionManager.getExpenseIdForConnection(connectionId);
     }
 
-    async getConnectionsForExpenseId(expenseId: string): Promise<string[]> {
-        return await this._connectionManager.getConnectionsForExpenseId(expenseId);
+    getConnectionsForExpenseId(expenseId: string): Promise<string[]> {
+        return this._connectionManager.getConnectionsForExpenseId(expenseId);
+    }
+    
+    generateConnectionToken(expenseId: string): Promise<string> {
+        return this._connectionManager.generateConnectionToken(expenseId);
+    }
+
+    verifyConnectionToken(token: string, expenseId: string): Promise<boolean> {
+        return this._connectionManager.verifyConnectionToken(token, expenseId);
     }
 }

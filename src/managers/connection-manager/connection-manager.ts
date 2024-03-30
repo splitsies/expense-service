@@ -6,6 +6,8 @@ import { IConnectionDao } from "src/dao/connection-dao/connection-dao-interface"
 import { Connection } from "src/models/connection/connection";
 import { NotFoundError } from "src/models/error/not-found-error";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
+import { randomUUID } from "crypto";
+import { IConnectionTokenDao } from "src/dao/connection-token-dao/connection-token-dao-interface";
 
 @injectable()
 export class ConnectionManager implements IConnectionManager {
@@ -13,6 +15,7 @@ export class ConnectionManager implements IConnectionManager {
         @inject(ILogger) private readonly _logger: ILogger,
         @inject(IConnectionDao) private readonly _connectionDao: IConnectionDao,
         @inject(IConnectionConfiguration) private readonly _connectionConfiguration: IConnectionConfiguration,
+        @inject(IConnectionTokenDao) private readonly _connectionTokenDao: IConnectionTokenDao,
     ) {}
 
     async createConnection(connectionId: string, expenseId: string): Promise<IConnection> {
@@ -42,6 +45,7 @@ export class ConnectionManager implements IConnectionManager {
 
     async deleteExpired(): Promise<void> {
         await this._connectionDao.deleteExpiredConnections();
+        await this._connectionTokenDao.deleteExpired();
         return;
     }
 
@@ -56,5 +60,15 @@ export class ConnectionManager implements IConnectionManager {
 
     async getConnectionsForExpenseId(expenseId: string): Promise<string[]> {
         return await this._connectionDao.getConnectionsForExpense(expenseId);
+    }
+
+    async generateConnectionToken(expenseId: string): Promise<string> {
+        const token = randomUUID();
+        await this._connectionTokenDao.create({ expenseId, connectionId: token, ttl: Date.now() + 30000 });
+        return token;
+    }
+
+    async verifyConnectionToken(token: string, expenseId: string): Promise<boolean> {
+        return await this._connectionTokenDao.verify(token, expenseId);
     }
 }

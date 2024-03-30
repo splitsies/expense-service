@@ -65,6 +65,10 @@ import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-inter
 import { ExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao";
 import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper.ts/expense-dto-mapper-interface";
 import { ExpenseDtoMapper } from "src/mappers/expense-dto-mapper.ts/expense-dto-mapper";
+import { IConnectionTokenDao } from "src/dao/connection-token-dao/connection-token-dao-interface";
+import { ConnectionTokenDao } from "src/dao/connection-token-dao/connection-token-dao";
+import { IConnectionTokenDaoStatements } from "src/dao/connection-token-dao/connection-token-dao-statements-interface";
+import { ConnectionTokenDaoStatements } from "src/dao/connection-token-dao/connection-token-dao-statements";
 
 const container = new Container();
 
@@ -117,4 +121,6 @@ container
 container.bind<IExpenseDaMapper>(IExpenseDaMapper).to(ExpenseDaMapper).inSingletonScope();
 container.bind<IExpenseItemDao>(IExpenseItemDao).to(ExpenseItemDao).inSingletonScope();
 container.bind<IExpenseDtoMapper>(IExpenseDtoMapper).to(ExpenseDtoMapper).inSingletonScope();
+container.bind<IConnectionTokenDao>(IConnectionTokenDao).to(ConnectionTokenDao).inSingletonScope();
+container.bind<IConnectionTokenDaoStatements>(IConnectionTokenDaoStatements).to(ConnectionTokenDaoStatements).inSingletonScope();
 export { container };

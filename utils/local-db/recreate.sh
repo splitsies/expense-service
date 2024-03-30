@@ -8,30 +8,6 @@ cd utils/local-db
 docker-compose -p splitsies-expense-db up -d
 
 aws dynamodb create-table \
-    --table-name Splitsies-Expense-local \
-    --attribute-definitions \
-        AttributeName=id,AttributeType=S \
-        AttributeName=transactionDate,AttributeType=S \
-    --key-schema AttributeName=id,KeyType=HASH \
-    --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
-    --table-class STANDARD \
-    --endpoint-url http://localhost:8000 \
-    --global-secondary-indexes \
-        "[
-            {
-                \"IndexName\": \"TransactionDateIndex\",
-                \"KeySchema\": [
-                    {\"AttributeName\":\"id\",\"KeyType\":\"HASH\"},
-                    {\"AttributeName\":\"transactionDate\",\"KeyType\":\"RANGE\"}
-                ],
-                \"Projection\":{
-                    \"ProjectionType\":\"ALL\"
-                },
-                \"BillingMode\": \"PAY_PER_REQUEST\"
-            }
-        ]"
-
-aws dynamodb create-table \
     --table-name Splitsies-ExpenseConnection-local \
     --attribute-definitions \
         AttributeName=connectionId,AttributeType=S \
@@ -61,16 +37,16 @@ aws dynamodb create-table \
         ]"
 
 aws dynamodb create-table \
-    --table-name Splitsies-UserExpense-local \
+    --table-name Splitsies-ConnectionToken-local \
     --attribute-definitions \
+        AttributeName=connectionId,AttributeType=S \
         AttributeName=expenseId,AttributeType=S \
-        AttributeName=userId,AttributeType=S \
     --key-schema \
         AttributeName=expenseId,KeyType=HASH \
-        AttributeName=userId,KeyType=RANGE \
+        AttributeName=connectionId,KeyType=RANGE \
     --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
     --table-class STANDARD \
-    --endpoint-url http://localhost:8000 
+    --endpoint-url http://localhost:8000
 
 aws dynamodb create-table \
     --table-name Splitsies-ExpenseJoinRequest-local \

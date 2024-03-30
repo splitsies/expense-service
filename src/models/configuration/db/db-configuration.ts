@@ -17,6 +17,7 @@ export class DbConfiguration implements IDbConfiguration {
     readonly pgPort: number;
     readonly pgHost: string;
     readonly pgDatabaseName: string;
+    readonly connectionTokenTableName: string;
 
     constructor() {
         assert(!!process.env.dbAccessKeyId, "db access key was undefined");
@@ -24,6 +25,7 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.dbRegion, "db region was undefined");
         assert(!!process.env.dbTableName, "db table name was undefined");
         assert(!!process.env.connectionTableName, "db table name was undefined");
+        assert(!!process.env.connectionTokenTableName, "CONNECTION_TOKEN_TABLE_NAME name was undefined");
         assert(!!process.env.dbEndpoint, "db endpoint was undefined");
         assert(!!process.env.userExpenseTableName, "DB_USER_EXPENSE_TABLE_NAME was undefined");
         assert(!!process.env.expenseJoinRequestTableName, "DB_EXPENSE_JOIN_REQUEST_TABLE_NAME was undefined");
@@ -46,6 +48,7 @@ export class DbConfiguration implements IDbConfiguration {
         this.pgPort = parseInt(process.env.pgPort);
         this.pgHost = process.env.pgHost;
         this.pgDatabaseName = process.env.pgDatabaseName;
+        this.connectionTokenTableName = process.env.connectionTokenTableName;
     }
 
     get dbAccessKeyId(): string {
