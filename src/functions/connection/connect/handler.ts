@@ -6,12 +6,12 @@ import { DataResponse, HttpStatusCode, IExpenseDto, InvalidArgumentsError } from
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 import { IExpenseService } from "src/services/expense-service/expense-service-interface";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
-import { IJwtStrategyProvider } from "src/providers/jwt-strategy-provider/jwt-strategy-provider-interface";
+// import { IJwtStrategyProvider } from "src/providers/jwt-strategy-provider/jwt-strategy-provider-interface";
 
 const logger = container.get<ILogger>(ILogger);
 const connectionService = container.get<IConnectionService>(IConnectionService);
 const expenseService = container.get<IExpenseService>(IExpenseService);
-const jwtStrategyProvider = container.get<IJwtStrategyProvider>(IJwtStrategyProvider);
+// const jwtStrategyProvider = container.get<IJwtStrategyProvider>(IJwtStrategyProvider);
 
 const expectedErrors = [
     new ExpectedError(InvalidArgumentsError, HttpStatusCode.BAD_REQUEST, "invalid request"),
