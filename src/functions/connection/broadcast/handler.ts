@@ -37,9 +37,9 @@ export const main: DynamoDBStreamHandler = (event, context, callback) => {
     console.log(event.Records.map(r => JSON.stringify(r, null, 2)));
 
     for (const record of event.Records) {
-        if (!record.dynamodb?.Keys) continue;
-        console.log(record.dynamodb.Keys);
-        const update = unmarshall({ ...record.dynamodb.Keys } as Record<string, AttributeValue>) as IExpenseUpdate;
+        if (!record.dynamodb?.NewImage) continue;
+        console.log(record.dynamodb.NewImage);
+        const update = unmarshall({ ...record.dynamodb.NewImage } as Record<string, AttributeValue>) as IExpenseUpdate;
         console.log(update);
     }
 
