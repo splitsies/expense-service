@@ -1,3 +1,4 @@
+import { DynamoDBStreamEvent } from "aws-lambda";
 import "reflect-metadata";
 // import schema from "./schema";
 // import { ExpectedError, ILogger, SplitsiesFunctionHandlerFactory } from "@splitsies/utils";
@@ -29,7 +30,7 @@ import "reflect-metadata";
 //     new ExpectedError(MethodNotSupportedError, HttpStatusCode.BAD_REQUEST, "Unknown method"),
 //     new ExpectedError(InvalidArgumentsError, HttpStatusCode.BAD_REQUEST, "Missing payload"),
 // ];
-export const main = (event, context, callback) => {
-    console.log({ handler: "BROADCAST", event, context, callback });
+export const main = (event: DynamoDBStreamEvent, context, callback) => {
+    console.log(event.Records.map(r => JSON.stringify(r, null, 2)));
     callback?.(null, "ayo i did it");
 };
