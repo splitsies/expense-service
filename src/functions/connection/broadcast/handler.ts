@@ -1,5 +1,8 @@
-import { DynamoDBStreamEvent } from "aws-lambda";
+import { AttributeValue } from "@aws-sdk/client-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+import { Context, DynamoDBStreamEvent, DynamoDBStreamHandler } from "aws-lambda";
 import "reflect-metadata";
+import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 // import schema from "./schema";
 // import { ExpectedError, ILogger, SplitsiesFunctionHandlerFactory } from "@splitsies/utils";
 // import { container } from "src/di/inversify.config";
@@ -30,7 +33,15 @@ import "reflect-metadata";
 //     new ExpectedError(MethodNotSupportedError, HttpStatusCode.BAD_REQUEST, "Unknown method"),
 //     new ExpectedError(InvalidArgumentsError, HttpStatusCode.BAD_REQUEST, "Missing payload"),
 // ];
-export const main = (event: DynamoDBStreamEvent, context, callback) => {
+export const main: DynamoDBStreamHandler = (event, context, callback) => {
     console.log(event.Records.map(r => JSON.stringify(r, null, 2)));
-    callback?.(null, "ayo i did it");
+
+    for (const record of event.Records) {
+        if (!record.dynamodb?.Keys) continue;
+        console.log(record.dynamodb.Keys);
+        const update = unmarshall({ ...record.dynamodb.Keys } as Record<string, AttributeValue>) as IExpenseUpdate;
+        console.log(update);
+    }
+
+    callback(null);
 };
