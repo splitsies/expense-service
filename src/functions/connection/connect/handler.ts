@@ -25,13 +25,13 @@ export const main = SplitsiesFunctionHandlerFactory.create<typeof schema, IExpen
         logger.log("connecting...");
         let userId = "";
 
-        try {
-            const policy = await jwtStrategyProvider.provide().authenticate(authToken);
-            userId = policy.context.userId as string;
-        } catch (e) {
-            logger.error(`Unauthorized user connection attempt to ${expenseId}`, e);
-            throw new UnauthorizedUserError();
-        }
+        // try {
+        //     const policy = await jwtStrategyProvider.provide().authenticate(authToken);
+        //     userId = policy.context.userId as string;
+        // } catch (e) {
+        //     logger.error(`Unauthorized user connection attempt to ${expenseId}`, e);
+        //     throw new UnauthorizedUserError();
+        // }
 
         const connectionId = requestContext.connectionId;
         logger.log("getting user expense");
