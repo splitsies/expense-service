@@ -14,7 +14,7 @@ export class ExpenseItemDao extends DaoBase<IExpenseItem> implements IExpenseIte
         @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
     ) {
         const keySelector = (c: IExpenseItem) => ({ expenseId: c.expenseId, id: c.id });
-        super(logger, dbConfiguration, "Splitsies-ExpenseItem-local", keySelector);
+        super(logger, dbConfiguration, dbConfiguration.expenseItemTableName, keySelector);
     }    
 
     async getForExpense(expenseId: string): Promise<IExpenseItem[]> {
