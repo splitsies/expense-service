@@ -53,9 +53,10 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async createExpense(userId: string): Promise<IExpenseDto> {
-        const created = await this._expenseDao.create(new ExpenseDa(randomUUID(), "Untitled", new Date()));
+        const id = randomUUID();
+        const created = await this._expenseDao.create(new ExpenseDa(id, "Untitled", new Date()));
         await this._userExpenseDao.create({ expenseId: created.id, userId, pendingJoin: false });
-        return this.getExpense(userId);
+        return this.getExpense(id);
     }
 
     async createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto> {
