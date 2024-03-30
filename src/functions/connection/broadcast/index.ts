@@ -1,4 +1,3 @@
-import { VpcConfig } from "src/config/vpc.config";
 import { handlerPath } from "../../../libs/handler-resolver";
 
 export default {
@@ -12,6 +11,5 @@ export default {
                 startingPosition: "LATEST"
             }            
         },
-    ],
-    vpc: VpcConfig.vpc
+    ]
 };

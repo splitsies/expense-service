@@ -11,7 +11,7 @@ import {
     InvalidArgumentsError,
 } from "@splitsies/shared-models";
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
-import { middyfyWs } from "@libs/lambda";
+import { middyfy, middyfyWs } from "@libs/lambda";
 import { MismatchedExpenseError } from "src/models/error/mismatched-expense-error";
 import { MethodNotSupportedError } from "src/models/error/method-not-supported-error";
 import { IExpenseMessageStrategy } from "src/strategies/expense-message-strategy/expense-message-strategy-interface";
@@ -29,7 +29,7 @@ const expectedErrors = [
     new ExpectedError(MethodNotSupportedError, HttpStatusCode.BAD_REQUEST, "Unknown method"),
     new ExpectedError(InvalidArgumentsError, HttpStatusCode.BAD_REQUEST, "Missing payload"),
 ];
-export const main = middyfyWs(
+export const main = middyfy(
     SplitsiesFunctionHandlerFactory.create<typeof schema, any>(
         logger,
         async (event) => {
