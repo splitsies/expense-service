@@ -10,6 +10,7 @@ import { ILogger } from "@splitsies/utils";
 import { IExpenseManager } from "src/managers/expense-manager/expense-manager-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
+import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -87,7 +88,7 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.saveUpdatedItems(updatedItems);
     }
 
-    async getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequest[]> {
+    async getExpenseJoinRequestsForUser(userId: string): Promise<IUserExpenseDto[]> {
         return await this._expenseManager.getExpenseJoinRequestsForUser(userId);
     }
 

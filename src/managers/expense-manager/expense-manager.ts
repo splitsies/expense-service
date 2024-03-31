@@ -20,6 +20,8 @@ import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper.ts/expense-dto
 import { ExpenseDa } from "src/models/expense/expense-da";
 import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 import { IExpenseUpdateDao } from "src/dao/expense-update-dao/expense-update-dao-interface";
+import { UserExpenseDto } from "src/models/user-expense-dto/user-expense-dto";
+import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -34,7 +36,6 @@ export class ExpenseManager implements IExpenseManager {
     ) { }
     
     async queueExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void> {
-        console.log({ creating: expenseUpdate });
         await this._expenseUpdateDao.create(expenseUpdate);
     }
 
@@ -151,8 +152,15 @@ export class ExpenseManager implements IExpenseManager {
         return expense;
     }
 
-    async getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequest[]> {
-        return this._userExpenseDao.getJoinRequestsForUser(userId) as Promise<IExpenseJoinRequest[]>;
+    async getExpenseJoinRequestsForUser(userId: string): Promise<IUserExpenseDto[]> {
+        const userExpenses = await this._userExpenseDao.getJoinRequestsForUser(userId);
+        return await Promise.all(userExpenses.map(async u => new UserExpenseDto(
+            await this.getExpense(u.expenseId),
+            u.userId,
+            u.pendingJoin,
+            u.requestingUserId,
+            u.createdAt
+        )));
     }
 
     async getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]> {

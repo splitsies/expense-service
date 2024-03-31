@@ -1,5 +1,6 @@
 import { IExpenseDto, IExpenseItem, IExpenseJoinRequest, IExpenseUserDetails } from "@splitsies/shared-models";
 import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
+import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 
 export interface IExpenseManager {
@@ -12,7 +13,7 @@ export interface IExpenseManager {
     getUsersForExpense(expenseId: string): Promise<string[]>;
     addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;
-    getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequest[]>;
+    getExpenseJoinRequestsForUser(userId: string): Promise<IUserExpenseDto[]>;
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
     removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]>;
