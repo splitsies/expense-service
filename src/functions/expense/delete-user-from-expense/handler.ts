@@ -6,7 +6,6 @@ import { HttpStatusCode, DataResponse, ExpenseMessage } from "@splitsies/shared-
 import { SplitsiesFunctionHandlerFactory, ILogger, ExpectedError } from "@splitsies/utils";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
-import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 
 const logger = container.get<ILogger>(ILogger);
 const expenseService = container.get<IExpenseService>(IExpenseService);
@@ -25,13 +24,7 @@ export const main = middyfy(
             }
 
             const updatedExpense = await expenseService.removeUserFromExpense(expenseId, userId);
-            const joinRequests = await expenseService.getJoinRequestsForExpense(expenseId);
-
-            await Promise.all([
-                broadcaster.broadcast(expenseId, new ExpenseMessage("expense", updatedExpense)),
-                broadcaster.broadcast(expenseId, new ExpenseMessage("joinRequests", joinRequests)),
-            ]);
-
+            await broadcaster.broadcast(updatedExpense);
             return new DataResponse(HttpStatusCode.OK, null).toJson();
         },
         [new ExpectedError(UnauthorizedUserError, HttpStatusCode.UNAUTHORIZED, "User cannot modify this expense")],

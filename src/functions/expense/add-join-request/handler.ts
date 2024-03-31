@@ -28,18 +28,9 @@ export const main = middyfy(
             }
 
             await expenseService.addExpenseJoinRequest(event.body.userId, event.body.expenseId, tokenUserId);
-
-            const updatedJoinRequests = await expenseService.getJoinRequestsForExpense(event.body.expenseId);
             const expense = await expenseService.getExpense(event.body.expenseId);
 
-            await Promise.all([
-                expenseBroadcaster.broadcast(
-                    event.body.expenseId,
-                    new ExpenseMessage("joinRequests", updatedJoinRequests),
-                ),
-                expenseBroadcaster.broadcast(event.body.expenseId, new ExpenseMessage("expense", expense)),
-            ]);
-
+            await expenseBroadcaster.broadcast(expense);
             return new DataResponse(HttpStatusCode.OK, null).toJson();
         },
         expectedErrors,

@@ -40,9 +40,7 @@ export const main = middyfyWs(
 
             const updated = await expenseMessageStrategy.execute(event.body.method as ExpenseOperation, params);
 
-            console.log(`broadcasting update ${JSON.stringify(updated)}`);
-            await expenseBroadcaster.broadcast(updated.id, new ExpenseMessage("expense", updated));
-            console.log("did the broadcast");
+            await expenseBroadcaster.broadcast(updated);
             return new DataResponse(HttpStatusCode.OK, updated).toJson();
         },
         expectedErrors,

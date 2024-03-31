@@ -36,6 +36,8 @@ export class ConnectionDao extends DaoBase<IConnection> implements IConnectionDa
             }),
         );
 
+        console.log({ result });
+
         return result.Items ? result.Items.map((i) => unmarshall(i).connectionId as string) : [];
     }
 

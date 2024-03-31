@@ -21,7 +21,7 @@ export const main = middyfy(
             const expenses = await expenseService.replaceGuestUserInfo(guestId, registeredUser);
 
             for (const expense of expenses) {
-                expenseBroadcaster.broadcast(expense.expense.id, new ExpenseMessage("expense", expense));
+                expenseBroadcaster.broadcast(expense);
             }
 
             return new DataResponse(HttpStatusCode.OK, null).toJson();

@@ -17,27 +17,15 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
         @inject(IExpenseService) private readonly _expenseService: IExpenseService,
     ) {}
 
-    async broadcast(expenseId: string, message: IExpenseMessage): Promise<void> {
-
-        // TODO: do stream triggers work locally? just broadcast this instead if running local if it doesn't
-        const expense = await this._expenseService.getExpense(expenseId);
-        return this._expenseService.queueExpenseUpdate(new ExpenseUpdate(expense));
-
-
-
-
-        const connectionIds = await this._connectionService.getConnectionsForExpenseId(expenseId);
-
-        const promises: Promise<void>[] = [];
-        for (const id of connectionIds) {
-            try {
-                promises.push(sendMessage(this._connectionConfiguration.gatewayUrl, id, message));
-            } catch (e) {
-                this._logger.error(`uncaught exception broadcasting for connection ${id}`, e);
-            }
+    async broadcast(expense: IExpenseDto): Promise<void> {
+        if (this._connectionConfiguration.gatewayUrl.includes("http://localhost") || 
+            this._connectionConfiguration.gatewayUrl.includes("http://0.0.0.0")) {            
+            // The lambda doesn't trigger locally from the stream update, so notify directly
+            // since we don't care about the VPC at this point
+            return this.notify(expense);
         }
 
-        await Promise.all(promises);
+        return this._expenseService.queueExpenseUpdate(new ExpenseUpdate(expense));
     }
 
     async notify(expense: IExpenseDto): Promise<void> {

@@ -2,7 +2,7 @@ import schema from "./schema";
 import { middyfy } from "../../../libs/lambda";
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
-import { HttpStatusCode, DataResponse, ExpenseMessage } from "@splitsies/shared-models";
+import { HttpStatusCode, DataResponse } from "@splitsies/shared-models";
 import { SplitsiesFunctionHandlerFactory, ILogger, ExpectedError } from "@splitsies/utils";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
@@ -22,7 +22,7 @@ export const main = middyfy(
             await expenseService.addUserToExpense(userId, expenseId, event.requestContext.authorizer.userId);
 
             const expense = await expenseService.getExpense(expenseId);
-            await expenseBroadcaster.broadcast(expenseId, new ExpenseMessage("expense", expense));
+            await expenseBroadcaster.broadcast(expense);
             return new DataResponse(HttpStatusCode.OK, null).toJson();
         },
         [
