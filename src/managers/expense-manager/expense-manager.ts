@@ -38,8 +38,8 @@ export class ExpenseManager implements IExpenseManager {
         await this._expenseUpdateDao.create(expenseUpdate);
     }
 
-    async deleteExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void> {
-        await this._expenseUpdateDao.delete(this._expenseUpdateDao.key(expenseUpdate));
+    async deleteExpenseUpdates(expenseUpdates: IExpenseUpdate[]): Promise<void> {
+        await this._expenseUpdateDao.deleteBatch(expenseUpdates);
     }
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {

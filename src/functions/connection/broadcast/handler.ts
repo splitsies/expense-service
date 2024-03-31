@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import { AttributeValue } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
-import { ExpenseDto } from "@splitsies/shared-models";
 import { DynamoDBStreamHandler } from "aws-lambda";
 import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 import { container } from "src/di/inversify.config";
@@ -13,28 +12,26 @@ const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaste
 const expenseService = container.get<IExpenseService>(IExpenseService);
 const dtoMapper = container.get<IExpenseDtoMapper>(IExpenseDtoMapper);
 
-export const main: DynamoDBStreamHandler = (event, context, callback) => {
-    const broadcasts: Promise<void>[] = [];
-    const deletes: Promise<void>[] = [];
+export const main: DynamoDBStreamHandler = (event, _, callback) => {
+    const promises: Promise<void>[] = [];
+    const updates: IExpenseUpdate[] = [];
     const cache = new Map<string, IExpenseUpdate>();
     
-
     for (const record of event.Records) {
-        console.log({ eventName: record.eventName });
         if (!record.dynamodb?.NewImage) continue;
-        console.log(record.dynamodb.NewImage);
 
-        const update = unmarshall({ ...record.dynamodb.NewImage } as Record<string, AttributeValue>) as IExpenseUpdate;
-        deletes.push(expenseService.deleteExpenseUpdate(update));
+        const update = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IExpenseUpdate;
+        updates.push(update);
 
         if (Date.now() > update.ttl) continue;
         const cached = cache.get(update.id);
         cache.set(update.id, (cached && cached.timestamp > update.timestamp) ? cached : update);
     }
 
+    promises.push(expenseService.deleteExpenseUpdates(updates));
     for (const [_, update] of cache) {
-        broadcasts.push(expenseBroadcaster.notify(dtoMapper.fromUpdate(update)));
+        promises.push(expenseBroadcaster.notify(dtoMapper.fromUpdate(update)));
     }
 
-    Promise.all([...broadcasts, ...deletes]).then(() => callback(null));
+    Promise.all(promises).then(() => callback(null));
 };

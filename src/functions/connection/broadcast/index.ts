@@ -6,8 +6,7 @@ export default {
         {
             stream: {
                 type: "dynamodb",
-                arn: "arn:aws:dynamodb:us-east-1:975049909936:table/Splitsies-ExpenseUpdate-dev-pr/stream/2024-03-30T21:45:35.401",
-                batchSize: 10,
+                arn: "${param:EXPENSE_UPDATE_STREAM_ARN}",
                 startingPosition: "LATEST",
                 filterPatterns: [
                     { eventName: ["INSERT"] }

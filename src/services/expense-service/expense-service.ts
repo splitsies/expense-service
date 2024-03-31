@@ -22,8 +22,8 @@ export class ExpenseService implements IExpenseService {
         await this._expenseManager.queueExpenseUpdate(expenseUpdate);
     }
 
-    async deleteExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void> {
-        await this._expenseManager.deleteExpenseUpdate(expenseUpdate);
+    async deleteExpenseUpdates(expenseUpdates: IExpenseUpdate[]): Promise<void> {
+        await this._expenseManager.deleteExpenseUpdates(expenseUpdates);
     }
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {

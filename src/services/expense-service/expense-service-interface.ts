@@ -33,7 +33,7 @@ export interface IExpenseService {
     saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]>;
     replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]>;
     queueExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void>;
-    deleteExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void>;
+    deleteExpenseUpdates(expenseUpdates: IExpenseUpdate[]): Promise<void>;
 }
 
 export const IExpenseService: symbol = Symbol.for("IExpenseService");
