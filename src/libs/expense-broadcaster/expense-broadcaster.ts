@@ -18,14 +18,8 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
     ) {}
 
     async broadcast(expense: IExpenseDto): Promise<void> {
-        if (this._connectionConfiguration.gatewayUrl.includes("http://localhost") || 
-            this._connectionConfiguration.gatewayUrl.includes("http://0.0.0.0")) {            
-            // The lambda doesn't trigger locally from the stream update, so notify directly
-            // since we don't care about the VPC at this point
-            return this.notify(expense);
-        }
-
-        return this._expenseService.queueExpenseUpdate(new ExpenseUpdate(expense));
+        // See @splitsies/utils/queue-runner for setting up local listening to DynamoDB Stream
+        return this._expenseService.queueExpenseUpdate(expense);
     }
 
     async notify(expense: IExpenseDto): Promise<void> {

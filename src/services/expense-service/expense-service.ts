@@ -4,12 +4,12 @@ import {
     IExpenseItem,
     IExpenseJoinRequest,
     IExpenseUserDetails,
+    IQueueMessage,
 } from "@splitsies/shared-models";
 import { IExpenseService } from "./expense-service-interface";
 import { ILogger } from "@splitsies/utils";
 import { IExpenseManager } from "src/managers/expense-manager/expense-manager-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
-import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
 import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 
 @injectable()
@@ -19,11 +19,12 @@ export class ExpenseService implements IExpenseService {
         @inject(IExpenseManager) private readonly _expenseManager: IExpenseManager
     ) {}
     
-    async queueExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void> {
+    async queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void> {
         await this._expenseManager.queueExpenseUpdate(expenseUpdate);
+        console.log(`Queued ${this.updateExpense}`);
     }
 
-    async deleteExpenseUpdates(expenseUpdates: IExpenseUpdate[]): Promise<void> {
+    async deleteExpenseUpdates(expenseUpdates: IQueueMessage<IExpenseDto>[]): Promise<void> {
         await this._expenseManager.deleteExpenseUpdates(expenseUpdates);
     }
 

@@ -1,4 +1,5 @@
 import { handlerPath } from "../../../libs/handler-resolver";
+import { QueueConfig } from "src/config/queue.config";
 
 export default {
     handler: `${handlerPath(__dirname)}/handler.main`,
@@ -6,10 +7,15 @@ export default {
         {
             stream: {
                 type: "dynamodb",
-                arn: "${param:EXPENSE_UPDATE_STREAM_ARN}",
+                arn: "${param:MESSAGE_QUEUE_ARN}",
                 startingPosition: "LATEST",
                 filterPatterns: [
-                    { eventName: ["INSERT"] }
+                    { eventName: ["INSERT"] },
+                    {
+                        dynamodb: {
+                            Keys: { queueName: { "S": [QueueConfig.expenseUpdate] } }
+                        }
+                    }
                 ],
             }
         },

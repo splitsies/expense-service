@@ -20,5 +20,7 @@ sls offline start \
     --param='PG_HOST=127.0.0.1' \
     --param='PG_PORT=5432' \
     --param='PG_DATABASE_NAME=postgres' \
-    --param='EXPENSE_UPDATE_TABLE_NAME=Splitsies-ExpenseUpdate-local'
+    --param='EXPENSE_UPDATE_TABLE_NAME=Splitsies-ExpenseUpdate-local' \
+    --param='MESSAGE_QUEUE_RESOURCE_NAME=Splitsies-MessageQueue-local' \
+    --param='QUEUE_ENDPOINT=http://localhost:12345'
     

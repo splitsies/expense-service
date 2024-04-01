@@ -6,12 +6,14 @@ import {
     IExpenseJoinRequest,
     IExpenseItem,
     IExpenseDto,
+    QueueMessage,
+    IQueueMessage,
 } from "@splitsies/shared-models";
 import { IExpenseManager } from "./expense-manager-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
-import { ILogger } from "@splitsies/utils";
+import { ILogger, IMessageQueueClient } from "@splitsies/utils";
 import { IExpenseJoinRequestDao } from "src/dao/expense-join-request-dao/expense-join-request-dao-interface";
 import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-interface";
 import { IExpenseDa } from "src/models/expense/expense-da-interface";
@@ -22,6 +24,7 @@ import { IExpenseUpdate } from "src/models/expense-update/expense-update-interfa
 import { IExpenseUpdateDao } from "src/dao/expense-update-dao/expense-update-dao-interface";
 import { UserExpenseDto } from "src/models/user-expense-dto/user-expense-dto";
 import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
+import { QueueConfig } from "src/config/queue.config";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -32,15 +35,19 @@ export class ExpenseManager implements IExpenseManager {
         @inject(IExpenseJoinRequestDao) private readonly _expenseJoinRequestDao: IExpenseJoinRequestDao,
         @inject(IExpenseItemDao) private readonly _expenseItemDao: IExpenseItemDao,
         @inject(IExpenseDtoMapper) private readonly _dtoMapper: IExpenseDtoMapper,
-        @inject(IExpenseUpdateDao) private readonly _expenseUpdateDao: IExpenseUpdateDao
+        @inject(IExpenseUpdateDao) private readonly _expenseUpdateDao: IExpenseUpdateDao,
+        @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient
     ) { }
     
-    async queueExpenseUpdate(expenseUpdate: IExpenseUpdate): Promise<void> {
-        await this._expenseUpdateDao.create(expenseUpdate);
+    async queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void> {
+        // await this._expenseUpdateDao.create(expenseUpdate);
+        await this._messageQueueClient.create(
+            new QueueMessage<IExpenseDto>(QueueConfig.expenseUpdate, randomUUID(), expenseUpdate));
     }
 
-    async deleteExpenseUpdates(expenseUpdates: IExpenseUpdate[]): Promise<void> {
-        await this._expenseUpdateDao.deleteBatch(expenseUpdates);
+    async deleteExpenseUpdates(expenseUpdates: IQueueMessage<IExpenseDto>[]): Promise<void> {
+        // await this._expenseUpdateDao.deleteBatch(expenseUpdates);
+        await this._messageQueueClient.deleteBatch(expenseUpdates)
     }
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {

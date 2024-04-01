@@ -15,5 +15,7 @@
     "pgPort": "${param:PG_PORT}",
     "pgDatabaseName": "${param:PG_DATABASE_NAME}",
     "connectionTokenTableName": "${param:CONNECTION_TOKEN_TABLE_NAME}",
-    "expenseUpdateTableName": "${param:EXPENSE_UPDATE_TABLE_NAME}"
+    "expenseUpdateTableName": "${param:EXPENSE_UPDATE_TABLE_NAME}",
+    "messageQueueResourceName": "${param:MESSAGE_QUEUE_RESOURCE_NAME}",
+    "queueEndpoint": "${param:QUEUE_ENDPOINT}"
 }
