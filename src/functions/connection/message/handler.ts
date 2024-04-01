@@ -4,7 +4,6 @@ import { ExpectedError, ILogger, SplitsiesFunctionHandlerFactory } from "@splits
 import { container } from "src/di/inversify.config";
 import {
     DataResponse,
-    ExpenseMessage,
     ExpenseOperation,
     HttpStatusCode,
     IExpenseMessageParametersMapper,

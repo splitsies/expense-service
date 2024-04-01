@@ -63,15 +63,12 @@ import { IExpenseDaMapper } from "src/mappers/expense-da-mapper-interface";
 import { ExpenseDaMapper } from "src/mappers/expense-da-mapper";
 import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-interface";
 import { ExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao";
-import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper.ts/expense-dto-mapper-interface";
-import { ExpenseDtoMapper } from "src/mappers/expense-dto-mapper.ts/expense-dto-mapper";
+import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper/expense-dto-mapper-interface";
+import { ExpenseDtoMapper } from "src/mappers/expense-dto-mapper/expense-dto-mapper";
 import { IConnectionTokenDao } from "src/dao/connection-token-dao/connection-token-dao-interface";
 import { ConnectionTokenDao } from "src/dao/connection-token-dao/connection-token-dao";
 import { IConnectionTokenDaoStatements } from "src/dao/connection-token-dao/connection-token-dao-statements-interface";
 import { ConnectionTokenDaoStatements } from "src/dao/connection-token-dao/connection-token-dao-statements";
-import { IExpenseUpdateDao } from "src/dao/expense-update-dao/expense-update-dao-interface";
-import { ExpenseUpdateDao } from "src/dao/expense-update-dao/expense-update-dao";
-
 const container = new Container();
 
 container.bind<ILogger>(ILogger).to(Logger).inSingletonScope();
@@ -125,6 +122,5 @@ container.bind<IExpenseItemDao>(IExpenseItemDao).to(ExpenseItemDao).inSingletonS
 container.bind<IExpenseDtoMapper>(IExpenseDtoMapper).to(ExpenseDtoMapper).inSingletonScope();
 container.bind<IConnectionTokenDao>(IConnectionTokenDao).to(ConnectionTokenDao).inSingletonScope();
 container.bind<IConnectionTokenDaoStatements>(IConnectionTokenDaoStatements).to(ConnectionTokenDaoStatements).inSingletonScope();
-container.bind<IExpenseUpdateDao>(IExpenseUpdateDao).to(ExpenseUpdateDao).inSingletonScope();
 container.bind<IMessageQueueClient>(IMessageQueueClient).to(MessageQueueClient).inSingletonScope();
 export { container };

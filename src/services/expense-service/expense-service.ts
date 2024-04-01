@@ -21,7 +21,6 @@ export class ExpenseService implements IExpenseService {
     
     async queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void> {
         await this._expenseManager.queueExpenseUpdate(expenseUpdate);
-        console.log(`Queued ${this.updateExpense}`);
     }
 
     async deleteExpenseUpdates(expenseUpdates: IQueueMessage<IExpenseDto>[]): Promise<void> {

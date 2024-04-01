@@ -18,10 +18,8 @@ import { IExpenseJoinRequestDao } from "src/dao/expense-join-request-dao/expense
 import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-interface";
 import { IExpenseDa } from "src/models/expense/expense-da-interface";
 import { UserExpense } from "src/models/user-expense/user-expense";
-import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper.ts/expense-dto-mapper-interface";
+import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper/expense-dto-mapper-interface";
 import { ExpenseDa } from "src/models/expense/expense-da";
-import { IExpenseUpdate } from "src/models/expense-update/expense-update-interface";
-import { IExpenseUpdateDao } from "src/dao/expense-update-dao/expense-update-dao-interface";
 import { UserExpenseDto } from "src/models/user-expense-dto/user-expense-dto";
 import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 import { QueueConfig } from "src/config/queue.config";
@@ -35,18 +33,17 @@ export class ExpenseManager implements IExpenseManager {
         @inject(IExpenseJoinRequestDao) private readonly _expenseJoinRequestDao: IExpenseJoinRequestDao,
         @inject(IExpenseItemDao) private readonly _expenseItemDao: IExpenseItemDao,
         @inject(IExpenseDtoMapper) private readonly _dtoMapper: IExpenseDtoMapper,
-        @inject(IExpenseUpdateDao) private readonly _expenseUpdateDao: IExpenseUpdateDao,
         @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient
     ) { }
     
     async queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void> {
-        // await this._expenseUpdateDao.create(expenseUpdate);
+        console.log(`Queuing updated...`);
         await this._messageQueueClient.create(
             new QueueMessage<IExpenseDto>(QueueConfig.expenseUpdate, randomUUID(), expenseUpdate));
+        console.log(`Done`);
     }
 
     async deleteExpenseUpdates(expenseUpdates: IQueueMessage<IExpenseDto>[]): Promise<void> {
-        // await this._expenseUpdateDao.deleteBatch(expenseUpdates);
         await this._messageQueueClient.deleteBatch(expenseUpdates)
     }
 
@@ -108,7 +105,9 @@ export class ExpenseManager implements IExpenseManager {
             })
         );
 
-        return expenses.map(e => this._dtoMapper.toDto(e, expenseToUsers.get(e.id), expenseToItems.get(e.id)));
+        const items = await Promise.all(expenses.map(e => this._dtoMapper.toDto(e, expenseToUsers.get(e.id), expenseToItems.get(e.id))));
+        console.log({ items });
+        return items;
     }
 
     async getUsersForExpense(expenseId: string): Promise<string[]> {
@@ -191,37 +190,38 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]> {
+        console.log({ guestUserId, registeredUser });
+        const updates: Promise<any>[] = [];
+
+        // Get user expense records
         const ues = await this._userExpenseDao.getForUser(guestUserId);
-        const userExpenses = await this.getExpensesForUser(guestUserId);
 
-        if (ues.length === 0 || userExpenses.length === 0) return [];
+        // Replace the existing guest id with registered id
+        updates.push(...ues.map((ue) => this._userExpenseDao.delete(this._userExpenseDao.key(ue))));
+        updates.push(...ues.map((ue) => this._userExpenseDao.create(new UserExpense(ue.expenseId, registeredUser.id, false, ue.requestingUserId))));
 
-        await Promise.all(ues.map((ue) => this._userExpenseDao.delete(this._userExpenseDao.key(ue))));
-        await Promise.all(
-            ues.map((ue) => this._userExpenseDao.create({ expenseId: ue.expenseId, userId: registeredUser.id, pendingJoin: false })),
-        );
+        const updatedExpenseIds: string[] = [];
 
-        const updatedExpenses: IExpenseDto[] = [];
-        for (const expense of userExpenses) {
-            let shouldUpdate = false;
-            for (const item of expense.items) {
+        // Replace any old item owners with the new user
+        for (const { expenseId } of ues) {
+            const items = await this._expenseItemDao.getForExpense(expenseId)
+
+            let updated = false;
+            for (const item of items) {
                 const idx = item.owners.findIndex((e) => e.id === guestUserId);
-                if (idx === -1) {
-                    continue;
-                }
+                if (idx === -1) continue;
 
-                shouldUpdate = true;
+                updated = true;
                 item.owners.splice(idx, 1);
                 item.owners.push(registeredUser);
+                updates.push(this._expenseItemDao.update(item));
             }
 
-            if (shouldUpdate) {
-                updatedExpenses.push(
-                    await this.updateExpense(expense.id, expense));
-            }
+            if (updated) updatedExpenseIds.push(expenseId);
         }
 
-        return updatedExpenses;
+        await Promise.all(updates);
+        return Promise.all(updatedExpenseIds.map(async id => await this.getExpense(id)));
     }
 
     async addExpenseItem(

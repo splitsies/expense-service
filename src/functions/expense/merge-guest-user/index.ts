@@ -1,30 +1,25 @@
-import schema from "./schema";
+import { VpcConfig } from "src/config/vpc.config";
 import { handlerPath } from "../../../libs/handler-resolver";
+import { QueueConfig } from "src/config/queue.config";
 
 export default {
     handler: `${handlerPath(__dirname)}/handler.main`,
-    timeout: 60,
     events: [
         {
-            http: {
-                method: "put",
-                path: "expenses/guests/{guestId}",
-                authorizer: { name: "verifyApiKey" },
-                request: {
-                    schemas: {
-                        "application/json": schema,
-                    },
-                },
-            },
+            stream: {
+                type: "dynamodb",
+                arn: "${param:MESSAGE_QUEUE_ARN}",
+                startingPosition: "LATEST",
+                filterPatterns: [
+                    { eventName: ["INSERT"] },
+                    {
+                        dynamodb: {
+                            Keys: { queueName: { "S": [QueueConfig.guestUserReplaced] } }
+                        }
+                    }
+                ],
+            }
         },
     ],
-    vpc: {
-        securityGroupIds: [
-            "sg-0c856a69027cbbe51",
-            "sg-0f8a62286187fbab0"
-        ],
-        subnetIds: [
-            "subnet-0301a21d6a9ca2e03",
-        ]
-    }
+    vpc: VpcConfig.vpc
 };

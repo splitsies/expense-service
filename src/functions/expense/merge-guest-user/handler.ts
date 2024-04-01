@@ -1,31 +1,37 @@
-import schema from "./schema";
-import { middyfy } from "../../../libs/lambda";
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
-import { HttpStatusCode, DataResponse, IExpenseUserDetails, ExpenseMessage } from "@splitsies/shared-models";
-import { SplitsiesFunctionHandlerFactory, ILogger, IExpectedError } from "@splitsies/utils";
+import { IExpenseUserDetails, IQueueMessage } from "@splitsies/shared-models";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
+import { DynamoDBStreamHandler } from "aws-lambda/trigger/dynamodb-stream";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { AttributeValue } from "@aws-sdk/client-dynamodb";
+import { IMessageQueueClient } from "@splitsies/utils";
 
-const logger = container.get<ILogger>(ILogger);
 const expenseService = container.get<IExpenseService>(IExpenseService);
 const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
+const messageQueueClient = container.get<IMessageQueueClient>(IMessageQueueClient);
 
-const expectedErrors: IExpectedError[] = [];
 
-export const main = middyfy(
-    SplitsiesFunctionHandlerFactory.create<typeof schema, void | string>(
-        logger,
-        async (event) => {
-            const guestId = decodeURIComponent(event.pathParameters.guestId);
-            const registeredUser = event.body.registeredUser as IExpenseUserDetails;
-            const expenses = await expenseService.replaceGuestUserInfo(guestId, registeredUser);
+export const main: DynamoDBStreamHandler = async (event, _, callback) => {
+    const messages: IQueueMessage<{ deletedGuestId: string; user: IExpenseUserDetails }[]>[] = [];
+    const promises: Promise<void>[] = [];
 
-            for (const expense of expenses) {
-                expenseBroadcaster.broadcast(expense);
-            }
+    for (const record of event.Records) {
+        if (!record.dynamodb.NewImage) continue;
 
-            return new DataResponse(HttpStatusCode.OK, null).toJson();
-        },
-        expectedErrors,
-    ),
-);
+        console.log({ image: record.dynamodb.NewImage });
+        const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<{ deletedGuestId: string; user: IExpenseUserDetails }[]>;
+        messages.push(message);
+
+        for (const payload of message.data) {
+            await expenseService.replaceGuestUserInfo(payload.deletedGuestId, payload.user).then((expenses) => {
+                for (const expense of expenses) {
+                    promises.push(expenseBroadcaster.broadcast(expense));
+                }
+            });
+        }
+            
+    }
+
+    Promise.all([...promises, messageQueueClient.deleteBatch(messages)]).then(() => callback(null));
+};
