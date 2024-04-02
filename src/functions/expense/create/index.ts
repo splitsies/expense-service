@@ -19,5 +19,5 @@ export default {
             },
         },
     ],
-    vpc: VpcConfig.vpc
+    vpc: VpcConfig.vpc,
 };

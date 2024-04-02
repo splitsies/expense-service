@@ -39,7 +39,7 @@ export class ConnectionTokenDao extends DaoBase<IConnection> implements IConnect
                 },
             }),
         );
-        console.log({ result });
+
         return result?.Items?.length !== 0;
     }
 

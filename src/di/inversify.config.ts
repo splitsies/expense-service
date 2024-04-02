@@ -15,8 +15,6 @@ import { IDbConfiguration } from "src/models/configuration/db/db-configuration-i
 import { DbConfiguration } from "src/models/configuration/db/db-configuration";
 import { ExpenseDao } from "src/dao/expense-dao/expense-dao";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
-import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client-interface";
-import { AlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client";
 import { IConnectionDao } from "src/dao/connection-dao/connection-dao-interface";
 import { ConnectionDao } from "src/dao/connection-dao/connection-dao";
 import { IConnectionManager } from "src/managers/connection-manager/connection-manager-interface";
@@ -34,10 +32,6 @@ import { IUserExpenseStatements } from "src/dao/user-expense-dao/user-expense-st
 import { UserExpenseStatements } from "src/dao/user-expense-dao/user-expense-statements";
 import { IApiConfiguration } from "src/models/configuration/api/api-configuration-interface";
 import { ApiConfiguration } from "src/models/configuration/api/api-configuration";
-import { IOcrApiClient } from "src/api/ocr-api-client/ocr-api-client-interface";
-import { OcrApiClient } from "src/api/ocr-api-client/ocr-api-client";
-import { IUsersApiClient } from "src/api/users-api-client/users-api-client-interface";
-import { UsersApiClient } from "src/api/users-api-client/users-api-client";
 import { IFirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration-interface";
 import { FirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration";
 import { IAdminAuthProvider } from "src/providers/admin-auth-provider-interface";
@@ -82,9 +76,6 @@ container.bind<ILogger>(ILogger).to(Logger).inSingletonScope();
 
 container.bind<IExpenseService>(IExpenseService).to(ExpenseService).inSingletonScope();
 container.bind<IExpenseManager>(IExpenseManager).to(ExpenseManager).inSingletonScope();
-container.bind<IAlgorithmsApiClient>(IAlgorithmsApiClient).to(AlgorithmsApiClient).inSingletonScope();
-container.bind<IOcrApiClient>(IOcrApiClient).to(OcrApiClient).inSingletonScope();
-container.bind<IUsersApiClient>(IUsersApiClient).to(UsersApiClient).inSingletonScope();
 container.bind<IApiConfiguration>(IApiConfiguration).to(ApiConfiguration).inSingletonScope();
 container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSingletonScope();
 container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(ConnectionConfiguration).inSingletonScope();

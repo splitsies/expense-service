@@ -27,18 +27,14 @@ export const main = SplitsiesFunctionHandlerFactory.create<typeof schema, IExpen
         }
 
         const connectionId = requestContext.connectionId;
-        logger.log("getting user expense");
         const userExpense = await expenseService.getUserExpense(userId, expenseId);
-        logger.log(`${userExpense}`);
 
         if (!userExpense) {
             logger.error(`No expense found for user ${userId} expense ${expenseId}`);
             throw new UnauthorizedUserError();
         }
 
-        logger.log("getting expense");
         const expense = await expenseService.getExpense(userExpense.expenseId);
-        logger.log(`${expense}`);
         await connectionService.create(connectionId, expenseId);
         return new DataResponse(HttpStatusCode.OK, expense).toJson();
     },

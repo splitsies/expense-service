@@ -17,7 +17,7 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
     ) {}
 
     async broadcast(expense: IExpenseDto): Promise<void> {
-        // See @splitsies/utils/queue-runner for setting up local listening to DynamoDB Stream
+        // See local-emulation/queue-runner for setting up local listening to DynamoDB Stream
         return this._expenseService.queueExpenseUpdate(expense);
     }
 
