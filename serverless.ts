@@ -78,7 +78,7 @@ const serverlessConfiguration: AWS = {
         mergeGuestUser,
         removeUserFromExpense,
         createConnectionToken,
-        broadcast
+        broadcast,
     },
     package: { individually: true },
     custom: {

@@ -5,7 +5,7 @@ import { IConnectionManager } from "src/managers/connection-manager/connection-m
 
 @injectable()
 export class ConnectionService implements IConnectionService {
-    constructor(@inject(IConnectionManager) private readonly _connectionManager: IConnectionManager) { }
+    constructor(@inject(IConnectionManager) private readonly _connectionManager: IConnectionManager) {}
 
     create(id: string, expenseId: string): Promise<IConnection> {
         return this._connectionManager.createConnection(id, expenseId);
@@ -34,7 +34,7 @@ export class ConnectionService implements IConnectionService {
     getConnectionsForExpenseId(expenseId: string): Promise<string[]> {
         return this._connectionManager.getConnectionsForExpenseId(expenseId);
     }
-    
+
     generateConnectionToken(expenseId: string): Promise<string> {
         return this._connectionManager.generateConnectionToken(expenseId);
     }

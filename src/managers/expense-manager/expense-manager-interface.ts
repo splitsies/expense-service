@@ -1,4 +1,10 @@
-import { IExpenseDto, IExpenseItem, IExpenseJoinRequest, IExpenseUserDetails, IQueueMessage } from "@splitsies/shared-models";
+import {
+    IExpenseDto,
+    IExpenseItem,
+    IExpenseJoinRequest,
+    IExpenseUserDetails,
+    IQueueMessage,
+} from "@splitsies/shared-models";
 import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 

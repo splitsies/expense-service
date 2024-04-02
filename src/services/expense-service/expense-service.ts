@@ -16,9 +16,9 @@ import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-in
 export class ExpenseService implements IExpenseService {
     constructor(
         @inject(ILogger) private readonly _logger: ILogger,
-        @inject(IExpenseManager) private readonly _expenseManager: IExpenseManager
+        @inject(IExpenseManager) private readonly _expenseManager: IExpenseManager,
     ) {}
-    
+
     async queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void> {
         await this._expenseManager.queueExpenseUpdate(expenseUpdate);
     }
@@ -40,10 +40,7 @@ export class ExpenseService implements IExpenseService {
     }
 
     async createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto> {
-        return this._expenseManager.createExpenseFromScan(
-            expense,
-            userId,
-        );
+        return this._expenseManager.createExpenseFromScan(expense, userId);
     }
 
     async updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto> {

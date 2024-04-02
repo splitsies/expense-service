@@ -8,14 +8,14 @@ import { IExpenseDa } from "src/models/expense/expense-da-interface";
 
 @injectable()
 export class ExpenseDao implements IExpenseDao {
-
     private readonly _client: Sql;
 
-    constructor(
-        @inject(ILogger) logger: ILogger,
-        @inject(IDbConfiguration) _dbConfiguration: IDbConfiguration,
-    ) {    
-        this._client = postgres({ hostname: _dbConfiguration.pgHost, port:_dbConfiguration.pgPort, database: _dbConfiguration.pgDatabaseName });        
+    constructor(@inject(ILogger) logger: ILogger, @inject(IDbConfiguration) _dbConfiguration: IDbConfiguration) {
+        this._client = postgres({
+            hostname: _dbConfiguration.pgHost,
+            port: _dbConfiguration.pgPort,
+            database: _dbConfiguration.pgDatabaseName,
+        });
     }
 
     async create(model: IExpense): Promise<IExpenseDa> {
@@ -40,7 +40,7 @@ export class ExpenseDao implements IExpenseDao {
 
         return res.length ? res[0] : undefined;
     }
-    
+
     async update(updated: IExpense): Promise<IExpenseDa> {
         const res = await this._client<IExpense[]>`
             UPDATE "Expense"

@@ -20,9 +20,9 @@ const expenseItemSchema = {
         price: { type: "number" },
         owners: { type: "array", items: expenseUserDetailsSchema },
         isProportional: { type: "boolean" },
-        createdAt: { type: "number" }
+        createdAt: { type: "number" },
     },
-    required: ["id","expenseId", "name", "price", "owners"],
+    required: ["id", "expenseId", "name", "price", "owners"],
 } as const;
 
 export default {
@@ -34,13 +34,12 @@ export default {
             properties: {
                 id: { type: "string" },
                 name: { type: "string" },
-                transactionDate: { type: "string", format: "date-time"},
-                items: { type: "array", "items": expenseItemSchema },
-                userIds: { type: "array", "items": { type: "string" }},
+                transactionDate: { type: "string", format: "date-time" },
+                items: { type: "array", items: expenseItemSchema },
+                userIds: { type: "array", items: { type: "string" } },
             },
             required: ["id", "name", "transactionDate", "items", "userIds"],
-        }
+        },
     },
     required: ["userId"],
 } as const;
-

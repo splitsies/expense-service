@@ -22,22 +22,23 @@ export class ConnectionTokenDao extends DaoBase<IConnection> implements IConnect
     }
 
     async verify(token: string, expenseId: string): Promise<boolean> {
-
-        const result = await this._client.send(new QueryCommand({
-            TableName: this.dbConfiguration.connectionTokenTableName,
-            KeyConditionExpression: "#expenseId = :expenseId AND #connectionId = :connectionId",
-            FilterExpression: "#ttl > :now",
-            ExpressionAttributeNames: {
-                "#expenseId": "expenseId",
-                "#connectionId": "connectionId",
-                "#ttl": "ttl"
-            },
-            ExpressionAttributeValues: {
-                ":expenseId": { "S": expenseId },
-                ":connectionId": { "S": token },
-                ":now": { "N": `${Date.now()}` }
-            }
-        }));
+        const result = await this._client.send(
+            new QueryCommand({
+                TableName: this.dbConfiguration.connectionTokenTableName,
+                KeyConditionExpression: "#expenseId = :expenseId AND #connectionId = :connectionId",
+                FilterExpression: "#ttl > :now",
+                ExpressionAttributeNames: {
+                    "#expenseId": "expenseId",
+                    "#connectionId": "connectionId",
+                    "#ttl": "ttl",
+                },
+                ExpressionAttributeValues: {
+                    ":expenseId": { S: expenseId },
+                    ":connectionId": { S: token },
+                    ":now": { N: `${Date.now()}` },
+                },
+            }),
+        );
         console.log({ result });
         return result?.Items?.length !== 0;
     }
@@ -59,7 +60,9 @@ export class ConnectionTokenDao extends DaoBase<IConnection> implements IConnect
 
         await Promise.all(expired.map((connection) => this.delete(this._keySelector(connection))));
         this._logger.log(
-            `Successfully deleted expired connection tokens: ${expired.map((c) => `${c.connectionId}::${c.ttl}`).join(",")}`,
+            `Successfully deleted expired connection tokens: ${expired
+                .map((c) => `${c.connectionId}::${c.ttl}`)
+                .join(",")}`,
         );
 
         return expired.map((i) => i.connectionId);

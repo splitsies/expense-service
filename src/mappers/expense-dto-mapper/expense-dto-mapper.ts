@@ -6,11 +6,6 @@ import { injectable } from "inversify";
 @injectable()
 export class ExpenseDtoMapper implements IExpenseDtoMapper {
     toDto(expense: IExpenseDa, userIds: string[], items: IExpenseItem[]): IExpenseDto {
-        return new ExpenseDto(
-            expense.id,
-            expense.name,
-            expense.transactionDate.toISOString(),
-            items,
-            userIds);
+        return new ExpenseDto(expense.id, expense.name, expense.transactionDate.toISOString(), items, userIds);
     }
 }

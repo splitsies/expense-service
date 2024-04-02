@@ -7,5 +7,6 @@ export class UserExpenseDto implements IUserExpenseDto {
         readonly userId: string,
         readonly pendingJoin: boolean,
         readonly requestingUserId?: string,
-        readonly createdAt?: Date) {}
+        readonly createdAt?: Date,
+    ) {}
 }

@@ -11,9 +11,7 @@ import { IExpenseService } from "src/services/expense-service/expense-service-in
 
 @injectable()
 export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
-    constructor(
-        @inject(IExpenseService) private readonly _expenseService: IExpenseService
-    ) {}
+    constructor(@inject(IExpenseService) private readonly _expenseService: IExpenseService) {}
 
     async execute(operationName: ExpenseOperation, params: IExpenseMessageParameters): Promise<IExpenseDto> {
         switch (operationName) {
@@ -81,7 +79,7 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
 
             updated.push(item);
         }
-        
+
         await this._expenseService.saveUpdatedItems(updated);
         return this._expenseService.getExpense(expenseId);
     }
@@ -107,10 +105,16 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
     }
 
     private async updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<IExpenseDto> {
-        return this.updateExpense(expenseId, (e) => ({ ...e, transactionDate: transactionDate.toISOString() } as IExpenseDto));
+        return this.updateExpense(
+            expenseId,
+            (e) => ({ ...e, transactionDate: transactionDate.toISOString() } as IExpenseDto),
+        );
     }
 
-    private async updateExpense(expenseId: string, update: (expense: IExpenseDto) => IExpenseDto): Promise<IExpenseDto> {
+    private async updateExpense(
+        expenseId: string,
+        update: (expense: IExpenseDto) => IExpenseDto,
+    ): Promise<IExpenseDto> {
         const expense = await this._expenseService.getExpense(expenseId);
         const updated = update(expense);
         return this._expenseService.updateExpense(expense.id, updated);

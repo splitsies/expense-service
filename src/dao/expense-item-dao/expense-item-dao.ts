@@ -14,7 +14,7 @@ export class ExpenseItemDao extends DaoBase<IExpenseItem> implements IExpenseIte
     ) {
         const keySelector = (c: IExpenseItem) => ({ expenseId: c.expenseId, id: c.id });
         super(logger, dbConfiguration, dbConfiguration.expenseItemTableName, keySelector);
-    }    
+    }
 
     async getForExpense(expenseId: string): Promise<IExpenseItem[]> {
         const timeout = Date.now() + 10000;
@@ -22,22 +22,24 @@ export class ExpenseItemDao extends DaoBase<IExpenseItem> implements IExpenseIte
         let next = undefined;
 
         do {
-            const response = await this._client.send(new QueryCommand({
-                TableName: this.dbConfiguration.expenseItemTableName,
-                ExclusiveStartKey: next,
-                KeyConditionExpression: "#expenseId = :expenseId",
-                ExpressionAttributeNames: {
-                    "#expenseId": "expenseId",
-                },
-                ExpressionAttributeValues: {
-                    ":expenseId": { S: expenseId }
-                }
-            }));
+            const response = await this._client.send(
+                new QueryCommand({
+                    TableName: this.dbConfiguration.expenseItemTableName,
+                    ExclusiveStartKey: next,
+                    KeyConditionExpression: "#expenseId = :expenseId",
+                    ExpressionAttributeNames: {
+                        "#expenseId": "expenseId",
+                    },
+                    ExpressionAttributeValues: {
+                        ":expenseId": { S: expenseId },
+                    },
+                }),
+            );
 
-            items.push(...(response.Items?.map(i => unmarshall(i) as IExpenseItem) ?? []));
+            items.push(...(response.Items?.map((i) => unmarshall(i) as IExpenseItem) ?? []));
             next = response?.LastEvaluatedKey;
         } while (next && Date.now() < timeout);
 
         return items;
-    }    
+    }
 }

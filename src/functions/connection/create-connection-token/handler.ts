@@ -9,11 +9,8 @@ const logger = container.get<ILogger>(ILogger);
 const connectionService = container.get<IConnectionService>(IConnectionService);
 
 export const main = middyfy(
-    SplitsiesFunctionHandlerFactory.create<typeof schema, string>(
-        logger,
-        async (event) => {
-            const token = await connectionService.generateConnectionToken(event.pathParameters.expenseId);
-            return new DataResponse(HttpStatusCode.CREATED, token).toJson();
-        }
-    ),
+    SplitsiesFunctionHandlerFactory.create<typeof schema, string>(logger, async (event) => {
+        const token = await connectionService.generateConnectionToken(event.pathParameters.expenseId);
+        return new DataResponse(HttpStatusCode.CREATED, token).toJson();
+    }),
 );

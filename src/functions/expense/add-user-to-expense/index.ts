@@ -1,3 +1,4 @@
+import { VpcConfig } from "src/config/vpc.config";
 import { handlerPath } from "../../../libs/handler-resolver";
 import schema from "./schema";
 
@@ -18,13 +19,5 @@ export default {
             },
         },
     ],
-    vpc: {
-        securityGroupIds: [
-            "sg-0c856a69027cbbe51",
-            "sg-0f8a62286187fbab0"
-        ],
-        subnetIds: [
-            "subnet-0301a21d6a9ca2e03",
-        ]
-    }
+    vpc: VpcConfig.vpc
 };

@@ -9,23 +9,25 @@ import postgres, { Sql } from "postgres";
 export class UserExpenseDao implements IUserExpenseDao {
     private readonly _client: Sql;
 
-    constructor(
-        @inject(ILogger) logger: ILogger,
-        @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
-    ) {
+    constructor(@inject(ILogger) logger: ILogger, @inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
         const keySelector = (e: IUserExpense) => ({ expenseId: e.expenseId, userId: e.userId });
         this.key = keySelector;
-        this._client = postgres({ hostname: dbConfiguration.pgHost, port: dbConfiguration.pgPort, database: dbConfiguration.pgDatabaseName });
+        this._client = postgres({
+            hostname: dbConfiguration.pgHost,
+            port: dbConfiguration.pgPort,
+            database: dbConfiguration.pgDatabaseName,
+        });
     }
     key: (model: IUserExpense) => Record<string, string | number>;
 
     async create(model: IUserExpense): Promise<IUserExpense> {
-
         const res = await this._client<IUserExpense[]>`
             INSERT INTO "UserExpense"
                 ("expenseId", "userId", "pendingJoin", "requestingUserId", "createdAt")
             VALUES
-                (${model.expenseId}, ${model.userId}, ${!!model.pendingJoin}, ${model.requestingUserId ?? null}, ${model.createdAt ?? null}) 
+                (${model.expenseId}, ${model.userId}, ${!!model.pendingJoin}, ${model.requestingUserId ?? null}, ${
+            model.createdAt ?? null
+        }) 
             RETURNING *;
         `;
 
@@ -77,14 +79,13 @@ export class UserExpenseDao implements IUserExpenseDao {
     }
 
     async getExpenseIdsForUser(userId: string): Promise<string[]> {
-
         const res = await this._client<{ expenseId: string }[]>`        
             SELECT "expenseId" FROM "UserExpense"
              WHERE "userId" = ${userId}
              AND "pendingJoin" = FALSE;
         `;
 
-        return res.length ? res.map(u => u.expenseId) : [];
+        return res.length ? res.map((u) => u.expenseId) : [];
     }
 
     async getUsersForExpense(expenseId: string): Promise<string[]> {
@@ -93,7 +94,7 @@ export class UserExpenseDao implements IUserExpenseDao {
              WHERE "expenseId" = ${expenseId};
         `;
 
-        return res.length ? res.map(u => u.userId) : [];
+        return res.length ? res.map((u) => u.userId) : [];
     }
 
     async getJoinRequestsForUser(userId: string): Promise<IUserExpense[]> {
@@ -104,7 +105,7 @@ export class UserExpenseDao implements IUserExpenseDao {
                AND "pendingJoin" = TRUE;
         `;
 
-        return res.length ? res : [];    
+        return res.length ? res : [];
     }
 
     async getJoinRequestsForExpense(expenseId: string): Promise<IUserExpense[]> {
@@ -115,6 +116,6 @@ export class UserExpenseDao implements IUserExpenseDao {
                AND "pendingJoin" = TRUE;
         `;
 
-        return res.length ? res : [];    
+        return res.length ? res : [];
     }
 }

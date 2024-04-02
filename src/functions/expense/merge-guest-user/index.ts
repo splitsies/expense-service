@@ -14,12 +14,12 @@ export default {
                     { eventName: ["INSERT"] },
                     {
                         dynamodb: {
-                            Keys: { queueName: { "S": [QueueConfig.guestUserReplaced] } }
-                        }
-                    }
+                            Keys: { queueName: { S: [QueueConfig.guestUserReplaced] } },
+                        },
+                    },
                 ],
-            }
+            },
         },
     ],
-    vpc: VpcConfig.vpc
+    vpc: VpcConfig.vpc,
 };

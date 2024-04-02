@@ -20,7 +20,7 @@ const expenseItemSchema = {
         price: { type: "number" },
         owners: { type: "array", items: expenseUserDetailsSchema },
         isProportional: { type: "boolean" },
-        createdAt: { type: "number" }
+        createdAt: { type: "number" },
     },
     required: ["id", "name", "price", "owners"],
 } as const;

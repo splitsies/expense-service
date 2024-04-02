@@ -3,7 +3,14 @@ import { Container } from "inversify";
 import { IExpenseService } from "../services/expense-service/expense-service-interface";
 import { ExpenseService } from "../services/expense-service/expense-service";
 import { IExpenseManager } from "../managers/expense-manager/expense-manager-interface";
-import { ApiKeyConfiguration, IApiKeyConfiguration, ILogger, IMessageQueueClient, Logger, MessageQueueClient } from "@splitsies/utils";
+import {
+    ApiKeyConfiguration,
+    IApiKeyConfiguration,
+    ILogger,
+    IMessageQueueClient,
+    Logger,
+    MessageQueueClient,
+} from "@splitsies/utils";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { DbConfiguration } from "src/models/configuration/db/db-configuration";
 import { ExpenseDao } from "src/dao/expense-dao/expense-dao";
@@ -83,7 +90,6 @@ container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSinglet
 container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(ConnectionConfiguration).inSingletonScope();
 container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao).inSingletonScope();
 
-
 container.bind<IConnectionService>(IConnectionService).to(ConnectionService).inSingletonScope();
 container.bind<IConnectionManager>(IConnectionManager).to(ConnectionManager).inSingletonScope();
 container.bind<IConnectionDao>(IConnectionDao).to(ConnectionDao).inSingletonScope();
@@ -121,6 +127,9 @@ container.bind<IExpenseDaMapper>(IExpenseDaMapper).to(ExpenseDaMapper).inSinglet
 container.bind<IExpenseItemDao>(IExpenseItemDao).to(ExpenseItemDao).inSingletonScope();
 container.bind<IExpenseDtoMapper>(IExpenseDtoMapper).to(ExpenseDtoMapper).inSingletonScope();
 container.bind<IConnectionTokenDao>(IConnectionTokenDao).to(ConnectionTokenDao).inSingletonScope();
-container.bind<IConnectionTokenDaoStatements>(IConnectionTokenDaoStatements).to(ConnectionTokenDaoStatements).inSingletonScope();
+container
+    .bind<IConnectionTokenDaoStatements>(IConnectionTokenDaoStatements)
+    .to(ConnectionTokenDaoStatements)
+    .inSingletonScope();
 container.bind<IMessageQueueClient>(IMessageQueueClient).to(MessageQueueClient).inSingletonScope();
 export { container };

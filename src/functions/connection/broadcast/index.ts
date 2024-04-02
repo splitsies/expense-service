@@ -13,11 +13,11 @@ export default {
                     { eventName: ["INSERT"] },
                     {
                         dynamodb: {
-                            Keys: { queueName: { "S": [QueueConfig.expenseUpdate] } }
-                        }
-                    }
+                            Keys: { queueName: { S: [QueueConfig.expenseUpdate] } },
+                        },
+                    },
                 ],
-            }
+            },
         },
-    ]
+    ],
 };

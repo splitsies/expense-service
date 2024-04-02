@@ -14,16 +14,18 @@ export const main: DynamoDBStreamHandler = (event, _, callback) => {
     const promises: Promise<void>[] = [];
     const updates: IQueueMessage<IExpenseDto>[] = [];
     const cache = new Map<string, IQueueMessage<IExpenseDto>>();
-    
+
     for (const record of event.Records) {
         if (!record.dynamodb?.NewImage) continue;
 
-        const update = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<IExpenseDto>;
+        const update = unmarshall(
+            record.dynamodb.NewImage as Record<string, AttributeValue>,
+        ) as IQueueMessage<IExpenseDto>;
         updates.push(update);
 
         if (Date.now() > update.ttl) continue;
         const cached = cache.get(update.data.id);
-        cache.set(update.data.id, (cached && cached.timestamp > update.timestamp) ? cached : update);
+        cache.set(update.data.id, cached && cached.timestamp > update.timestamp ? cached : update);
     }
 
     promises.push(expenseService.deleteExpenseUpdates(updates));

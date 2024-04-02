@@ -7,6 +7,11 @@ import { IExpenseDaMapper } from "./expense-da-mapper-interface";
 @injectable()
 export class ExpenseDaMapper implements IExpenseDaMapper {
     fromDa(expenseDa: IExpenseDa, items: IExpenseItem[]): IExpense {
-        return new Expense(expenseDa.id, expenseDa.name, expenseDa.transactionDate, items.sort((a,b) => a.createdAt - b.createdAt));
+        return new Expense(
+            expenseDa.id,
+            expenseDa.name,
+            expenseDa.transactionDate,
+            items.sort((a, b) => a.createdAt - b.createdAt),
+        );
     }
 }

@@ -24,10 +24,7 @@ export const main = middyfy(
             if (userId !== tokenUserId) throw new UnauthorizedUserError();
 
             const result = await expenseService.getExpenseJoinRequestsForUser(userId);
-            return new DataResponse(
-                HttpStatusCode.OK,
-                result
-            ).toJson();
+            return new DataResponse(HttpStatusCode.OK, result).toJson();
         },
         expectedErrors,
     ),

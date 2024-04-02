@@ -19,8 +19,8 @@ const expectedErrors = [
 export const main = SplitsiesFunctionHandlerFactory.create<typeof schema, IExpenseDto | string>(
     logger,
     async ({ requestContext, queryStringParameters: { expenseId, userId, connectionToken } }) => {
-        console.log({ expenseId, userId, connectionToken });
-        if (!expenseId || !userId || !connectionToken || !requestContext.connectionId) throw new InvalidArgumentsError();
+        if (!expenseId || !userId || !connectionToken || !requestContext.connectionId)
+            throw new InvalidArgumentsError();
 
         if (!(await connectionService.verifyConnectionToken(connectionToken, expenseId))) {
             throw new UnauthorizedUserError();

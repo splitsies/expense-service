@@ -6,5 +6,6 @@ export class UserExpense implements IUserExpense {
         readonly userId: string,
         readonly pendingJoin: boolean,
         readonly requestingUserId?: string,
-        readonly createdAt?: Date) {}
+        readonly createdAt?: Date,
+    ) {}
 }
