@@ -3,7 +3,6 @@
     "dbSecretAccessKey": "${param:DB_SECRET_ACCESS_KEY}",
     "dbRegion": "${param:DB_REGION}",
     "dbTableName": "${param:DB_TABLE_NAME}",
-    "transactionDateIndexName": "${param:TRANSACTION_DATE_INDEX_NAME}",
     "connectionTableName": "${param:CONNECTION_TABLE_NAME}",
     "userExpenseTableName": "${param:DB_USER_EXPENSE_TABLE_NAME}",
     "expenseItemTableName": "${param:EXPENSE_ITEM_TABLE_NAME}",
