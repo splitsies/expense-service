@@ -30,8 +30,6 @@ import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-inter
 import { UserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao";
 import { IUserExpenseStatements } from "src/dao/user-expense-dao/user-expense-statements-interface";
 import { UserExpenseStatements } from "src/dao/user-expense-dao/user-expense-statements";
-import { IApiConfiguration } from "src/models/configuration/api/api-configuration-interface";
-import { ApiConfiguration } from "src/models/configuration/api/api-configuration";
 import { IFirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration-interface";
 import { FirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration";
 import { IAdminAuthProvider } from "src/providers/admin-auth-provider-interface";
@@ -76,7 +74,6 @@ container.bind<ILogger>(ILogger).to(Logger).inSingletonScope();
 
 container.bind<IExpenseService>(IExpenseService).to(ExpenseService).inSingletonScope();
 container.bind<IExpenseManager>(IExpenseManager).to(ExpenseManager).inSingletonScope();
-container.bind<IApiConfiguration>(IApiConfiguration).to(ApiConfiguration).inSingletonScope();
 container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSingletonScope();
 container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(ConnectionConfiguration).inSingletonScope();
 container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao).inSingletonScope();
