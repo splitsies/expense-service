@@ -14,7 +14,6 @@ import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { ILogger, IMessageQueueClient } from "@splitsies/utils";
-import { IExpenseJoinRequestDao } from "src/dao/expense-join-request-dao/expense-join-request-dao-interface";
 import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-interface";
 import { IExpenseDa } from "src/models/expense/expense-da-interface";
 import { UserExpense } from "src/models/user-expense/user-expense";
@@ -30,7 +29,6 @@ export class ExpenseManager implements IExpenseManager {
         @inject(ILogger) private readonly _logger: ILogger,
         @inject(IExpenseDao) private readonly _expenseDao: IExpenseDao,
         @inject(IUserExpenseDao) private readonly _userExpenseDao: IUserExpenseDao,
-        @inject(IExpenseJoinRequestDao) private readonly _expenseJoinRequestDao: IExpenseJoinRequestDao,
         @inject(IExpenseItemDao) private readonly _expenseItemDao: IExpenseItemDao,
         @inject(IExpenseDtoMapper) private readonly _dtoMapper: IExpenseDtoMapper,
         @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient,
@@ -264,10 +262,5 @@ export class ExpenseManager implements IExpenseManager {
 
     async saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]> {
         return Promise.all(updatedItems.map((i) => this._expenseItemDao.update(i)));
-    }
-
-    async joinRequestExists(userId: string, expenseId: string): Promise<boolean> {
-        const key = this._expenseJoinRequestDao.key({ userId, expenseId, requestingUserId: "", createdAt: new Date() });
-        return !!(await this._expenseJoinRequestDao.read(key));
     }
 }
