@@ -1,6 +1,6 @@
 {
   "name": "expense-service",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
@@ -9,9 +9,6 @@
     "serve:dev-pr": "./utils/local-startup/startup-dev-pr.sh",
     "format": "prettier --write \"./**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
-    "start-db": "cd utils/local-db && docker-compose -p splitsies-expense-db up",
-    "recreate-db": "./utils/local-db/recreate.sh",
-    "kill-db": "docker kill splitsies-expense-db-local",
     "clear-shared-models": "npm cache clean --force && rm -rf ./node_modules/@splitsies/shared-models && rm -rf ./package-lock.json"
   },
   "engines": {
@@ -25,12 +22,13 @@
     "@middy/core": "^3.4.0",
     "@middy/http-json-body-parser": "^3.4.0",
     "@middy/ws-json-body-parser": "^4.4.0",
-    "@splitsies/shared-models": "^0.0.24",
-    "@splitsies/utils": "^0.0.25",
+    "@splitsies/shared-models": "^0.0.28",
+    "@splitsies/utils": "^0.0.26",
     "firebase-admin": "^11.11.0",
     "inversify": "6.0.1",
     "jwt-decode": "^3.1.2",
     "mathjs": "^11.8.0",
+    "postgres": "^3.4.4",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {

@@ -8,6 +8,8 @@ export interface IConnectionManager {
     getRelatedConnections(connectionId: string): Promise<string[]>;
     getExpenseIdForConnection(connectionId: string): Promise<string>;
     getConnectionsForExpenseId(expenseId: string): Promise<string[]>;
+    generateConnectionToken(expenseId: string): Promise<string>;
+    verifyConnectionToken(token: string, expenseId: string): Promise<boolean>;
 }
 
 export const IConnectionManager = Symbol.for("IConnectionManager");

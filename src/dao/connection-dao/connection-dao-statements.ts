@@ -11,7 +11,7 @@ export class ConnectionDaoStatements implements IConnectionDaoStatements {
 
     constructor(@inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
         const table = dbConfiguration.connectionTableName;
-        this.GetConnectionIdsForExpense = `SELECT connectionId FROM "${table}" WHERE expenseId = ? AND ttl >= ?`;
+        this.GetConnectionIdsForExpense = `SELECT connectionId FROM "${table}"."ExpenseIndex" WHERE expenseId = ? AND ttl >= ?`;
         this.GetExpenseIdForConnection = `SELECT expenseId FROM "${table}" WHERE connectionId = ? AND ttl >= ?`;
         this.GetExpiredConnections = `SELECT * FROM "${table}" WHERE ttl < ?`;
         this.GetByConnectionId = `SELECT * FROM "${table}" WHERE connectionId = ?`;

@@ -13,7 +13,7 @@
       "resolveJsonModule": true, // import configuration json files
       "esModuleInterop": true, // import configuration json files
     },
-    "include": ["src/**/*.ts", "serverless.ts"],
+    "include": ["src/**/*.ts", "serverless.ts", "src/mappers/expense-dto-mapper"],
     "exclude": [
       "node_modules/**/*",
       ".serverless/**/*",

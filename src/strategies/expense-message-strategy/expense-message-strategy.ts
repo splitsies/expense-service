@@ -1,25 +1,19 @@
 import {
-    ExpenseItem,
     ExpenseOperation,
-    IExpense,
+    IExpenseDto,
     IExpenseItem,
     IExpenseMessageParameters,
-    IExpenseUpdateMapper,
     IExpenseUserDetails,
 } from "@splitsies/shared-models";
 import { IExpenseMessageStrategy } from "./expense-message-strategy-interface";
 import { inject, injectable } from "inversify";
 import { IExpenseService } from "src/services/expense-service/expense-service-interface";
-import { randomUUID } from "crypto";
 
 @injectable()
 export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
-    constructor(
-        @inject(IExpenseService) private readonly _expenseService: IExpenseService,
-        @inject(IExpenseUpdateMapper) private readonly _expenseUpdateMapper: IExpenseUpdateMapper,
-    ) {}
+    constructor(@inject(IExpenseService) private readonly _expenseService: IExpenseService) {}
 
-    async execute(operationName: ExpenseOperation, params: IExpenseMessageParameters): Promise<IExpense> {
+    async execute(operationName: ExpenseOperation, params: IExpenseMessageParameters): Promise<IExpenseDto> {
         switch (operationName) {
             case "addItem":
                 return this.addItem(
@@ -46,8 +40,6 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
             case "updateTransactionDate":
                 return this.updateExpenseTransactionDate(params.expenseId, params.transactionDate);
         }
-
-        throw new Error("Method not allowed");
     }
 
     private async addItem(
@@ -56,42 +48,40 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         price: number,
         owners: IExpenseUserDetails[],
         isProportional: boolean,
-    ): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            const item = new ExpenseItem(randomUUID(), name, price, owners, isProportional);
-            e.items.push(item);
-            return e;
-        });
+    ): Promise<IExpenseDto> {
+        return this._expenseService.addExpenseItem(name, price, owners, isProportional, expenseId);
     }
 
-    private async removeItem(expenseId: string, item: IExpenseItem): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            const itemIndex = e.items.findIndex((i) => i.id === item.id);
-            if (itemIndex !== -1) e.items.splice(itemIndex, 1);
-            return e;
-        });
+    private async removeItem(expenseId: string, item: IExpenseItem): Promise<IExpenseDto> {
+        return await this._expenseService.removeExpenseItem(item.id, expenseId);
     }
 
     private async updateItemSelections(
         expenseId: string,
         user: IExpenseUserDetails,
         selectedItemIds: string[],
-    ): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            for (const item of e.items) {
-                const itemSelected = selectedItemIds.includes(item.id);
-                const userOwnsItem = !!item.owners.find((o) => o.id === user.id);
+    ): Promise<IExpenseDto> {
+        const expenseItems = await this._expenseService.getExpenseItems(expenseId);
+        const updated: IExpenseItem[] = [];
 
-                if (itemSelected && !userOwnsItem) {
-                    item.owners.push(user);
-                } else if (!itemSelected && userOwnsItem) {
-                    const index = item.owners.findIndex((o) => o.id === user.id);
-                    if (index !== -1) item.owners.splice(index, 1);
-                }
+        for (const item of expenseItems) {
+            const itemSelected = selectedItemIds.includes(item.id);
+            const userOwnsItem = !!item.owners.find((o) => o.id === user.id);
+
+            if (itemSelected && !userOwnsItem) {
+                item.owners.push(user);
+            } else if (!itemSelected && userOwnsItem) {
+                const index = item.owners.findIndex((o) => o.id === user.id);
+                if (index !== -1) item.owners.splice(index, 1);
+            } else {
+                continue;
             }
 
-            return e;
-        });
+            updated.push(item);
+        }
+
+        await this._expenseService.saveUpdatedItems(updated);
+        return this._expenseService.getExpense(expenseId);
     }
 
     private async updateItemDetails(
@@ -100,33 +90,33 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         name: string,
         price: number,
         isProportional: boolean,
-    ): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            const itemIndex = e.items.findIndex((i) => i.id === itemId);
-            if (itemIndex === -1) return e;
+    ): Promise<IExpenseDto> {
+        const expenseItems = await this._expenseService.getExpenseItems(expenseId);
+        const itemIndex = expenseItems.findIndex((i) => i.id === itemId);
+        if (itemIndex === -1) throw new Error("Item not found for expense");
 
-            const updatedItem = { ...e.items[itemIndex], name, price, isProportional };
-            e.items[itemIndex] = updatedItem;
-            return e;
-        });
+        const updatedItem = { ...expenseItems[itemIndex], name, price, isProportional };
+        await this._expenseService.saveUpdatedItems([updatedItem]);
+        return this._expenseService.getExpense(expenseId);
     }
 
-    private async updateExpenseName(expenseId: string, expenseName: string): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            const expense = { ...e, name: expenseName } as IExpense;
-            return expense;
-        });
+    private async updateExpenseName(expenseId: string, expenseName: string): Promise<IExpenseDto> {
+        return this.updateExpense(expenseId, (e) => ({ ...e, name: expenseName } as IExpenseDto));
     }
 
-    private async updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<IExpense> {
-        return this.updateExpense(expenseId, (e) => {
-            const expense = { ...e, transactionDate } as IExpense;
-            return expense;
-        });
+    private async updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<IExpenseDto> {
+        return this.updateExpense(
+            expenseId,
+            (e) => ({ ...e, transactionDate: transactionDate.toISOString() } as IExpenseDto),
+        );
     }
 
-    private async updateExpense(expenseId: string, update: (expense: IExpense) => IExpense): Promise<IExpense> {
+    private async updateExpense(
+        expenseId: string,
+        update: (expense: IExpenseDto) => IExpenseDto,
+    ): Promise<IExpenseDto> {
         const expense = await this._expenseService.getExpense(expenseId);
-        return this._expenseService.updateExpense(expense.id, this._expenseUpdateMapper.toDtoModel(update(expense)));
+        const updated = update(expense);
+        return this._expenseService.updateExpense(expense.id, updated);
     }
 }

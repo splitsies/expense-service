@@ -1,36 +1,40 @@
 import {
-    IExpense,
+    IExpenseDto,
+    IExpenseItem,
     IExpenseJoinRequest,
-    IExpenseJoinRequestDto,
-    IExpensePayload,
-    IExpenseUpdate,
     IExpenseUserDetails,
+    IQueueMessage,
 } from "@splitsies/shared-models";
+import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 
 export interface IExpenseService {
-    getExpense(id: string): Promise<IExpense>;
+    getExpense(id: string): Promise<IExpenseDto>;
     getUserExpense(userId: string, expenseId: string): Promise<IUserExpense>;
-    createExpense(userId: string): Promise<IExpense>;
-    createExpenseFromImage(base64Image: string, userId: string): Promise<IExpense>;
-    updateExpense(id: string, updated: IExpenseUpdate): Promise<IExpense>;
-    getExpensesForUser(userId: string): Promise<IExpense[]>;
+    createExpense(userId: string): Promise<IExpenseDto>;
+    createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
+    updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
+    getExpensesForUser(userId: string): Promise<IExpenseDto[]>;
     getUsersForExpense(expenseId: string): Promise<string[]>;
-    addUserToExpense(userExpense: IUserExpense, requestingUserId: string): Promise<void>;
-    removeUserFromExpense(expenseId: string, userId: string): Promise<IExpense>;
-    getExpenseUserDetailsForExpenses(expenseIds: string[]): Promise<Map<string, IExpenseUserDetails[]>>;
-    getExpenseJoinRequestsForUser(userId: string): Promise<IExpenseJoinRequestDto[]>;
+    addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
+    removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;
+    getExpenseJoinRequestsForUser(userId: string): Promise<IUserExpenseDto[]>;
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
     removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]>;
-    addItemToExpense(
+    addExpenseItem(
         name: string,
         price: number,
         owners: IExpenseUserDetails[],
         isProportional: boolean,
         expenseId: string,
-    ): Promise<IExpense>;
-    replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpensePayload[]>;
+    ): Promise<IExpenseDto>;
+    removeExpenseItem(itemId: string, expenseId: string): Promise<IExpenseDto>;
+    getExpenseItems(expenseId: string): Promise<IExpenseItem[]>;
+    saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]>;
+    replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]>;
+    queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void>;
+    deleteExpenseUpdates(expenseUpdates: IQueueMessage<IExpenseDto>[]): Promise<void>;
 }
 
 export const IExpenseService: symbol = Symbol.for("IExpenseService");

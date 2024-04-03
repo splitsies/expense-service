@@ -4,10 +4,8 @@ import { ExpectedError, ILogger, SplitsiesFunctionHandlerFactory } from "@splits
 import { container } from "src/di/inversify.config";
 import {
     DataResponse,
-    ExpenseMessage,
     ExpenseOperation,
     HttpStatusCode,
-    IExpenseMapper,
     IExpenseMessageParametersMapper,
     InvalidArgumentsError,
 } from "@splitsies/shared-models";
@@ -21,7 +19,6 @@ import { IExpenseMessageParametersDto } from "@splitsies/shared-models/lib/src/e
 
 const logger = container.get<ILogger>(ILogger);
 const connectionService = container.get<IConnectionService>(IConnectionService);
-const expenseMapper = container.get<IExpenseMapper>(IExpenseMapper);
 const expenseMessageStrategy = container.get<IExpenseMessageStrategy>(IExpenseMessageStrategy);
 const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
 const expenseMessageParametersMapper = container.get<IExpenseMessageParametersMapper>(IExpenseMessageParametersMapper);
@@ -42,10 +39,7 @@ export const main = middyfyWs(
 
             const updated = await expenseMessageStrategy.execute(event.body.method as ExpenseOperation, params);
 
-            await expenseBroadcaster.broadcast(
-                updated.id,
-                new ExpenseMessage("expense", expenseMapper.toDtoModel(updated)),
-            );
+            await expenseBroadcaster.broadcast(updated);
             return new DataResponse(HttpStatusCode.OK, updated).toJson();
         },
         expectedErrors,

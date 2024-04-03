@@ -1,3 +1,4 @@
+import { VpcConfig } from "src/config/vpc.config";
 import { handlerPath } from "../../../libs/handler-resolver";
 
 export default {
@@ -12,4 +13,5 @@ export default {
             },
         },
     ],
+    vpc: VpcConfig.vpc,
 };

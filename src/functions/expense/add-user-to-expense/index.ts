@@ -1,3 +1,4 @@
+import { VpcConfig } from "src/config/vpc.config";
 import { handlerPath } from "../../../libs/handler-resolver";
 import schema from "./schema";
 
@@ -18,4 +19,5 @@ export default {
             },
         },
     ],
+    vpc: VpcConfig.vpc,
 };

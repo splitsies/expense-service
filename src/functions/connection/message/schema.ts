@@ -15,10 +15,12 @@ const expenseItemSchema = {
     type: "object",
     properties: {
         id: { type: "string" },
+        expenseId: { type: "string" },
         name: { type: "string" },
         price: { type: "number" },
         owners: { type: "array", items: expenseUserDetailsSchema },
         isProportional: { type: "boolean" },
+        createdAt: { type: "number" },
     },
     required: ["id", "name", "price", "owners"],
 } as const;

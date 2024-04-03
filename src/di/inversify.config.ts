@@ -3,13 +3,18 @@ import { Container } from "inversify";
 import { IExpenseService } from "../services/expense-service/expense-service-interface";
 import { ExpenseService } from "../services/expense-service/expense-service";
 import { IExpenseManager } from "../managers/expense-manager/expense-manager-interface";
-import { ApiKeyConfiguration, IApiKeyConfiguration, ILogger, Logger } from "@splitsies/utils";
+import {
+    ApiKeyConfiguration,
+    IApiKeyConfiguration,
+    ILogger,
+    IMessageQueueClient,
+    Logger,
+    MessageQueueClient,
+} from "@splitsies/utils";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { DbConfiguration } from "src/models/configuration/db/db-configuration";
 import { ExpenseDao } from "src/dao/expense-dao/expense-dao";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
-import { IAlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client-interface";
-import { AlgorithmsApiClient } from "src/api/algorithms-api-client/algorithms-api-client";
 import { IConnectionDao } from "src/dao/connection-dao/connection-dao-interface";
 import { ConnectionDao } from "src/dao/connection-dao/connection-dao";
 import { IConnectionManager } from "src/managers/connection-manager/connection-manager-interface";
@@ -25,12 +30,6 @@ import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-inter
 import { UserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao";
 import { IUserExpenseStatements } from "src/dao/user-expense-dao/user-expense-statements-interface";
 import { UserExpenseStatements } from "src/dao/user-expense-dao/user-expense-statements";
-import { IApiConfiguration } from "src/models/configuration/api/api-configuration-interface";
-import { ApiConfiguration } from "src/models/configuration/api/api-configuration";
-import { IOcrApiClient } from "src/api/ocr-api-client/ocr-api-client-interface";
-import { OcrApiClient } from "src/api/ocr-api-client/ocr-api-client";
-import { IUsersApiClient } from "src/api/users-api-client/users-api-client-interface";
-import { UsersApiClient } from "src/api/users-api-client/users-api-client";
 import { IFirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration-interface";
 import { FirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration";
 import { IAdminAuthProvider } from "src/providers/admin-auth-provider-interface";
@@ -43,15 +42,10 @@ import { IFirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/fireb
 import { FirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy";
 import {
     ExpenseJoinRequestDaMapper,
-    ExpenseMapper,
     ExpenseMessageParametersMapper,
-    ExpenseUpdateMapper,
     ExpenseUserDetailsMapper,
     IExpenseJoinRequestDaMapper,
-    IExpenseMapper,
-    IExpenseMessageParameters,
     IExpenseMessageParametersMapper,
-    IExpenseUpdateMapper,
     IExpenseUserDetailsMapper,
 } from "@splitsies/shared-models";
 import { IExpenseStatements } from "src/dao/expense-dao/expense-statements-interface";
@@ -64,23 +58,25 @@ import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcast
 import { ExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster";
 import { IExpenseMessageStrategy } from "src/strategies/expense-message-strategy/expense-message-strategy-interface";
 import { ExpenseMessageStrategy } from "src/strategies/expense-message-strategy/expense-message-strategy";
-
+import { IExpenseDaMapper } from "src/mappers/expense-da-mapper-interface";
+import { ExpenseDaMapper } from "src/mappers/expense-da-mapper";
+import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-interface";
+import { ExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao";
+import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper/expense-dto-mapper-interface";
+import { ExpenseDtoMapper } from "src/mappers/expense-dto-mapper/expense-dto-mapper";
+import { IConnectionTokenDao } from "src/dao/connection-token-dao/connection-token-dao-interface";
+import { ConnectionTokenDao } from "src/dao/connection-token-dao/connection-token-dao";
+import { IConnectionTokenDaoStatements } from "src/dao/connection-token-dao/connection-token-dao-statements-interface";
+import { ConnectionTokenDaoStatements } from "src/dao/connection-token-dao/connection-token-dao-statements";
 const container = new Container();
 
 container.bind<ILogger>(ILogger).to(Logger).inSingletonScope();
 
 container.bind<IExpenseService>(IExpenseService).to(ExpenseService).inSingletonScope();
 container.bind<IExpenseManager>(IExpenseManager).to(ExpenseManager).inSingletonScope();
-container.bind<IAlgorithmsApiClient>(IAlgorithmsApiClient).to(AlgorithmsApiClient).inSingletonScope();
-container.bind<IOcrApiClient>(IOcrApiClient).to(OcrApiClient).inSingletonScope();
-container.bind<IUsersApiClient>(IUsersApiClient).to(UsersApiClient).inSingletonScope();
-container.bind<IApiConfiguration>(IApiConfiguration).to(ApiConfiguration).inSingletonScope();
 container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSingletonScope();
 container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(ConnectionConfiguration).inSingletonScope();
 container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao).inSingletonScope();
-
-container.bind<IExpenseMapper>(IExpenseMapper).to(ExpenseMapper).inSingletonScope();
-container.bind<IExpenseUpdateMapper>(IExpenseUpdateMapper).to(ExpenseUpdateMapper).inSingletonScope();
 
 container.bind<IConnectionService>(IConnectionService).to(ConnectionService).inSingletonScope();
 container.bind<IConnectionManager>(IConnectionManager).to(ConnectionManager).inSingletonScope();
@@ -114,4 +110,14 @@ container
     .bind<IExpenseMessageParametersMapper>(IExpenseMessageParametersMapper)
     .to(ExpenseMessageParametersMapper)
     .inSingletonScope();
+
+container.bind<IExpenseDaMapper>(IExpenseDaMapper).to(ExpenseDaMapper).inSingletonScope();
+container.bind<IExpenseItemDao>(IExpenseItemDao).to(ExpenseItemDao).inSingletonScope();
+container.bind<IExpenseDtoMapper>(IExpenseDtoMapper).to(ExpenseDtoMapper).inSingletonScope();
+container.bind<IConnectionTokenDao>(IConnectionTokenDao).to(ConnectionTokenDao).inSingletonScope();
+container
+    .bind<IConnectionTokenDaoStatements>(IConnectionTokenDaoStatements)
+    .to(ConnectionTokenDaoStatements)
+    .inSingletonScope();
+container.bind<IMessageQueueClient>(IMessageQueueClient).to(MessageQueueClient).inSingletonScope();
 export { container };

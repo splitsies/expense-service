@@ -2,14 +2,13 @@ import schema from "./schema";
 import { middyfy } from "../../../libs/lambda";
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
-import { HttpStatusCode, DataResponse, NotFoundError, IExpenseDto, IExpenseMapper } from "@splitsies/shared-models";
+import { HttpStatusCode, DataResponse, NotFoundError, IExpenseDto } from "@splitsies/shared-models";
 import { SplitsiesFunctionHandlerFactory, ILogger, IExpectedError, ExpectedError } from "@splitsies/utils";
 import { ImageProcessingError } from "src/models/error/image-processing-error";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 
 const logger = container.get<ILogger>(ILogger);
 const expenseService = container.get<IExpenseService>(IExpenseService);
-const expenseMapper = container.get<IExpenseMapper>(IExpenseMapper);
 
 const expectedErrors: IExpectedError[] = [
     new ExpectedError(NotFoundError, HttpStatusCode.BAD_REQUEST, `Unable to find user`),
@@ -25,11 +24,11 @@ export const main = middyfy(
                 throw new UnauthorizedUserError();
             }
 
-            const result = !!event.body.image
-                ? await expenseService.createExpenseFromImage(event.body.image, event.body.userId)
+            const result = !!event.body.expense
+                ? await expenseService.createExpenseFromScan(event.body.expense as IExpenseDto, event.body.userId)
                 : await expenseService.createExpense(event.body.userId);
 
-            return new DataResponse(HttpStatusCode.CREATED, expenseMapper.toDtoModel(result)).toJson();
+            return new DataResponse(HttpStatusCode.CREATED, result).toJson();
         },
         expectedErrors,
     ),

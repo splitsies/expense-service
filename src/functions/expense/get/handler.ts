@@ -2,13 +2,12 @@ import schema from "./schema";
 import { middyfy } from "../../../libs/lambda";
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
-import { HttpStatusCode, DataResponse, IExpenseDto, IExpenseMapper } from "@splitsies/shared-models";
+import { HttpStatusCode, DataResponse, IExpenseDto } from "@splitsies/shared-models";
 import { SplitsiesFunctionHandlerFactory, ILogger, ExpectedError, IExpectedError } from "@splitsies/utils";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 
 const logger = container.get<ILogger>(ILogger);
 const expenseService = container.get<IExpenseService>(IExpenseService);
-const expenseMapper = container.get<IExpenseMapper>(IExpenseMapper);
 
 const expectedErrors: IExpectedError[] = [
     new ExpectedError(UnauthorizedUserError, HttpStatusCode.FORBIDDEN, "Unauthorized to access this resource"),
@@ -27,7 +26,7 @@ export const main = middyfy(
             }
 
             const expense = await expenseService.getExpense(result.expenseId);
-            return new DataResponse(HttpStatusCode.OK, expenseMapper.toDtoModel(expense)).toJson();
+            return new DataResponse(HttpStatusCode.OK, expense).toJson();
         },
         expectedErrors,
     ),
