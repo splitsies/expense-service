@@ -28,8 +28,6 @@ import { ConnectionConfiguration } from "src/models/configuration/connection/con
 import { ExpenseManager } from "src/managers/expense-manager/expense-manager";
 import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-interface";
 import { UserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao";
-import { IUserExpenseStatements } from "src/dao/user-expense-dao/user-expense-statements-interface";
-import { UserExpenseStatements } from "src/dao/user-expense-dao/user-expense-statements";
 import { IFirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration-interface";
 import { FirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration";
 import { IAdminAuthProvider } from "src/providers/admin-auth-provider-interface";
@@ -85,7 +83,6 @@ container.bind<IConnectionDao>(IConnectionDao).to(ConnectionDao).inSingletonScop
 container.bind<IConnectionDaoStatements>(IConnectionDaoStatements).to(ConnectionDaoStatements).inSingletonScope();
 
 container.bind<IUserExpenseDao>(IUserExpenseDao).to(UserExpenseDao).inSingletonScope();
-container.bind<IUserExpenseStatements>(IUserExpenseStatements).to(UserExpenseStatements).inSingletonScope();
 container.bind<IFirebaseConfiguration>(IFirebaseConfiguration).to(FirebaseConfiguration).inSingletonScope();
 container.bind<IAdminAuthProvider>(IAdminAuthProvider).to(AdminAuthProvider).inSingletonScope();
 container.bind<IJwtStrategyProvider>(IJwtStrategyProvider).to(JwtStrategyProvider).inSingletonScope();
