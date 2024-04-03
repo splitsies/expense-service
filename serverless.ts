@@ -1,6 +1,5 @@
 import type { AWS } from "@serverless/typescript";
 
-import apiConfig from "./src/config/api.config.json";
 import dbConfig from "./src/config/db.config.json";
 import connectionConfig from "./src/config/connection.config.json";
 import firebaseConfig from "./src/config/firebase.config.json";
@@ -52,7 +51,6 @@ const serverlessConfiguration: AWS = {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
             NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
             APIG_URL: "${param:APIG_URL}",
-            ...apiConfig,
             ...dbConfig,
             ...connectionConfig,
             ...firebaseConfig,

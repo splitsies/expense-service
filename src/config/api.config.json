@@ -1,3 +1,0 @@
-{
-    "INTERNAL_API_KEY": "${param:INTERNAL_API_KEY}"
-}
