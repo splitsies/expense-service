@@ -5,7 +5,6 @@ export interface IDbConfiguration {
     readonly tableName: string;
     readonly expenseItemTableName: string;
     readonly connectionTableName: string;
-    readonly expenseJoinRequestTableName: string;
     readonly endpoint: string;
     readonly pgHost: string;
     readonly pgPort: number;
