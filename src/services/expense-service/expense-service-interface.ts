@@ -4,6 +4,7 @@ import {
     IExpenseJoinRequest,
     IExpenseUserDetails,
     IQueueMessage,
+    IScanResult,
 } from "@splitsies/shared-models";
 import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
@@ -14,7 +15,7 @@ export interface IExpenseService {
     createExpense(userId: string): Promise<IExpenseDto>;
     createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
-    getExpensesForUser(userId: string): Promise<IExpenseDto[]>;
+    getExpensesForUser(userId: string, lastEvaluatedKey?: { id: string, transactionDate: string }): Promise<IScanResult<IExpenseDto>>;
     getUsersForExpense(expenseId: string): Promise<string[]>;
     addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;

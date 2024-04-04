@@ -8,6 +8,8 @@ import {
     IExpenseDto,
     QueueMessage,
     IQueueMessage,
+    IScanResult,
+    ScanResult,
 } from "@splitsies/shared-models";
 import { IExpenseManager } from "./expense-manager-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
@@ -88,14 +90,13 @@ export class ExpenseManager implements IExpenseManager {
         return this.getExpense(id);
     }
 
-    // TODO: Make this take in a lastEvaluatedKey and make the front-end infinite scrolling
-    async getExpensesForUser(userId: string): Promise<IExpenseDto[]> {
+    async getExpensesForUser(userId: string, lastEvaluatedKey: { id: string, transactionDate: string } = undefined): Promise<IScanResult<IExpenseDto>> {
         const expenseToItems = new Map<string, IExpenseItem[]>();
         const expenseToUsers = new Map<string, string[]>();
-        const expenses = await this._expenseDao.getExpensesForUser(userId);
+        const expenses = await this._expenseDao.getExpensesForUser(userId, lastEvaluatedKey);
 
         await Promise.all(
-            expenses.map(async (e) => {
+            expenses.result.map(async (e) => {
                 const items = await this._expenseItemDao.getForExpense(e.id);
                 expenseToItems.set(e.id, items);
                 const users = await this._userExpenseDao.getUsersForExpense(e.id);
@@ -104,10 +105,11 @@ export class ExpenseManager implements IExpenseManager {
         );
 
         const items = await Promise.all(
-            expenses.map((e) => this._dtoMapper.toDto(e, expenseToUsers.get(e.id), expenseToItems.get(e.id))),
+            expenses.result.map((e) => this._dtoMapper.toDto(e, expenseToUsers.get(e.id), expenseToItems.get(e.id))),
         );
-        console.log({ items });
-        return items;
+
+
+        return new ScanResult(items, expenses.lastEvaluatedKey);
     }
 
     async getUsersForExpense(expenseId: string): Promise<string[]> {

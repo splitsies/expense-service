@@ -2,7 +2,7 @@ import schema from "./schema";
 import { middyfy } from "../../../libs/lambda";
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
-import { HttpStatusCode, DataResponse, InvalidArgumentsError, IExpenseDto } from "@splitsies/shared-models";
+import { HttpStatusCode, DataResponse, InvalidArgumentsError, IExpenseDto, IScanResult } from "@splitsies/shared-models";
 import { SplitsiesFunctionHandlerFactory, ILogger, ExpectedError, IExpectedError } from "@splitsies/utils";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 
@@ -15,7 +15,7 @@ const expectedErrors: IExpectedError[] = [
 ];
 
 export const main = middyfy(
-    SplitsiesFunctionHandlerFactory.create<typeof schema, IExpenseDto[] | string>(
+    SplitsiesFunctionHandlerFactory.create<typeof schema, IScanResult<IExpenseDto> | string>(
         logger,
         async (event) => {
             if (!event.queryStringParameters.userId) {
@@ -26,8 +26,12 @@ export const main = middyfy(
                 throw new UnauthorizedUserError();
             }
 
+            const lastEvaluatedKey = event.queryStringParameters.lastEvaluatedKey
+                ? JSON.parse(decodeURIComponent(event.queryStringParameters.lastEvaluatedKey)) as { id: string, transactionDate: string }
+                : undefined;
+
             const userId = event.queryStringParameters.userId;
-            const expenses = await expenseService.getExpensesForUser(userId);
+            const expenses = await expenseService.getExpensesForUser(userId, lastEvaluatedKey);
             return new DataResponse(HttpStatusCode.OK, expenses).toJson();
         },
         expectedErrors,

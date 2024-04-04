@@ -5,6 +5,7 @@ import {
     IExpenseJoinRequest,
     IExpenseUserDetails,
     IQueueMessage,
+    IScanResult,
 } from "@splitsies/shared-models";
 import { IExpenseService } from "./expense-service-interface";
 import { ILogger } from "@splitsies/utils";
@@ -47,8 +48,8 @@ export class ExpenseService implements IExpenseService {
         return await this._expenseManager.updateExpense(id, updated);
     }
 
-    async getExpensesForUser(userId: string): Promise<IExpenseDto[]> {
-        return await this._expenseManager.getExpensesForUser(userId);
+    async getExpensesForUser(userId: string, lastEvaluatedKey?: { id: string, transactionDate: string }): Promise<IScanResult<IExpenseDto>> {
+        return await this._expenseManager.getExpensesForUser(userId, lastEvaluatedKey);
     }
 
     async getUsersForExpense(expenseId: string): Promise<string[]> {
