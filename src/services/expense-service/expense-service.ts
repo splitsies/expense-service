@@ -48,7 +48,10 @@ export class ExpenseService implements IExpenseService {
         return await this._expenseManager.updateExpense(id, updated);
     }
 
-    async getExpensesForUser(userId: string, lastEvaluatedKey?: { id: string, transactionDate: string }): Promise<IScanResult<IExpenseDto>> {
+    async getExpensesForUser(
+        userId: string,
+        lastEvaluatedKey?: { id: string; transactionDate: string },
+    ): Promise<IScanResult<IExpenseDto>> {
         return await this._expenseManager.getExpensesForUser(userId, lastEvaluatedKey);
     }
 

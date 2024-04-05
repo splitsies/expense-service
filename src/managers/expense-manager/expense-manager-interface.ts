@@ -15,7 +15,10 @@ export interface IExpenseManager {
     createExpense(userId: string): Promise<IExpenseDto>;
     createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
-    getExpensesForUser(userId: string, lastEvaluatedKey?: { id: string, transactionDate: string }): Promise<IScanResult<IExpenseDto>>;
+    getExpensesForUser(
+        userId: string,
+        lastEvaluatedKey?: { id: string; transactionDate: string },
+    ): Promise<IScanResult<IExpenseDto>>;
     getUsersForExpense(expenseId: string): Promise<string[]>;
     addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;

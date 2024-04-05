@@ -2,7 +2,13 @@ import schema from "./schema";
 import { middyfy } from "../../../libs/lambda";
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
-import { HttpStatusCode, DataResponse, InvalidArgumentsError, IExpenseDto, IScanResult } from "@splitsies/shared-models";
+import {
+    HttpStatusCode,
+    DataResponse,
+    InvalidArgumentsError,
+    IExpenseDto,
+    IScanResult,
+} from "@splitsies/shared-models";
 import { SplitsiesFunctionHandlerFactory, ILogger, ExpectedError, IExpectedError } from "@splitsies/utils";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 
@@ -27,7 +33,10 @@ export const main = middyfy(
             }
 
             const lastEvaluatedKey = event.queryStringParameters.lastEvaluatedKey
-                ? JSON.parse(decodeURIComponent(event.queryStringParameters.lastEvaluatedKey)) as { id: string, transactionDate: string }
+                ? (JSON.parse(decodeURIComponent(event.queryStringParameters.lastEvaluatedKey)) as {
+                      id: string;
+                      transactionDate: string;
+                  })
                 : undefined;
 
             const userId = event.queryStringParameters.userId;

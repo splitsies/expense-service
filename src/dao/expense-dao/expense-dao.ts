@@ -60,30 +60,39 @@ export class ExpenseDao implements IExpenseDao {
         `;
     }
 
-    async getExpensesForUser(userId: string, lastEvaluatedKey: { id: string, transactionDate: string } = undefined): Promise<IScanResult<IExpenseDa>> {
-        const res = !lastEvaluatedKey ? await this._client<IExpenseDa[]>`
+    async getExpensesForUser(
+        userId: string,
+        lastEvaluatedKey: { id: string; transactionDate: string } = undefined,
+    ): Promise<IScanResult<IExpenseDa>> {
+        const res = !lastEvaluatedKey
+            ? await this._client<IExpenseDa[]>`
             SELECT e.*
               FROM "Expense" e, "UserExpense" ue
              WHERE e."id" = ue."expenseId"
                AND ue."userId" = ${userId}
                AND ue."pendingJoin" = FALSE
           ORDER BY e."transactionDate" DESC
-             LIMIT 5;
-        ` : await this._client<IExpenseDa[]>`
+             LIMIT 10;
+        `
+            : await this._client<IExpenseDa[]>`
             SELECT e.*
                 FROM "Expense" e, "UserExpense" ue
             WHERE e."id" = ue."expenseId"
                 AND ue."userId" = ${userId}
                 AND ue."pendingJoin" = FALSE
                 AND e."id" != ${lastEvaluatedKey.id}
-                AND e."transactionDate" < ${lastEvaluatedKey.transactionDate}
+                AND e."transactionDate" <= ${lastEvaluatedKey.transactionDate}
             ORDER BY e."transactionDate" DESC
-            LIMIT 5;
+            LIMIT 10;
         `;
 
-        const { id, transactionDate } = res[res.length - 1];
-        const scan = new ScanResult<IExpenseDa>(res, { LastEvaluatedKey: { id, transactionDate } });
-        return scan;
+        if (res.length) {
+            const { id, transactionDate } = res[res.length - 1];
+            const scan = new ScanResult<IExpenseDa>(res, { LastEvaluatedKey: { id, transactionDate } });
+            return scan;
+        }
+
+        return new ScanResult<IExpenseDa>([], undefined);
     }
 
     async getExpenses(expenseIds: string[]): Promise<IExpenseDa[]> {
