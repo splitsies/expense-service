@@ -60,39 +60,19 @@ export class ExpenseDao implements IExpenseDao {
         `;
     }
 
-    async getExpensesForUser(
-        userId: string,
-        lastEvaluatedKey: { id: string; transactionDate: string } = undefined,
-    ): Promise<IScanResult<IExpenseDa>> {
-        const res = !lastEvaluatedKey
-            ? await this._client<IExpenseDa[]>`
+    async getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDa>> {
+        const res = await this._client<IExpenseDa[]>`
             SELECT e.*
               FROM "Expense" e, "UserExpense" ue
              WHERE e."id" = ue."expenseId"
                AND ue."userId" = ${userId}
                AND ue."pendingJoin" = FALSE
           ORDER BY e."transactionDate" DESC
-             LIMIT 10;
-        `
-            : await this._client<IExpenseDa[]>`
-            SELECT e.*
-                FROM "Expense" e, "UserExpense" ue
-            WHERE e."id" = ue."expenseId"
-                AND ue."userId" = ${userId}
-                AND ue."pendingJoin" = FALSE
-                AND e."id" != ${lastEvaluatedKey.id}
-                AND e."transactionDate" <= ${lastEvaluatedKey.transactionDate}
-            ORDER BY e."transactionDate" DESC
-            LIMIT 10;
+             LIMIT ${limit} OFFSET ${offset}
         `;
 
-        if (res.length) {
-            const { id, transactionDate } = res[res.length - 1];
-            const scan = new ScanResult<IExpenseDa>(res, { LastEvaluatedKey: { id, transactionDate } });
-            return scan;
-        }
-
-        return new ScanResult<IExpenseDa>([], undefined);
+        const scan = new ScanResult<IExpenseDa>(res, { nextPage: { limit, offset: offset + (res?.length ?? 0) } });
+        return scan;
     }
 
     async getExpenses(expenseIds: string[]): Promise<IExpenseDa[]> {

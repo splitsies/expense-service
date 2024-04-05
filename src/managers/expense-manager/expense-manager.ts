@@ -90,13 +90,10 @@ export class ExpenseManager implements IExpenseManager {
         return this.getExpense(id);
     }
 
-    async getExpensesForUser(
-        userId: string,
-        lastEvaluatedKey: { id: string; transactionDate: string } = undefined,
-    ): Promise<IScanResult<IExpenseDto>> {
+    async getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDto>> {
         const expenseToItems = new Map<string, IExpenseItem[]>();
         const expenseToUsers = new Map<string, string[]>();
-        const expenses = await this._expenseDao.getExpensesForUser(userId, lastEvaluatedKey);
+        const expenses = await this._expenseDao.getExpensesForUser(userId, limit, offset);
 
         await Promise.all(
             expenses.result.map(async (e) => {

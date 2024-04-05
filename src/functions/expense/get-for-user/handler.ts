@@ -32,15 +32,15 @@ export const main = middyfy(
                 throw new UnauthorizedUserError();
             }
 
-            const lastEvaluatedKey = event.queryStringParameters.lastEvaluatedKey
-                ? (JSON.parse(decodeURIComponent(event.queryStringParameters.lastEvaluatedKey)) as {
-                      id: string;
-                      transactionDate: string;
+            const pagination = event.queryStringParameters.pagination
+                ? (JSON.parse(decodeURIComponent(event.queryStringParameters.pagination)) as {
+                      limit: number;
+                      offset: number;
                   })
-                : undefined;
+                : { limit: 10, offset: 0 };
 
             const userId = event.queryStringParameters.userId;
-            const expenses = await expenseService.getExpensesForUser(userId, lastEvaluatedKey);
+            const expenses = await expenseService.getExpensesForUser(userId, pagination.limit, pagination.offset);
             return new DataResponse(HttpStatusCode.OK, expenses).toJson();
         },
         expectedErrors,
