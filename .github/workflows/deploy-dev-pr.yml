@@ -23,7 +23,7 @@ jobs:
       uses: serverless/github-action@v3.1
       with:
         args: |
-            deploy --stage dev-pr
+            deploy --stage dev-pr \
             --param="TEST_PARAM=${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID }}"
 
       env:
