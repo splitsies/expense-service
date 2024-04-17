@@ -22,7 +22,37 @@ jobs:
     - name: serverless deploy
       uses: serverless/github-action@v3.1
       with:
-        args: deploy --stage production
+        args: deploy --stage production \
+                --param="DB_EXPENSE_JOIN_REQUEST_TABLE_NAME=Splitsies-ExpenseJoinRequest-production" \
+                --param="CONNECTION_TTL_SEC=1800" \
+                --param="DB_REGION=us-east-1" \
+                --param="CONNECTION_TOKEN_TABLE_NAME=Splitsies-ConnectionToken-production" \
+                --param="CONNECTION_TABLE_NAME=Splitsies-ExpenseConnection-production" \
+                --param="TRANSACTION_DATE_INDEX_NAME=TransactionDateIndex" \
+                --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
+                --param="MESSAGE_QUEUE_RESOURCE_NAME=Splitsies-MessageQueue-production" \
+                --param="EXPENSE_UPDATE_TABLE_NAME=Splitsies-ExpenseUpdate-production" \
+                --param="DB_TABLE_NAME=Splitsies-Expense-production" \
+                --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
+                --param="EXPENSE_ITEM_TABLE_NAME=Splitsies-ExpenseItem-production" \
+                --param="DB_USER_EXPENSE_TABLE_NAME=Splitsies-UserExpense-production" \
+                --param="APIG_URL=https://srzam2rrj5.execute-api.us-east-1.amazonaws.com/production/" \
+                --param="PG_DATABASE_NAME=${{ secrets.PG_DATABASE_NAME_PRODUCTION }}" \
+                --param="PGPASSWORD=${{ secrets.PGPASSWORD }}" \
+                --param="PG_HOST=${{ secrets.PG_HOST }}" \
+                --param="PG_PORT=${{ secrets.PG_PORT }}" \
+                --param="PGUSERNAME=${{ secrets.PGUSERNAME }}" \
+                --param="INTERNAL_API_KEY=${{ secrets.INTERNAL_API_KEY }}" \
+                --param="DB_ACCESS_KEY_ID=${{ secrets.DB_ACCESS_KEY_ID }}" \
+                --param="DB_SECRET_ACCESS_KEY=${{ secrets.DB_SECRET_ACCESS_KEY }}" \
+                --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_PRODUCTION }}" \
+                --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_PRODUCTION }}" \
+                --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_PRODUCTION }}" \
+                --param="FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID_PRODUCTION }}" \
+                --param="FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID_PRODUCTION }}" \
+                --param="FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY_PRODUCTION }}" \
+                --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PRODUCTION }}" \
+                --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PRODUCTION }}"
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
         AWS_ACCESS_KEY_ID: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID }}
