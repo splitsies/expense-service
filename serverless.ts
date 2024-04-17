@@ -54,6 +54,7 @@ const serverlessConfiguration: AWS = {
             ...dbConfig,
             ...connectionConfig,
             ...firebaseConfig,
+            TEST_PARAM: "${param:TEST_PARAM}"
         },
     },
     // import the function via paths

@@ -21,6 +21,8 @@ export class FirebaseConfiguration implements IFirebaseConfiguration {
         assert(!!process.env.FIREBASE_APP_ID, "FIREBASE_APP_ID was undefined");
         assert(!!process.env.FIREBASE_MEASUREMENT_ID, "FIREBASE_MEASUREMENT_ID was undefined");
 
+        console.log({ TEST_PARAM: process.env.TEST_PARAM });
+
         this.apiKey = process.env.FIREBASE_API_KEY;
         this.authDomain = process.env.FIREBASE_AUTH_DOMAIN;
         this.projectId = process.env.FIREBASE_PROJECT_ID;
