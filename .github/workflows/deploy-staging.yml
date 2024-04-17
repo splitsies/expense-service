@@ -36,7 +36,7 @@ jobs:
                 --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
                 --param="EXPENSE_ITEM_TABLE_NAME=Splitsies-ExpenseItem-staging" \
                 --param="DB_USER_EXPENSE_TABLE_NAME=Splitsies-UserExpense-staging" \
-                --param="APIG_URL=https://srzam2rrj5.execute-api.us-east-1.amazonaws.com/staging/" \
+                --param="APIG_URL=https://djb25cevxg.execute-api.us-east-1.amazonaws.com/staging/" \
                 --param="PG_DATABASE_NAME=${{ secrets.PG_DATABASE_NAME_STAGING }}" \
                 --param="PGPASSWORD=${{ secrets.PGPASSWORD }}" \
                 --param="PG_HOST=${{ secrets.PG_HOST }}" \
