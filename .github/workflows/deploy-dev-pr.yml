@@ -37,7 +37,7 @@ jobs:
                 --param="EXPENSE_ITEM_TABLE_NAME=Splitsies-ExpenseItem-dev-pr" \
                 --param="DB_USER_EXPENSE_TABLE_NAME=Splitsies-UserExpense-dev-pr" \
                 --param="APIG_URL=https://srzam2rrj5.execute-api.us-east-1.amazonaws.com/dev-pr/" \
-                --param="PG_DATABASE_NAME=${{ secrets.PG_DATABASE_NAME }}" \
+                --param="PG_DATABASE_NAME=${{ secrets.PG_DATABASE_NAME_DEV_PR }}" \
                 --param="PGPASSWORD=${{ secrets.PGPASSWORD }}" \
                 --param="PG_HOST=${{ secrets.PG_HOST }}" \
                 --param="PG_PORT=${{ secrets.PG_PORT }}" \
