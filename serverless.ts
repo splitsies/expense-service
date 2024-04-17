@@ -53,7 +53,7 @@ const serverlessConfiguration: AWS = {
             APIG_URL: "${param:APIG_URL}",
             ...dbConfig,
             ...connectionConfig,
-            ...firebaseConfig,
+            ...firebaseConfig
         },
     },
     // import the function via paths
