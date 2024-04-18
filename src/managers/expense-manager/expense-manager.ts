@@ -273,17 +273,15 @@ export class ExpenseManager implements IExpenseManager {
         let offset = 0;
         let nextOffset = 0;
 
-        console.log(`deleting user data for ${userId}`);
-
         do {
             const scanResult = await this._expenseDao.getExpensesForUser(userId, limit, nextOffset);
-            expenseIds.push(...scanResult.result.map(e => e.id));
+            expenseIds.push(...scanResult.result.map((e) => e.id));
 
             for (const expense of scanResult.result) {
                 const items = await this._expenseItemDao.getForExpense(expense.id);
 
                 for (const item of items) {
-                    const index = item.owners.findIndex(o => o.id === userId);
+                    const index = item.owners.findIndex((o) => o.id === userId);
                     if (index === -1) continue;
 
                     item.owners.splice(index, 1);
@@ -292,9 +290,9 @@ export class ExpenseManager implements IExpenseManager {
             }
 
             offset = nextOffset;
-            nextOffset = (scanResult.lastEvaluatedKey.nextPage as { limit: number; offset: number; }).offset;
-        } while (offset !== nextOffset)
-        
+            nextOffset = (scanResult.lastEvaluatedKey.nextPage as { limit: number; offset: number }).offset;
+        } while (offset !== nextOffset);
+
         await Promise.all([...itemUpdates, this._userExpenseDao.deleteForUser(userId)]);
 
         return expenseIds;
