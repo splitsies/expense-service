@@ -8,5 +8,6 @@ export interface IUserExpenseDao extends IDao<IUserExpense> {
     getForUser(userId: string): Promise<IUserExpense[]>;
     getJoinRequestsForUser(userId: string): Promise<IUserExpense[]>;
     getJoinRequestsForExpense(expenseId: string): Promise<IUserExpense[]>;
+    deleteForUser(userId: string): Promise<void>;
 }
 export const IUserExpenseDao = Symbol.for("IUserExpenseDao");

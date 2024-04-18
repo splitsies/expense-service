@@ -36,6 +36,7 @@ export interface IExpenseManager {
     replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]>;
     queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void>;
     deleteExpenseUpdates(expenseUpdates: IQueueMessage<IExpenseDto>[]): Promise<void>;
+    deleteUserData(userId: string): Promise<string[]>;
 }
 
 export const IExpenseManager = Symbol.for("IExpenseManager");

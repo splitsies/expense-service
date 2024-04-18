@@ -105,4 +105,8 @@ export class ExpenseService implements IExpenseService {
     async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]> {
         return this._expenseManager.replaceGuestUserInfo(guestUserId, registeredUser);
     }
+
+    async deleteUserData(userId: string): Promise<string[]> {
+        return await this._expenseManager.deleteUserData(userId);
+    }
 }

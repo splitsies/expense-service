@@ -118,4 +118,11 @@ export class UserExpenseDao implements IUserExpenseDao {
 
         return res.length ? res : [];
     }
+
+    async deleteForUser(userId: string): Promise<void> {
+        await this._client`
+            DELETE FROM "UserExpense"
+                  WHERE "userId" = ${userId};
+        `;
+    }
 }
