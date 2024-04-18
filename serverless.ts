@@ -23,6 +23,7 @@ import mergeGuestUser from "@functions/expense/merge-guest-user";
 import removeUserFromExpense from "@functions/expense/delete-user-from-expense";
 import createConnectionToken from "@functions/connection/create-connection-token";
 import broadcast from "@functions/connection/broadcast";
+import deleteUserData from "@functions/expense/delete-user-data";
 
 const serverlessConfiguration: AWS = {
     org: "splitsies",
@@ -77,6 +78,7 @@ const serverlessConfiguration: AWS = {
         removeUserFromExpense,
         createConnectionToken,
         broadcast,
+        deleteUserData,
     },
     package: { individually: true },
     custom: {
