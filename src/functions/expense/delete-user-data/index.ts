@@ -11,8 +11,8 @@ export default {
                 arn: "${param:MESSAGE_QUEUE_ARN}",
                 startingPosition: "LATEST",
                 filterPatterns: [
-                    { eventName: ["INSERT"] },
                     {
+                        eventName: ["INSERT"],
                         dynamodb: {
                             Keys: { queueName: { S: [QueueConfig.userDeleted] } },
                         },
