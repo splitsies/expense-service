@@ -7,6 +7,10 @@ export const middyfy = (handler) => {
     return middy(handler).use(middyJsonBodyParser()).use(doNotWaitForEmptyEventLoop());
 };
 
+export const middyfyConnection = (handler) => {
+    return middy(handler).use(doNotWaitForEmptyEventLoop());
+};
+
 export const middyfyWs = (handler) => {
     return middy(handler).use(wsJsonBodyParserMiddleware());
 };

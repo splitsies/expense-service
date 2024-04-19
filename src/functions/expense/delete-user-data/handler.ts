@@ -6,15 +6,15 @@ import { DynamoDBStreamEvent } from "aws-lambda/trigger/dynamodb-stream";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { AttributeValue } from "@aws-sdk/client-dynamodb";
 import { IMessageQueueClient } from "@splitsies/utils";
-import { middyfy } from "@libs/lambda";
-import { Callback } from "aws-lambda";
+import { middyfyConnection } from "@libs/lambda";
+import { Callback, Context } from "aws-lambda/handler";
 
 const expenseService = container.get<IExpenseService>(IExpenseService);
 const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
 const messageQueueClient = container.get<IMessageQueueClient>(IMessageQueueClient);
 
 
-export const main = middyfy((event: DynamoDBStreamEvent, _, callback: Callback<any>) => {
+export const main = middyfyConnection((event: DynamoDBStreamEvent, _: Context, callback: Callback<any>) => {
     const start = Date.now();
     const handler = async () => {
         const messages: IQueueMessage<string>[] = [];
