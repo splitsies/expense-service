@@ -15,10 +15,10 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
     const messages: IQueueMessage<string>[] = [];
     const promises: Promise<string[]>[] = [];
 
+    console.log({ event });
+
     for (const record of event.Records) {
         if (!record.dynamodb.NewImage) continue;
-
-        console.log({ newImage: record.dynamodb.NewImage });
 
         const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<string>;
         console.log({ message });
