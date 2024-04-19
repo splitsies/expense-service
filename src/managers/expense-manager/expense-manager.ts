@@ -269,7 +269,7 @@ export class ExpenseManager implements IExpenseManager {
         const expenseIds = [];
         const limit = 500;
 
-        const itemUpdates = [];
+        const updatedItems = [];
         let offset = 0;
         let nextOffset = 0;
 
@@ -283,9 +283,9 @@ export class ExpenseManager implements IExpenseManager {
                 for (const item of items) {
                     const index = item.owners.findIndex((o) => o.id === userId);
                     if (index === -1) continue;
-
+                    
                     item.owners.splice(index, 1);
-                    itemUpdates.push(this.saveUpdatedItems([item]));
+                    updatedItems.push(item);
                 }
             }
 
@@ -293,7 +293,7 @@ export class ExpenseManager implements IExpenseManager {
             nextOffset = (scanResult.lastEvaluatedKey.nextPage as { limit: number; offset: number }).offset;
         } while (offset !== nextOffset);
 
-        await Promise.all([...itemUpdates, this._userExpenseDao.deleteForUser(userId)]);
+        await Promise.all([this.saveUpdatedItems(updatedItems), this._userExpenseDao.deleteForUser(userId)]);
 
         return expenseIds;
     }
