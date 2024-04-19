@@ -296,7 +296,12 @@ export class ExpenseManager implements IExpenseManager {
         } while (offset !== nextOffset);
 
         this._logger.log(JSON.stringify(updatedItems));
-        await Promise.all([this.saveUpdatedItems(updatedItems), this._userExpenseDao.deleteForUser(userId)]);
+        await this.saveUpdatedItems(updatedItems);
+        this._logger.log("Updated items successfully");
+        
+        await this._userExpenseDao.deleteForUser(userId);
+        this._logger.log("Updated UserExpense records successfully");
+        // await Promise.all([this.saveUpdatedItems(updatedItems), this._userExpenseDao.deleteForUser(userId)]);
 
         return expenseIds;
     }
