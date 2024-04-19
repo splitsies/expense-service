@@ -47,7 +47,7 @@ export const main: DynamoDBStreamHandler = (event, _, callback) => {
     };
 
     handler().then(_ => {
-        callback(null);
+        callback(null, null);
         console.log("success");
         console.log(`time: ${Date.now() - start}`);
     });
