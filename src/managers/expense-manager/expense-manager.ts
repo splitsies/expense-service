@@ -296,14 +296,7 @@ export class ExpenseManager implements IExpenseManager {
             nextOffset = (scanResult.lastEvaluatedKey.nextPage as { limit: number; offset: number }).offset;
         } while (offset !== nextOffset);
 
-        this._logger.log(JSON.stringify(updatedItems));
-        await this.saveUpdatedItems(updatedItems);
-        this._logger.log("Updated items successfully");
-
-        await this._userExpenseDao.deleteForUser(userId);
-        this._logger.log("Updated UserExpense records successfully");
         await Promise.all([this.saveUpdatedItems(updatedItems), this._userExpenseDao.deleteForUser(userId)]);
-
         return expenseIds;
     }
 }

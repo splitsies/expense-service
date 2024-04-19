@@ -14,36 +14,23 @@ const messageQueueClient = container.get<IMessageQueueClient>(IMessageQueueClien
 
 export const main: DynamoDBStreamHandler = async (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
-    const start = Date.now();
     
     const messages: IQueueMessage<string>[] = [];
     const expenseIds = [];
-
-    console.log(JSON.stringify(event, null, 2));
 
     for (const record of event.Records) {
         if (!record.dynamodb.NewImage) continue;
 
         const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<string>;
-        console.log({ record });
         messages.push(message);
         expenseIds.push(...(await expenseService.deleteUserData(message.data)));
     }
 
-    console.log("all updates complete");
-    console.log({ expenseIds });
-
     for (const id of expenseIds) {
         const expense = await expenseService.getExpense(id);
-        console.log({ expense });
-
         await expenseBroadcaster.broadcast(expense);
-        console.log(`broadcasted ${id}`);
     }
 
     await messageQueueClient.deleteBatch(messages);
-    
-    console.log("success");
-    console.log(`time: ${Date.now() - start}`);
     callback(null, null);
 };
