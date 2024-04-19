@@ -18,6 +18,7 @@ export const main: DynamoDBStreamHandler = (event, _, callback) => {
     const handler = async () => {
         const messages: IQueueMessage<string>[] = [];
         const promises: Promise<string[]>[] = [];
+        const expenseIds = [];
 
         console.log(JSON.stringify(event, null, 2));
 
@@ -27,10 +28,10 @@ export const main: DynamoDBStreamHandler = (event, _, callback) => {
             const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<string>;
         //     console.log({ record });
             messages.push(message);
-            promises.push(expenseService.deleteUserData(message.data));
+            expenseIds.push( ...(await expenseService.deleteUserData(message.data)));
         // }
 
-        const expenseIds = (await Promise.all(promises)).reduce((p, c) => [...c], []);
+        // const expenseIds = (await Promise.all(promises)).reduce((p, c) => [...c], []);
         // console.log("all updates complete");
         // console.log({ expenseIds });
 
