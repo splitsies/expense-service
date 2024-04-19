@@ -1,18 +1,16 @@
 import "reflect-metadata";
 import { AttributeValue } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { DynamoDBStreamHandler } from "aws-lambda";
 import { container } from "src/di/inversify.config";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
 import { IExpenseService } from "src/services/expense-service/expense-service-interface";
 import { IExpenseDto, IQueueMessage } from "@splitsies/shared-models";
-import { middyfyConnection } from "@libs/lambda";
-import { DynamoDBStreamEvent } from "aws-lambda/trigger/dynamodb-stream";
-import { Callback, Context } from "aws-lambda/handler";
 
 const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
 const expenseService = container.get<IExpenseService>(IExpenseService);
 
-export const main = middyfyConnection(async (event: DynamoDBStreamEvent, _: Context, callback: Callback<any>) => {
+export const main: DynamoDBStreamHandler = (event, _, callback) => {
     const promises: Promise<void>[] = [];
     const updates: IQueueMessage<IExpenseDto>[] = [];
     const cache = new Map<string, IQueueMessage<IExpenseDto>>();
@@ -36,4 +34,4 @@ export const main = middyfyConnection(async (event: DynamoDBStreamEvent, _: Cont
     }
 
     Promise.all(promises).then(() => callback(null));
-});
+};
