@@ -26,11 +26,14 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
         promises.push(expenseService.deleteUserData(message.data));
     }
 
-    const expenseIds = (await Promise.all(promises)).reduce((p, c) => [...c], []);
+    const expenseIds = (await Promise.all(promises)).reduce((p, c) => [...c], []); 
+    console.log("all updates complete");
 
     for (const id of expenseIds) {
         const expense = await expenseService.getExpense(id);
+
         expenseBroadcaster.broadcast(expense);
+        console.log(`broadcasted ${id}`);
     }
 
     // await messageQueueClient.deleteBatch(messages);
