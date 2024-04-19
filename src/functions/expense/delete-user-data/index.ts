@@ -15,6 +15,7 @@ export default {
                         eventName: ["INSERT"],
                         dynamodb: {
                             Keys: { queueName: { S: [QueueConfig.userDeleted] } },
+                            NewImage: { ttl: { N: ["<", Date.now()] } }
                         },
                     },
                 ],
