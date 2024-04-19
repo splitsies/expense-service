@@ -21,7 +21,7 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
         if (!record.dynamodb.NewImage) continue;
 
         const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<string>;
-        console.log({ message });
+        console.log(JSON.stringify(event, null, 2));
         messages.push(message);
         promises.push(expenseService.deleteUserData(message.data));
     }
