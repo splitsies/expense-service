@@ -18,6 +18,8 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
     for (const record of event.Records) {
         if (!record.dynamodb.NewImage) continue;
 
+        console.log({ newImage: record.dynamodb.NewImage });
+
         const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<string>;
         console.log({ message });
         messages.push(message);
@@ -31,6 +33,6 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
         expenseBroadcaster.broadcast(expense);
     }
 
-    await messageQueueClient.deleteBatch(messages);
+    // await messageQueueClient.deleteBatch(messages);
     callback(null);
 };
