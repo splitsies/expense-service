@@ -32,7 +32,7 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
     for (const id of expenseIds) {
         const expense = await expenseService.getExpense(id);
 
-        expenseBroadcaster.broadcast(expense);
+        await expenseBroadcaster.broadcast(expense);
         console.log(`broadcasted ${id}`);
     }
 
