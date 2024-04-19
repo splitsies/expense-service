@@ -28,6 +28,7 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
 
     const expenseIds = (await Promise.all(promises)).reduce((p, c) => [...c], []); 
     console.log("all updates complete");
+    console.log({expenseIds});
 
     for (const id of expenseIds) {
         const expense = await expenseService.getExpense(id);
@@ -39,4 +40,5 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
 
     await messageQueueClient.deleteBatch(messages);
     callback(null);
+    console.log("success");
 };
