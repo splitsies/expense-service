@@ -286,8 +286,8 @@ export class ExpenseManager implements IExpenseManager {
                 for (const item of items) {
                     const index = item.owners.findIndex((o) => o.id === userId);
                     if (index === -1) continue;
-                    
-                    item.owners.splice(index, 1);                    
+
+                    item.owners.splice(index, 1);
                     updatedItems.push(item);
                 }
             }

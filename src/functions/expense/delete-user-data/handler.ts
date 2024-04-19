@@ -11,10 +11,9 @@ const expenseService = container.get<IExpenseService>(IExpenseService);
 const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
 const messageQueueClient = container.get<IMessageQueueClient>(IMessageQueueClient);
 
-
 export const main: DynamoDBStreamHandler = async (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
-    
+
     const messages: IQueueMessage<string>[] = [];
     const expenseIds = [];
 

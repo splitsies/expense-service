@@ -16,7 +16,7 @@ export default {
                     {
                         eventName: ["INSERT"],
                         dynamodb: {
-                            Keys: { queueName: { S: [QueueConfig.userDeleted] } }
+                            Keys: { queueName: { S: [QueueConfig.userDeleted] } },
                         },
                     },
                 ],
