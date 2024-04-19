@@ -14,6 +14,7 @@ const messageQueueClient = container.get<IMessageQueueClient>(IMessageQueueClien
 
 
 export const main: DynamoDBStreamHandler = (event, _, callback) => {
+    const start = Date.now();
     const handler = async () => {
         const messages: IQueueMessage<string>[] = [];
         const promises: Promise<string[]>[] = [];
@@ -48,6 +49,7 @@ export const main: DynamoDBStreamHandler = (event, _, callback) => {
     handler().then(_ => {
         callback(null);
         console.log("success");
+        console.log(`time: ${Date.now() - start}`);
     });
-    
+
 };
