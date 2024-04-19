@@ -277,19 +277,20 @@ export class ExpenseManager implements IExpenseManager {
 
         do {
             const scanResult = await this._expenseDao.getExpensesForUser(userId, limit, nextOffset);
+            console.log({ scanResult });
             expenseIds.push(...scanResult.result.map((e) => e.id));
 
-            for (const expense of scanResult.result) {
-                const items = await this._expenseItemDao.getForExpense(expense.id);
+            // for (const expense of scanResult.result) {
+            //     const items = await this._expenseItemDao.getForExpense(expense.id);
 
-                for (const item of items) {
-                    const index = item.owners.findIndex((o) => o.id === userId);
-                    if (index === -1) continue;
+            //     for (const item of items) {
+            //         const index = item.owners.findIndex((o) => o.id === userId);
+            //         if (index === -1) continue;
                     
-                    item.owners.splice(index, 1);                    
-                    updatedItems.push(item);
-                }
-            }
+            //         item.owners.splice(index, 1);                    
+            //         updatedItems.push(item);
+            //     }
+            // }
 
             offset = nextOffset;
             nextOffset = (scanResult.lastEvaluatedKey.nextPage as { limit: number; offset: number }).offset;
