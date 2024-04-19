@@ -16,17 +16,17 @@ const messageQueueClient = container.get<IMessageQueueClient>(IMessageQueueClien
 export const main: DynamoDBStreamHandler = (event, _, callback) => {
     const start = Date.now();
     const handler = async () => {
-        // const messages: IQueueMessage<string>[] = [];
-        // const promises: Promise<string[]>[] = [];
+        const messages: IQueueMessage<string>[] = [];
+        const promises: Promise<string[]>[] = [];
 
-        // console.log(JSON.stringify(event, null, 2));
+        console.log(JSON.stringify(event, null, 2));
 
-        // for (const record of event.Records) {
+        for (const record of event.Records) {
         //     if (!record.dynamodb.NewImage) continue;
 
-        //     const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<string>;
+            const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<string>;
         //     console.log({ record });
-        //     messages.push(message);
+            messages.push(message);
         //     promises.push(expenseService.deleteUserData(message.data));
         // }
 
@@ -40,9 +40,9 @@ export const main: DynamoDBStreamHandler = (event, _, callback) => {
 
         //     await expenseBroadcaster.broadcast(expense);
         //     console.log(`broadcasted ${id}`);
-        // }
+        }
 
-        // await messageQueueClient.deleteBatch(messages);
+        await messageQueueClient.deleteBatch(messages);
     };
 
     handler().then(_ => {
