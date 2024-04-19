@@ -10,9 +10,11 @@ export default {
                 type: "dynamodb",
                 arn: "${param:MESSAGE_QUEUE_ARN}",
                 startingPosition: "LATEST",
+                maximumRetryAttempts: 3,
+                maximumRecordAgeInSeconds: 60,
                 filterPatterns: [
-                    { eventName: ["INSERT"] },
                     {
+                        eventName: ["INSERT"],
                         dynamodb: {
                             Keys: { queueName: { S: [QueueConfig.guestUserReplaced] } },
                         },
