@@ -11,7 +11,7 @@ export default {
                 arn: "${param:MESSAGE_QUEUE_ARN}",
                 startingPosition: "LATEST",
                 maximumRetryAttempts: 3,
-                maximumRecordAge: 60,
+                maximumRecordAgeInSeconds: 60,
                 filterPatterns: [
                     {
                         eventName: ["INSERT"],
