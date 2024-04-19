@@ -280,17 +280,17 @@ export class ExpenseManager implements IExpenseManager {
             console.log({ scanResult });
             expenseIds.push(...scanResult.result.map((e) => e.id));
 
-            // for (const expense of scanResult.result) {
-            //     const items = await this._expenseItemDao.getForExpense(expense.id);
+            for (const expense of scanResult.result) {
+                const items = await this._expenseItemDao.getForExpense(expense.id);
 
-            //     for (const item of items) {
-            //         const index = item.owners.findIndex((o) => o.id === userId);
-            //         if (index === -1) continue;
+                for (const item of items) {
+                    const index = item.owners.findIndex((o) => o.id === userId);
+                    if (index === -1) continue;
                     
-            //         item.owners.splice(index, 1);                    
-            //         updatedItems.push(item);
-            //     }
-            // }
+                    item.owners.splice(index, 1);                    
+                    updatedItems.push(item);
+                }
+            }
 
             offset = nextOffset;
             nextOffset = (scanResult.lastEvaluatedKey.nextPage as { limit: number; offset: number }).offset;
@@ -300,9 +300,9 @@ export class ExpenseManager implements IExpenseManager {
         await this.saveUpdatedItems(updatedItems);
         this._logger.log("Updated items successfully");
 
-        // await this._userExpenseDao.deleteForUser(userId);
-        // this._logger.log("Updated UserExpense records successfully");
-        // await Promise.all([this.saveUpdatedItems(updatedItems), this._userExpenseDao.deleteForUser(userId)]);
+        await this._userExpenseDao.deleteForUser(userId);
+        this._logger.log("Updated UserExpense records successfully");
+        await Promise.all([this.saveUpdatedItems(updatedItems), this._userExpenseDao.deleteForUser(userId)]);
 
         return expenseIds;
     }

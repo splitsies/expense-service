@@ -13,34 +13,34 @@ const messageQueueClient = container.get<IMessageQueueClient>(IMessageQueueClien
 
 
 
-export const main: DynamoDBStreamHandler = (event, _, callback) => {
+export const main: DynamoDBStreamHandler = (event, context, callback) => {
+    context.callbackWaitsForEmptyEventLoop = false;
+
     const start = Date.now();
     const handler = async () => {
         const messages: IQueueMessage<string>[] = [];
-        const promises: Promise<string[]>[] = [];
         const expenseIds = [];
 
         console.log(JSON.stringify(event, null, 2));
 
         for (const record of event.Records) {
-        //     if (!record.dynamodb.NewImage) continue;
+            if (!record.dynamodb.NewImage) continue;
 
             const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<string>;
-        //     console.log({ record });
+            console.log({ record });
             messages.push(message);
             expenseIds.push( ...(await expenseService.deleteUserData(message.data)));
-        // }
+        }
 
-        // const expenseIds = (await Promise.all(promises)).reduce((p, c) => [...c], []);
-        // console.log("all updates complete");
-        // console.log({ expenseIds });
+        console.log("all updates complete");
+        console.log({ expenseIds });
 
-        // for (const id of expenseIds) {
-        //     const expense = await expenseService.getExpense(id);
-        //     console.log({ expense });
+        for (const id of expenseIds) {
+            const expense = await expenseService.getExpense(id);
+            console.log({ expense });
 
-        //     await expenseBroadcaster.broadcast(expense);
-        //     console.log(`broadcasted ${id}`);
+            await expenseBroadcaster.broadcast(expense);
+            console.log(`broadcasted ${id}`);
         }
 
         await messageQueueClient.deleteBatch(messages);
