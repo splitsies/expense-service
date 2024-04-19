@@ -12,7 +12,7 @@ const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaste
 const messageQueueClient = container.get<IMessageQueueClient>(IMessageQueueClient);
 
 export const main: DynamoDBStreamHandler = async (event, _, callback) => {
-    const messages: IQueueMessage<string>[] = [];
+    const messages: IQueueMessage<{ userId: string }>[] = [];
     const promises: Promise<string[]>[] = [];
 
     console.log(JSON.stringify(event, null, 2));
@@ -20,10 +20,10 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
     for (const record of event.Records) {
         if (!record.dynamodb.NewImage) continue;
 
-        const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<string>;
+        const message = unmarshall(record.dynamodb.NewImage as Record<string, AttributeValue>) as IQueueMessage<{ userId: string }>;
         console.log({ record });
         messages.push(message);
-        promises.push(expenseService.deleteUserData(message.data));
+        promises.push(expenseService.deleteUserData(message.data.userId));
     }
 
     const expenseIds = (await Promise.all(promises)).reduce((p, c) => [...c], []);
