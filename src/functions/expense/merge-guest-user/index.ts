@@ -10,6 +10,8 @@ export default {
                 type: "dynamodb",
                 arn: "${param:MESSAGE_QUEUE_ARN}",
                 startingPosition: "LATEST",
+                maximumRetryAttempts: 3,
+                maximumRecordAge: 60,
                 filterPatterns: [
                     {
                         eventName: ["INSERT"],

@@ -10,12 +10,13 @@ export default {
                 type: "dynamodb",
                 arn: "${param:MESSAGE_QUEUE_ARN}",
                 startingPosition: "LATEST",
+                maximumRetryAttempts: 3,
+                maximumRecordAge: 60,
                 filterPatterns: [
                     {
                         eventName: ["INSERT"],
                         dynamodb: {
-                            Keys: { queueName: { S: [QueueConfig.userDeleted] } },
-                            NewImage: { ttl: { N: ["<", Date.now()] } }
+                            Keys: { queueName: { S: [QueueConfig.userDeleted] } }
                         },
                     },
                 ],
