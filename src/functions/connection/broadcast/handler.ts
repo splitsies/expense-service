@@ -28,7 +28,7 @@ export const main: DynamoDBStreamHandler = (event, _, callback) => {
         cache.set(update.data.id, cached && cached.timestamp > update.timestamp ? cached : update);
     }
 
-    promises.push(expenseService.deleteExpenseUpdates(updates));
+    // promises.push(expenseService.deleteExpenseUpdates(updates));
     for (const [_, update] of cache) {
         promises.push(expenseBroadcaster.notify(update.data));
     }
