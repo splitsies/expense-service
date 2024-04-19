@@ -31,11 +31,12 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
 
     for (const id of expenseIds) {
         const expense = await expenseService.getExpense(id);
+        console.log({ expense });
 
         await expenseBroadcaster.broadcast(expense);
         console.log(`broadcasted ${id}`);
     }
 
-    // await messageQueueClient.deleteBatch(messages);
+    await messageQueueClient.deleteBatch(messages);
     callback(null);
 };

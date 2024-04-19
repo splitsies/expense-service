@@ -32,5 +32,5 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
         }
     }
 
-    Promise.all([...promises]).then(() => callback(null));
+    Promise.all([...promises, messageQueueClient.deleteBatch(messages)]).then(() => callback(null));
 };
