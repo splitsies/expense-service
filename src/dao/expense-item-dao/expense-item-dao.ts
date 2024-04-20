@@ -40,6 +40,6 @@ export class ExpenseItemDao extends DaoBase<IExpenseItem> implements IExpenseIte
             next = response?.LastEvaluatedKey;
         } while (next && Date.now() < timeout);
 
-        return items;
+        return items.sort((a, b) => a.createdAt - b.createdAt);
     }
 }
