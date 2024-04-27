@@ -24,10 +24,8 @@
     "@middy/http-json-body-parser": "^3.4.0",
     "@middy/ws-json-body-parser": "^4.4.0",
     "@splitsies/shared-models": "^0.0.28",
-    "@splitsies/utils": "^0.0.26",
-    "firebase-admin": "^11.11.0",
+    "@splitsies/utils": "^0.0.28",
     "inversify": "6.0.1",
-    "jwt-decode": "^3.1.2",
     "mathjs": "^11.8.0",
     "postgres": "^3.4.4",
     "reflect-metadata": "^0.1.13"

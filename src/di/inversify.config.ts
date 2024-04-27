@@ -28,16 +28,6 @@ import { ConnectionConfiguration } from "src/models/configuration/connection/con
 import { ExpenseManager } from "src/managers/expense-manager/expense-manager";
 import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-interface";
 import { UserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao";
-import { IFirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration-interface";
-import { FirebaseConfiguration } from "src/models/configuration/firebase/firebase-configuration";
-import { IAdminAuthProvider } from "src/providers/admin-auth-provider-interface";
-import { AdminAuthProvider } from "src/providers/admin-auth-provider";
-import { IJwtStrategyProvider } from "src/providers/jwt-strategy-provider/jwt-strategy-provider-interface";
-import { JwtStrategyProvider } from "src/providers/jwt-strategy-provider/jwt-strategy-provider";
-import { IEmulatedJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/emulated-jwt-auth-strategy/emulated-jwt-auth-strategy-interface";
-import { EmulatedJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/emulated-jwt-auth-strategy/emulated-jwt-auth-strategy";
-import { IFirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy-interface";
-import { FirebaseJwtAuthStrategy } from "src/strategies/jwt-auth-strategy/firebase-jwt-auth-strategy/firebase-jwt-auth-strategy";
 import {
     ExpenseJoinRequestDaMapper,
     ExpenseMessageParametersMapper,
@@ -62,50 +52,36 @@ import { IConnectionTokenDao } from "src/dao/connection-token-dao/connection-tok
 import { ConnectionTokenDao } from "src/dao/connection-token-dao/connection-token-dao";
 import { IConnectionTokenDaoStatements } from "src/dao/connection-token-dao/connection-token-dao-statements-interface";
 import { ConnectionTokenDaoStatements } from "src/dao/connection-token-dao/connection-token-dao-statements";
-const container = new Container();
+const container = new Container({ defaultScope: "Singleton" });
 
-container.bind<ILogger>(ILogger).to(Logger).inSingletonScope();
+container.bind<ILogger>(ILogger).to(Logger);
 
-container.bind<IExpenseService>(IExpenseService).to(ExpenseService).inSingletonScope();
-container.bind<IExpenseManager>(IExpenseManager).to(ExpenseManager).inSingletonScope();
-container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration).inSingletonScope();
-container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(ConnectionConfiguration).inSingletonScope();
-container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao).inSingletonScope();
+container.bind<IExpenseService>(IExpenseService).to(ExpenseService);
+container.bind<IExpenseManager>(IExpenseManager).to(ExpenseManager);
+container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration);
+container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(ConnectionConfiguration);
+container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao);
 
-container.bind<IConnectionService>(IConnectionService).to(ConnectionService).inSingletonScope();
-container.bind<IConnectionManager>(IConnectionManager).to(ConnectionManager).inSingletonScope();
-container.bind<IConnectionDao>(IConnectionDao).to(ConnectionDao).inSingletonScope();
+container.bind<IConnectionService>(IConnectionService).to(ConnectionService);
+container.bind<IConnectionManager>(IConnectionManager).to(ConnectionManager);
+container.bind<IConnectionDao>(IConnectionDao).to(ConnectionDao);
 
-container.bind<IConnectionDaoStatements>(IConnectionDaoStatements).to(ConnectionDaoStatements).inSingletonScope();
+container.bind<IConnectionDaoStatements>(IConnectionDaoStatements).to(ConnectionDaoStatements);
 
-container.bind<IUserExpenseDao>(IUserExpenseDao).to(UserExpenseDao).inSingletonScope();
-container.bind<IFirebaseConfiguration>(IFirebaseConfiguration).to(FirebaseConfiguration).inSingletonScope();
-container.bind<IAdminAuthProvider>(IAdminAuthProvider).to(AdminAuthProvider).inSingletonScope();
-container.bind<IJwtStrategyProvider>(IJwtStrategyProvider).to(JwtStrategyProvider).inSingletonScope();
-container.bind<IEmulatedJwtAuthStrategy>(IEmulatedJwtAuthStrategy).to(EmulatedJwtAuthStrategy).inSingletonScope();
-container.bind<IFirebaseJwtAuthStrategy>(IFirebaseJwtAuthStrategy).to(FirebaseJwtAuthStrategy).inSingletonScope();
-container.bind<IExpenseStatements>(IExpenseStatements).to(ExpenseStatements).inSingletonScope();
-container.bind<IExpenseUserDetailsMapper>(IExpenseUserDetailsMapper).to(ExpenseUserDetailsMapper).inSingletonScope();
-container
-    .bind<IExpenseJoinRequestDaMapper>(IExpenseJoinRequestDaMapper)
-    .to(ExpenseJoinRequestDaMapper)
-    .inSingletonScope();
-container.bind<IExpenseBroadcaster>(IExpenseBroadcaster).to(ExpenseBroadcaster).inSingletonScope();
-container.bind<IApiKeyConfiguration>(IApiKeyConfiguration).to(ApiKeyConfiguration).inSingletonScope();
+container.bind<IUserExpenseDao>(IUserExpenseDao).to(UserExpenseDao);
+container.bind<IExpenseStatements>(IExpenseStatements).to(ExpenseStatements);
+container.bind<IExpenseUserDetailsMapper>(IExpenseUserDetailsMapper).to(ExpenseUserDetailsMapper);
+container.bind<IExpenseJoinRequestDaMapper>(IExpenseJoinRequestDaMapper).to(ExpenseJoinRequestDaMapper);
+container.bind<IExpenseBroadcaster>(IExpenseBroadcaster).to(ExpenseBroadcaster);
+container.bind<IApiKeyConfiguration>(IApiKeyConfiguration).to(ApiKeyConfiguration);
 
-container.bind<IExpenseMessageStrategy>(IExpenseMessageStrategy).to(ExpenseMessageStrategy).inSingletonScope();
-container
-    .bind<IExpenseMessageParametersMapper>(IExpenseMessageParametersMapper)
-    .to(ExpenseMessageParametersMapper)
-    .inSingletonScope();
+container.bind<IExpenseMessageStrategy>(IExpenseMessageStrategy).to(ExpenseMessageStrategy);
+container.bind<IExpenseMessageParametersMapper>(IExpenseMessageParametersMapper).to(ExpenseMessageParametersMapper);
 
-container.bind<IExpenseDaMapper>(IExpenseDaMapper).to(ExpenseDaMapper).inSingletonScope();
-container.bind<IExpenseItemDao>(IExpenseItemDao).to(ExpenseItemDao).inSingletonScope();
-container.bind<IExpenseDtoMapper>(IExpenseDtoMapper).to(ExpenseDtoMapper).inSingletonScope();
-container.bind<IConnectionTokenDao>(IConnectionTokenDao).to(ConnectionTokenDao).inSingletonScope();
-container
-    .bind<IConnectionTokenDaoStatements>(IConnectionTokenDaoStatements)
-    .to(ConnectionTokenDaoStatements)
-    .inSingletonScope();
-container.bind<IMessageQueueClient>(IMessageQueueClient).to(MessageQueueClient).inSingletonScope();
+container.bind<IExpenseDaMapper>(IExpenseDaMapper).to(ExpenseDaMapper);
+container.bind<IExpenseItemDao>(IExpenseItemDao).to(ExpenseItemDao);
+container.bind<IExpenseDtoMapper>(IExpenseDtoMapper).to(ExpenseDtoMapper);
+container.bind<IConnectionTokenDao>(IConnectionTokenDao).to(ConnectionTokenDao);
+container.bind<IConnectionTokenDaoStatements>(IConnectionTokenDaoStatements).to(ConnectionTokenDaoStatements);
+container.bind<IMessageQueueClient>(IMessageQueueClient).to(MessageQueueClient);
 export { container };

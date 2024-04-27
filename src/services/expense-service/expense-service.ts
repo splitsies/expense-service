@@ -103,8 +103,6 @@ export class ExpenseService implements IExpenseService {
         if (userId.startsWith("@splitsies-guest")) return;
 
         const expense = await this._expenseManager.getExpense(expenseId);
-
-        console.log("sending message for request");
         await this._messageQueueClient.create(
             new QueueMessage(QueueConfig.joinRequest, randomUUID(), { userId, expense, requestingUserId }),
         );
