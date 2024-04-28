@@ -24,7 +24,7 @@
     "@middy/http-json-body-parser": "^3.4.0",
     "@middy/ws-json-body-parser": "^4.4.0",
     "@splitsies/shared-models": "^0.0.28",
-    "@splitsies/utils": "^0.0.28",
+    "@splitsies/utils": "^0.0.29",
     "inversify": "6.0.1",
     "mathjs": "^11.8.0",
     "postgres": "^3.4.4",
