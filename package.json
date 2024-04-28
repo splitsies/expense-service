@@ -9,7 +9,8 @@
     "serve:dev-pr": "./utils/local-startup/startup-dev-pr.sh",
     "format": "prettier --write \"./**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
-    "clear-shared-models": "npm cache clean --force && rm -rf ./node_modules/@splitsies/shared-models && rm -rf ./package-lock.json"
+    "clear-shared-models": "npm cache clean --force && rm -rf ./node_modules/@splitsies/shared-models && rm -rf ./package-lock.json",
+    "clear-utils": "npm cache clean --force && rm -rf ./node_modules/@splitsies/utils && rm -rf ./package-lock.json"
   },
   "engines": {
     "node": ">=14.15.0"
@@ -24,7 +25,7 @@
     "@middy/http-json-body-parser": "^3.4.0",
     "@middy/ws-json-body-parser": "^4.4.0",
     "@splitsies/shared-models": "^0.0.28",
-    "@splitsies/utils": "^0.0.29",
+    "@splitsies/utils": "^0.0.30",
     "inversify": "6.0.1",
     "mathjs": "^11.8.0",
     "postgres": "^3.4.4",
