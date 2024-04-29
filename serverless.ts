@@ -52,6 +52,7 @@ const serverlessConfiguration: AWS = {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
             NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
             APIG_URL: "${param:APIG_URL}",
+            FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST,
             ...dbConfig,
             ...connectionConfig,
             ...firebaseConfig,

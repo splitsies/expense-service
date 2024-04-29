@@ -6,18 +6,22 @@ import {
     IExpenseUserDetails,
     IQueueMessage,
     IScanResult,
+    QueueMessage,
 } from "@splitsies/shared-models";
 import { IExpenseService } from "./expense-service-interface";
-import { ILogger } from "@splitsies/utils";
+import { ILogger, IMessageQueueClient } from "@splitsies/utils";
 import { IExpenseManager } from "src/managers/expense-manager/expense-manager-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
+import { QueueConfig } from "src/config/queue.config";
+import { randomUUID } from "crypto";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
     constructor(
         @inject(ILogger) private readonly _logger: ILogger,
         @inject(IExpenseManager) private readonly _expenseManager: IExpenseManager,
+        @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient,
     ) {}
 
     async queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void> {
@@ -57,7 +61,7 @@ export class ExpenseService implements IExpenseService {
     }
 
     async addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
-        return this._expenseManager.addUserToExpense(userId, expenseId, requestingUserId);
+        await this._expenseManager.addUserToExpense(userId, expenseId, requestingUserId);
     }
 
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {
@@ -94,8 +98,14 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.getJoinRequestsForExpense(expenseId);
     }
 
-    addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void> {
-        return this._expenseManager.addExpenseJoinRequest(userId, expenseId, requestUserId);
+    async addExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
+        await this._expenseManager.addExpenseJoinRequest(userId, expenseId, requestingUserId);
+        if (userId.startsWith("@splitsies-guest")) return;
+
+        const expense = await this._expenseManager.getExpense(expenseId);
+        await this._messageQueueClient.create(
+            new QueueMessage(QueueConfig.joinRequest, randomUUID(), { userId, expense, requestingUserId }),
+        );
     }
 
     removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
