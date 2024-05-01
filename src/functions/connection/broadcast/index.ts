@@ -16,6 +16,7 @@ export default {
                         eventName: ["INSERT"],
                         dynamodb: {
                             Keys: { queueName: { S: [QueueConfig.expenseUpdate] } },
+                            NewImage: { stage: { S: ["${param:STAGE}"]}},
                         },
                     },
                 ],
