@@ -23,7 +23,7 @@ jobs:
       uses: serverless/github-action@v3.1
       with:
         args: deploy --stage dev-pr \
-                --param='STAGE=devpr' \
+                --param='STAGE_NAME=devpr' \
                 --param="DB_EXPENSE_JOIN_REQUEST_TABLE_NAME=Splitsies-ExpenseJoinRequest-dev-pr" \
                 --param="CONNECTION_TTL_SEC=1800" \
                 --param="DB_REGION=us-east-1" \
