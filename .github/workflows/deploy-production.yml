@@ -23,7 +23,6 @@ jobs:
       uses: serverless/github-action@v3.1
       with:
         args: deploy --stage production \
-                --param='STAGE_NAME=production' \
                 --param="DB_EXPENSE_JOIN_REQUEST_TABLE_NAME=Splitsies-ExpenseJoinRequest-production" \
                 --param="CONNECTION_TTL_SEC=1800" \
                 --param="DB_REGION=us-east-1" \
@@ -54,7 +53,8 @@ jobs:
                 --param="FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY_PRODUCTION }}" \
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PRODUCTION }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PRODUCTION }}" \
-                --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_PRODUCTION }}"
+                --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_PRODUCTION }}" \
+                --param="QUEUE_STAGE_NAME=production"
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
         AWS_ACCESS_KEY_ID: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID }}
