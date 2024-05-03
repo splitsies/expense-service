@@ -21,7 +21,12 @@ export class ConnectionManager implements IConnectionManager {
     async createConnection(connectionId: string, expenseId: string): Promise<IConnection> {
         this._logger.debug("creating connection", connectionId, expenseId);
         return await this._connectionDao.create(
-            new Connection(connectionId, expenseId, Date.now() + this._connectionConfiguration.ttlMs),
+            new Connection(
+                connectionId,
+                expenseId,
+                Date.now() + this._connectionConfiguration.ttlMs,
+                this._connectionConfiguration.gatewayUrl,
+            ),
         );
     }
 
@@ -33,7 +38,9 @@ export class ConnectionManager implements IConnectionManager {
         const existing = await this._connectionDao.read({ connectionId, expenseId });
         if (!existing) throw new NotFoundError(`Could not find connection with id=${connectionId}`);
 
-        return await this._connectionDao.update(new Connection(existing.connectionId, existing.expenseId, newTtl));
+        return await this._connectionDao.update(
+            new Connection(existing.connectionId, existing.expenseId, newTtl, existing.gatewayUrl),
+        );
     }
 
     async deleteConnection(connectionId: string): Promise<void> {
@@ -49,7 +56,7 @@ export class ConnectionManager implements IConnectionManager {
         return;
     }
 
-    async getRelatedConnections(connectionId: string): Promise<string[]> {
+    async getRelatedConnections(connectionId: string): Promise<IConnection[]> {
         const expenseId = await this._connectionDao.getExpenseIdForConnection(connectionId);
         return await this._connectionDao.getConnectionsForExpense(expenseId);
     }
@@ -58,13 +65,19 @@ export class ConnectionManager implements IConnectionManager {
         return await this._connectionDao.getExpenseIdForConnection(connectionId);
     }
 
-    async getConnectionsForExpenseId(expenseId: string): Promise<string[]> {
+    async getConnectionsForExpenseId(expenseId: string): Promise<IConnection[]> {
         return await this._connectionDao.getConnectionsForExpense(expenseId);
     }
 
     async generateConnectionToken(expenseId: string): Promise<string> {
         const token = randomUUID();
-        await this._connectionTokenDao.create({ expenseId, connectionId: token, ttl: Date.now() + 30000 });
+        await this._connectionTokenDao.create({
+            expenseId,
+            connectionId: token,
+            ttl: Date.now() + 30000,
+            gatewayUrl: this._connectionConfiguration.gatewayUrl,
+        });
+
         return token;
     }
 

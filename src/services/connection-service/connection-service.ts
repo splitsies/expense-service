@@ -23,7 +23,7 @@ export class ConnectionService implements IConnectionService {
         return this._connectionManager.deleteExpired();
     }
 
-    getRelatedConnections(connectionId: string): Promise<string[]> {
+    getRelatedConnections(connectionId: string): Promise<IConnection[]> {
         return this._connectionManager.getRelatedConnections(connectionId);
     }
 
@@ -31,7 +31,7 @@ export class ConnectionService implements IConnectionService {
         return this._connectionManager.getExpenseIdForConnection(connectionId);
     }
 
-    getConnectionsForExpenseId(expenseId: string): Promise<string[]> {
+    getConnectionsForExpenseId(expenseId: string): Promise<IConnection[]> {
         return this._connectionManager.getConnectionsForExpenseId(expenseId);
     }
 
