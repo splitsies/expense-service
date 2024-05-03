@@ -17,6 +17,7 @@ export default {
                         eventName: ["INSERT"],
                         dynamodb: {
                             Keys: { queueName: { S: [QueueConfig.guestUserReplaced] } },
+                            NewImage: { stage: { S: ["${param:QUEUE_STAGE_NAME}"]}},
                         },
                     },
                 ],

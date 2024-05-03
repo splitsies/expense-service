@@ -1,5 +1,6 @@
 sls offline start \
     --host 0.0.0.0 \
+    --param='QUEUE_STAGE_NAME=local' \
     --param='DB_ENDPOINT=http://localhost:8000/' \
     --param='APIG_URL=http://0.0.0.0:14624/' \
     --param='DELETE_EXPIRED_INTERVAL_MIN=2' \
