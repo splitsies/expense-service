@@ -5,13 +5,13 @@ import { IDbConfiguration } from "src/models/configuration/db/db-configuration-i
 @injectable()
 export class ConnectionDaoStatements implements IConnectionDaoStatements {
     readonly GetExpenseIdForConnection: string;
-    readonly GetConnectionIdsForExpense: string;
+    readonly GetConnectionsForExpense: string;
     readonly GetExpiredConnections: string;
     readonly GetByConnectionId: string;
 
     constructor(@inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
         const table = dbConfiguration.connectionTableName;
-        this.GetConnectionIdsForExpense = `SELECT connectionId FROM "${table}"."ExpenseIndex" WHERE expenseId = ? AND ttl >= ?`;
+        this.GetConnectionsForExpense = `SELECT * FROM "${table}"."ExpenseIndex" WHERE expenseId = ? AND ttl >= ?`;
         this.GetExpenseIdForConnection = `SELECT expenseId FROM "${table}" WHERE connectionId = ? AND ttl >= ?`;
         this.GetExpiredConnections = `SELECT * FROM "${table}" WHERE ttl < ?`;
         this.GetByConnectionId = `SELECT * FROM "${table}" WHERE connectionId = ?`;

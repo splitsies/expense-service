@@ -28,15 +28,15 @@ export class ConnectionDao extends DaoBase<IConnection> implements IConnectionDa
         return result.Items?.length ? unmarshall(result.Items[0]).expenseId : undefined;
     }
 
-    async getConnectionsForExpense(expenseId: string): Promise<string[]> {
+    async getConnectionsForExpense(expenseId: string): Promise<IConnection[]> {
         const result = await this._client.send(
             new ExecuteStatementCommand({
-                Statement: this._statements.GetConnectionIdsForExpense,
+                Statement: this._statements.GetConnectionsForExpense,
                 Parameters: [{ S: expenseId }, { N: Date.now().toString() }],
             }),
         );
 
-        return result.Items ? result.Items.map((i) => unmarshall(i).connectionId as string) : [];
+        return result.Items ? result.Items.map((i) => unmarshall(i) as IConnection) : [];
     }
 
     async deleteExpiredConnections(): Promise<string[]> {

@@ -22,14 +22,15 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
     }
 
     async notify(expense: IExpenseDto): Promise<void> {
-        const connectionIds = await this._connectionService.getConnectionsForExpenseId(expense.id);
+        const connections = await this._connectionService.getConnectionsForExpenseId(expense.id);
 
         const promises: Promise<void>[] = [];
-        for (const id of connectionIds) {
+        for (const connection of connections) {
+            if (connection.gatewayUrl !== this._connectionConfiguration.gatewayUrl) continue;
             try {
-                promises.push(sendMessage(this._connectionConfiguration.gatewayUrl, id, expense));
+                promises.push(sendMessage(connection.gatewayUrl, connection.connectionId, expense));
             } catch (e) {
-                this._logger.error(`uncaught exception broadcasting for connection ${id}`, e);
+                this._logger.error(`uncaught exception broadcasting for connection ${connection}`, e);
             }
         }
 

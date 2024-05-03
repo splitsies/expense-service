@@ -5,9 +5,9 @@ export interface IConnectionService {
     refreshTtl(id: string): Promise<IConnection>;
     delete(id: string): Promise<void>;
     deleteExpired(): Promise<void>;
-    getRelatedConnections(connectionId: string): Promise<string[]>;
+    getRelatedConnections(connectionId: string): Promise<IConnection[]>;
     getExpenseIdForConnection(connectionId: string): Promise<string>;
-    getConnectionsForExpenseId(expenseId: string): Promise<string[]>;
+    getConnectionsForExpenseId(expenseId: string): Promise<IConnection[]>;
     generateConnectionToken(expenseId: string): Promise<string>;
     verifyConnectionToken(token: string, expenseId: string): Promise<boolean>;
 }
