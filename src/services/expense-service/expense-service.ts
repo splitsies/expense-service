@@ -4,7 +4,6 @@ import {
     IExpenseItem,
     IExpenseJoinRequest,
     IExpenseUserDetails,
-    IQueueMessage,
     IScanResult,
     QueueMessage,
 } from "@splitsies/shared-models";
@@ -15,6 +14,9 @@ import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 import { QueueConfig } from "src/config/queue.config";
 import { randomUUID } from "crypto";
+import { IExpensePublishRequest } from "src/models/expense-publish-request/expense-publish-request-interface";
+import { ExpensePublishRequest } from "src/models/expense-publish-request/expense-publish-request";
+import { IConnection } from "src/models/connection/connection-interface";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -24,12 +26,18 @@ export class ExpenseService implements IExpenseService {
         @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient,
     ) {}
 
-    async queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void> {
-        await this._expenseManager.queueExpenseUpdate(expenseUpdate);
-    }
-
-    async deleteExpenseUpdates(expenseUpdates: IQueueMessage<IExpenseDto>[]): Promise<void> {
-        await this._expenseManager.deleteExpenseUpdates(expenseUpdates);
+    async queueExpenseUpdate(expenseUpdate: IExpenseDto, connections: IConnection[]): Promise<void> {
+        const messages = connections.map((connection) =>
+            this._messageQueueClient.send(
+                new QueueMessage<IExpensePublishRequest>(
+                    QueueConfig.expenseUpdate,
+                    randomUUID(),
+                    new ExpensePublishRequest(expenseUpdate, connection),
+                ),
+            ),
+        );
+        
+        await Promise.all(messages);
     }
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
