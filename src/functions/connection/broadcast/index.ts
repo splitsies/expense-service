@@ -19,7 +19,7 @@ export default {
                             NewImage: {
                                 data: {
                                     "M": {
-                                        connection: { "M": { gatewayUrl: { S: ["bbldrizzy"] } } },
+                                        connection: { "M": { gatewayUrl: { S: ["${param:APIG_URL}"] } } },
                                     }
                                 }
                             },
