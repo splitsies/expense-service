@@ -17,7 +17,11 @@ export default {
                         dynamodb: {
                             Keys: { queueName: { S: [QueueConfig.expenseUpdate] } },
                             NewImage: {
-                                connection: { "M": { gatewayUrl: { S: ["bbldrizzy"] } } },
+                                data: {
+                                    "M": {
+                                        connection: { "M": { gatewayUrl: { S: ["bbldrizzy"] } } },
+                                    }
+                                }
                             },
                         },
                     },

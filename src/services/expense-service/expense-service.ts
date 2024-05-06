@@ -32,7 +32,7 @@ export class ExpenseService implements IExpenseService {
                 new QueueMessage<IExpensePublishRequest>(
                     QueueConfig.expenseUpdate,
                     randomUUID(),
-                    new ExpensePublishRequest(expenseUpdate, {...connection, gatewayUrl: "bbldrizzy"}),
+                    new ExpensePublishRequest(expenseUpdate, connection),
                 ),
             ),
         );
