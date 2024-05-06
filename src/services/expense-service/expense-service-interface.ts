@@ -3,9 +3,9 @@ import {
     IExpenseItem,
     IExpenseJoinRequest,
     IExpenseUserDetails,
-    IQueueMessage,
     IScanResult,
 } from "@splitsies/shared-models";
+import { IConnection } from "src/models/connection/connection-interface";
 import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 
@@ -33,8 +33,7 @@ export interface IExpenseService {
     getExpenseItems(expenseId: string): Promise<IExpenseItem[]>;
     saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]>;
     replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]>;
-    queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void>;
-    deleteExpenseUpdates(expenseUpdates: IQueueMessage<IExpenseDto>[]): Promise<void>;
+    queueExpenseUpdate(expenseUpdate: IExpenseDto, connections: IConnection[]): Promise<void>;
     deleteUserData(userId: string): Promise<string[]>;
 }
 
