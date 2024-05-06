@@ -17,7 +17,7 @@ export default {
                         dynamodb: {
                             Keys: { queueName: { S: [QueueConfig.expenseUpdate] } },
                             NewImage: {
-                                connection: { gatewayUrl: { S: ["${param:APIG_URL}"] } },
+                                connection: { "M": { gatewayUrl: { S: ["${param:APIG_URL}"] } } },
                             },
                         },
                     },
