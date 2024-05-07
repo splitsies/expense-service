@@ -16,6 +16,13 @@ export default {
                         eventName: ["INSERT"],
                         dynamodb: {
                             Keys: { queueName: { S: [QueueConfig.expenseUpdate] } },
+                            NewImage: {
+                                data: {
+                                    "M": {
+                                        connection: { "M": { gatewayUrl: { S: ["${param:APIG_URL}"] } } },
+                                    }
+                                }
+                            },
                         },
                     },
                 ],

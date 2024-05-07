@@ -41,11 +41,6 @@ export class ExpenseManager implements IExpenseManager {
             new QueueMessage<IExpenseDto>(QueueConfig.expenseUpdate, randomUUID(), expenseUpdate),
         );
     }
-
-    async deleteExpenseUpdates(expenseUpdates: IQueueMessage<IExpenseDto>[]): Promise<void> {
-        await this._messageQueueClient.deleteBatch(expenseUpdates);
-    }
-
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
         const userExpense = { userId, expenseId } as IUserExpense;
         const key = this._userExpenseDao.key(userExpense);

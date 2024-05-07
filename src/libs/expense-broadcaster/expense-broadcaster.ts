@@ -6,6 +6,7 @@ import { IConnectionService } from "src/services/connection-service/connection-s
 import { sendMessage } from "@libs/broadcast";
 import { ILogger } from "@splitsies/utils";
 import { IExpenseService } from "src/services/expense-service/expense-service-interface";
+import { IConnection } from "src/models/connection/connection-interface";
 
 @injectable()
 export class ExpenseBroadcaster implements IExpenseBroadcaster {
@@ -17,23 +18,17 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
     ) {}
 
     async broadcast(expense: IExpenseDto): Promise<void> {
-        // See local-emulation/queue-runner for setting up local listening to DynamoDB Stream
-        return this._expenseService.queueExpenseUpdate(expense);
-    }
-
-    async notify(expense: IExpenseDto): Promise<void> {
         const connections = await this._connectionService.getConnectionsForExpenseId(expense.id);
 
-        const promises: Promise<void>[] = [];
-        for (const connection of connections) {
-            if (connection.gatewayUrl !== this._connectionConfiguration.gatewayUrl) continue;
-            try {
-                promises.push(sendMessage(connection.gatewayUrl, connection.connectionId, expense));
-            } catch (e) {
-                this._logger.error(`uncaught exception broadcasting for connection ${connection}`, e);
-            }
-        }
+        // See local-emulation/queue-runner for setting up local listening to DynamoDB Stream
+        return this._expenseService.queueExpenseUpdate(expense, connections);
+    }
 
-        await Promise.all(promises);
+    async notify(expense: IExpenseDto, connection: IConnection): Promise<void> {
+        try {
+            await sendMessage(connection.gatewayUrl, connection.connectionId, expense);
+        } catch (e) {
+            this._logger.error(`uncaught exception broadcasting for connection ${connection}`, e);
+        }
     }
 }
