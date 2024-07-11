@@ -98,8 +98,8 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.saveUpdatedItems(updatedItems);
     }
 
-    async getExpenseJoinRequestsForUser(userId: string): Promise<IUserExpenseDto[]> {
-        return await this._expenseManager.getExpenseJoinRequestsForUser(userId);
+    async getExpenseJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpenseDto>>{
+        return await this._expenseManager.getExpenseJoinRequestsForUser(userId, limit, offset);
     }
 
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]> {

@@ -152,10 +152,11 @@ export class ExpenseManager implements IExpenseManager {
         return expense;
     }
 
-    async getExpenseJoinRequestsForUser(userId: string): Promise<IUserExpenseDto[]> {
-        const userExpenses = await this._userExpenseDao.getJoinRequestsForUser(userId);
-        return await Promise.all(
-            userExpenses.map(
+    async getExpenseJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpenseDto>> {
+        const scan = await this._userExpenseDao.getJoinRequestsForUser(userId, limit, offset);
+        
+        return new ScanResult(await Promise.all(
+            scan.result.map(
                 async (u) =>
                     new UserExpenseDto(
                         await this.getExpense(u.expenseId),
@@ -164,7 +165,9 @@ export class ExpenseManager implements IExpenseManager {
                         u.requestingUserId,
                         u.createdAt,
                     ),
+                ),
             ),
+            scan.lastEvaluatedKey
         );
     }
 

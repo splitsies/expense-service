@@ -4,6 +4,7 @@ import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { IUserExpenseDao } from "./user-expense-dao-interface";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import postgres, { Sql } from "postgres";
+import { IScanResult, ScanResult } from "@splitsies/shared-models";
 
 @injectable()
 export class UserExpenseDao implements IUserExpenseDao {
@@ -97,15 +98,19 @@ export class UserExpenseDao implements IUserExpenseDao {
         return res.length ? res.map((u) => u.userId) : [];
     }
 
-    async getJoinRequestsForUser(userId: string): Promise<IUserExpense[]> {
+    async getJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpense>> {
         const res = await this._client<IUserExpense[]>`
             SELECT *
               FROM "UserExpense"
              WHERE "userId" = ${userId}
                AND "pendingJoin" = TRUE;
+          ORDER BY "createdAt" DESC
+             LIMIT ${limit}
+            OFFSET ${offset}
         `;
 
-        return res.length ? res : [];
+        const scan = new ScanResult<IUserExpense>(res, { nextPage: { limit, offset: offset + (res?.length ?? 0) } });
+        return scan;
     }
 
     async getJoinRequestsForExpense(expenseId: string): Promise<IUserExpense[]> {
