@@ -152,23 +152,32 @@ export class ExpenseManager implements IExpenseManager {
         return expense;
     }
 
-    async getExpenseJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpenseDto>> {
+    async getExpenseJoinRequestsForUser(
+        userId: string,
+        limit: number,
+        offset: number,
+    ): Promise<IScanResult<IUserExpenseDto>> {
         const scan = await this._userExpenseDao.getJoinRequestsForUser(userId, limit, offset);
-        
-        return new ScanResult(await Promise.all(
-            scan.result.map(
-                async (u) =>
-                    new UserExpenseDto(
-                        await this.getExpense(u.expenseId),
-                        u.userId,
-                        u.pendingJoin,
-                        u.requestingUserId,
-                        u.createdAt,
-                    ),
+
+        return new ScanResult(
+            await Promise.all(
+                scan.result.map(
+                    async (u) =>
+                        new UserExpenseDto(
+                            await this.getExpense(u.expenseId),
+                            u.userId,
+                            u.pendingJoin,
+                            u.requestingUserId,
+                            u.createdAt,
+                        ),
                 ),
             ),
-            scan.lastEvaluatedKey
+            scan.lastEvaluatedKey,
         );
+    }
+
+    async getJoinRequestCountForUser(userId: string): Promise<number> {
+        return this._userExpenseDao.getJoinRequestCountForUser(userId);
     }
 
     async getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]> {

@@ -103,7 +103,7 @@ export class UserExpenseDao implements IUserExpenseDao {
             SELECT *
               FROM "UserExpense"
              WHERE "userId" = ${userId}
-               AND "pendingJoin" = TRUE;
+               AND "pendingJoin" = TRUE
           ORDER BY "createdAt" DESC
              LIMIT ${limit}
             OFFSET ${offset}
@@ -111,6 +111,17 @@ export class UserExpenseDao implements IUserExpenseDao {
 
         const scan = new ScanResult<IUserExpense>(res, { nextPage: { limit, offset: offset + (res?.length ?? 0) } });
         return scan;
+    }
+
+    async getJoinRequestCountForUser(userId: string): Promise<number> {
+        const res = await this._client<{ count: number }[]>`
+            SELECT COUNT(*) as "count"
+              FROM "UserExpense"
+             WHERE "userId" = ${userId}
+               AND "pendingJoin" = TRUE
+        `;
+
+        return res ? res[0].count : 0;
     }
 
     async getJoinRequestsForExpense(expenseId: string): Promise<IUserExpense[]> {

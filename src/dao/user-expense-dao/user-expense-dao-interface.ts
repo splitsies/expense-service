@@ -8,6 +8,7 @@ export interface IUserExpenseDao extends IDao<IUserExpense> {
     getUsersForExpense(expenseId: string): Promise<string[]>;
     getForUser(userId: string): Promise<IUserExpense[]>;
     getJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpense>>;
+    getJoinRequestCountForUser(userId: string): Promise<number>;
     getJoinRequestsForExpense(expenseId: string): Promise<IUserExpense[]>;
     deleteForUser(userId: string): Promise<void>;
 }
