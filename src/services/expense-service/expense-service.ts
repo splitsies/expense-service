@@ -36,7 +36,7 @@ export class ExpenseService implements IExpenseService {
                 ),
             ),
         );
-        
+
         await Promise.all(messages);
     }
 
@@ -98,8 +98,16 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.saveUpdatedItems(updatedItems);
     }
 
-    async getExpenseJoinRequestsForUser(userId: string): Promise<IUserExpenseDto[]> {
-        return await this._expenseManager.getExpenseJoinRequestsForUser(userId);
+    async getExpenseJoinRequestsForUser(
+        userId: string,
+        limit: number,
+        offset: number,
+    ): Promise<IScanResult<IUserExpenseDto>> {
+        return await this._expenseManager.getExpenseJoinRequestsForUser(userId, limit, offset);
+    }
+
+    async getJoinRequestCountForUser(userId: string): Promise<number> {
+        return await this._expenseManager.getJoinRequestCountForUser(userId);
     }
 
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]> {

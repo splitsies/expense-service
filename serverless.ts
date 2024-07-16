@@ -24,6 +24,7 @@ import removeUserFromExpense from "@functions/expense/delete-user-from-expense";
 import createConnectionToken from "@functions/connection/create-connection-token";
 import broadcast from "@functions/connection/broadcast";
 import deleteUserData from "@functions/expense/delete-user-data";
+import getJoinRequestCountForUser from "@functions/expense/get-join-request-count";
 
 const serverlessConfiguration: AWS = {
     org: "splitsies",
@@ -81,6 +82,7 @@ const serverlessConfiguration: AWS = {
         createConnectionToken,
         broadcast,
         deleteUserData,
+        getJoinRequestCountForUser,
     },
     package: { individually: true },
     custom: {
