@@ -2,8 +2,9 @@ import {
     IExpenseDto,
     IExpenseItem,
     IExpenseJoinRequest,
+    IExpensePayerDto,
     IExpenseUserDetails,
-    IQueueMessage,
+    IPayerShare,
     IScanResult,
 } from "@splitsies/shared-models";
 import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
@@ -37,6 +38,8 @@ export interface IExpenseManager {
     replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]>;
     queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void>;
     deleteUserData(userId: string): Promise<string[]>;
+    setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto>;
+    
 }
 
 export const IExpenseManager = Symbol.for("IExpenseManager");

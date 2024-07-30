@@ -54,7 +54,8 @@ jobs:
                 --param="FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY_DEV_PR }}" \
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_DEV_PR }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_DEV_PR }}" \
-                --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \                
+                --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \
+                --param="RTENV=dev-pr" \                
                 --param="QUEUE_STAGE_NAME=devpr"
 
       env:

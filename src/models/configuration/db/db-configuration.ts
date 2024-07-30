@@ -15,6 +15,7 @@ export class DbConfiguration implements IDbConfiguration {
     readonly pgHost: string;
     readonly pgDatabaseName: string;
     readonly connectionTokenTableName: string;
+    readonly expensePayerTableName: string;
 
     constructor() {
         assert(!!process.env.dbAccessKeyId, "db access key was undefined");
@@ -28,6 +29,7 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.pgPort, "PG_PORT was undefined");
         assert(!!process.env.pgHost, "PG_HOST was undefined");
         assert(!!process.env.pgDatabaseName, "PG_DATABASE_NAME was undefined");
+        assert(!!process.env.expensePayerTableName, "Expense Payer table name was undefined");
 
         this._dbAccessKeyId = process.env.dbAccessKeyId;
         this._dbSecretAccessKey = process.env.dbSecretAccessKey;
@@ -40,6 +42,7 @@ export class DbConfiguration implements IDbConfiguration {
         this.pgHost = process.env.pgHost;
         this.pgDatabaseName = process.env.pgDatabaseName;
         this.connectionTokenTableName = process.env.connectionTokenTableName;
+        this.expensePayerTableName = process.env.expensePayerTableName;
     }
 
     get dbAccessKeyId(): string {

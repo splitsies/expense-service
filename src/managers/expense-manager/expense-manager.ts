@@ -7,9 +7,10 @@ import {
     IExpenseItem,
     IExpenseDto,
     QueueMessage,
-    IQueueMessage,
     IScanResult,
     ScanResult,
+    IPayerShare,
+    PayerShare,
 } from "@splitsies/shared-models";
 import { IExpenseManager } from "./expense-manager-interface";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
@@ -24,6 +25,9 @@ import { ExpenseDa } from "src/models/expense/expense-da";
 import { UserExpenseDto } from "src/models/user-expense-dto/user-expense-dto";
 import { IUserExpenseDto } from "src/models/user-expense-dto/user-expense-dto-interface";
 import { QueueConfig } from "src/config/queue.config";
+import { IExpensePayerDao } from "src/dao/expense-payer-dao/expense-payer-dao-interface";
+import { ExpensePayer } from "src/models/expense-payer/expense-payer";
+import { InvalidStateError } from "src/models/error/invalid-state-error";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -32,6 +36,7 @@ export class ExpenseManager implements IExpenseManager {
         @inject(IExpenseDao) private readonly _expenseDao: IExpenseDao,
         @inject(IUserExpenseDao) private readonly _userExpenseDao: IUserExpenseDao,
         @inject(IExpenseItemDao) private readonly _expenseItemDao: IExpenseItemDao,
+        @inject(IExpensePayerDao) private readonly _expensePayerDao: IExpensePayerDao,
         @inject(IExpenseDtoMapper) private readonly _dtoMapper: IExpenseDtoMapper,
         @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient,
     ) {}
@@ -51,15 +56,17 @@ export class ExpenseManager implements IExpenseManager {
         let expenseDa: IExpenseDa;
         let items: IExpenseItem[];
         let userIds: string[];
+        let payers: IPayerShare[];
 
         await Promise.all([
             this._expenseDao.read({ id }).then((e) => (expenseDa = e)),
             this._userExpenseDao.getUsersForExpense(id).then((u) => (userIds = u)),
             this._expenseItemDao.getForExpense(id).then((e) => (items = e)),
+            this._expensePayerDao.getForExpense(id).then(ep => payers = ep.map(ep => new PayerShare(ep.userId, ep.share)))
         ]).catch((e) => this._logger.error(`Error fetching expense ${id}`, e));
 
         return expenseDa !== undefined && items !== undefined && userIds !== undefined
-            ? this._dtoMapper.toDto(expenseDa, userIds, items)
+            ? this._dtoMapper.toDto(expenseDa, userIds, items, payers)
             : null;
     }
 
@@ -67,6 +74,7 @@ export class ExpenseManager implements IExpenseManager {
         const id = randomUUID();
         const created = await this._expenseDao.create(new ExpenseDa(id, "Untitled", new Date()));
         await this._userExpenseDao.create({ expenseId: created.id, userId, pendingJoin: false });
+        await this._expensePayerDao.create(new ExpensePayer(id, userId, 1));
         return this.getExpense(id);
     }
 
@@ -76,6 +84,7 @@ export class ExpenseManager implements IExpenseManager {
             this._logger.error(`Error creating expense item`, e),
         );
         await this._userExpenseDao.create(new UserExpense(expense.id, userId, false));
+        await this._expensePayerDao.create(new ExpensePayer(expense.id, userId, 1));
 
         return this.getExpense(expense.id);
     }
@@ -129,6 +138,11 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {
+        const payerRecord = await this._expensePayerDao.read({ expenseId, userId });
+        if (payerRecord) {
+            throw new InvalidStateError("Could not remove user while they are marked as a payer");
+        }
+
         const items = await this._expenseItemDao.getForExpense(expenseId);
 
         for (const item of items) {
@@ -305,5 +319,41 @@ export class ExpenseManager implements IExpenseManager {
 
         await Promise.all([this.saveUpdatedItems(updatedItems), this._userExpenseDao.deleteForUser(userId)]);
         return expenseIds;
+    }
+
+    async setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto> {
+        let shareSum = 0;
+        const lookup = new Map<string, IPayerShare>();
+        for (const payer of payerShares) {
+            lookup.set(payer.userId, payer);
+            shareSum += payer.share;
+        }
+
+        if (Math.abs(1 - shareSum) > Number.EPSILON) {
+            // Validation to floating point accuracy
+            throw new InvalidStateError("Payer shares did not add up to 1");
+        }
+
+        const expensePayers = await this._expensePayerDao.getForExpense(expenseId);
+        for (const payer of expensePayers) {
+            const existing = lookup.get(payer.userId);
+            if (existing && existing.share !== payer.share) {
+                await this._expensePayerDao.update(new ExpensePayer(payer.expenseId, existing.userId, existing.share));
+                // Delete once we're done updating it
+                lookup.delete(payer.userId);
+                continue;
+            } else if (!existing) {
+                await this._expensePayerDao.delete({ expenseId, userId: payer.userId});
+            }            
+        }
+
+        // The payers remaining in the lookup are new, so they need to be added
+        for (const [userId, payer] of lookup) {
+            if (!expensePayers.find(p => p.userId === payer.userId)) {
+                await this._expensePayerDao.create(new ExpensePayer(expenseId, userId, payer.share));
+            }
+        }
+
+        return await this.getExpense(expenseId);
     }
 }
