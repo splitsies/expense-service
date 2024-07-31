@@ -18,5 +18,6 @@ sls offline start \
     --param='PG_DATABASE_NAME=postgres' \
     --param='EXPENSE_UPDATE_TABLE_NAME=Splitsies-ExpenseUpdate-local' \
     --param='MESSAGE_QUEUE_RESOURCE_NAME=Splitsies-MessageQueue-local' \
+    --param='RTENV=local' \
     --param="FIREBASE_ADMIN_CREDS=$FIREBASE_ADMIN_CREDS"
     

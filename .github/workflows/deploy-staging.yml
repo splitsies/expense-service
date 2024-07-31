@@ -54,6 +54,7 @@ jobs:
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PRODUCTION }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PRODUCTION }}" \
                 --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_PRODUCTION }}" \
+                --param="RTENV=production" \
                 --param="QUEUE_STAGE_NAME=staging"
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}

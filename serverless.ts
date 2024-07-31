@@ -1,5 +1,7 @@
 import type { AWS } from "@serverless/typescript";
 
+import dynamoDbTables from "./resources/dynamodb-tables";
+
 import dbConfig from "./src/config/db.config.json";
 import connectionConfig from "./src/config/connection.config.json";
 import firebaseConfig from "./src/config/firebase.config.json";
@@ -25,6 +27,8 @@ import createConnectionToken from "@functions/connection/create-connection-token
 import broadcast from "@functions/connection/broadcast";
 import deleteUserData from "@functions/expense/delete-user-data";
 import getJoinRequestCountForUser from "@functions/expense/get-join-request-count";
+import setExpensePayers from "@functions/expense/set-expense-payers";
+import setExpensePayerStatus from "@functions/expense/set-expense-payer-status";
 
 const serverlessConfiguration: AWS = {
     org: "splitsies",
@@ -83,8 +87,15 @@ const serverlessConfiguration: AWS = {
         broadcast,
         deleteUserData,
         getJoinRequestCountForUser,
+        setExpensePayers,
+        setExpensePayerStatus,
     },
     package: { individually: true },
+    resources: {
+        Resources: {
+            ...dynamoDbTables,
+        },
+    },
     custom: {
         apigUri: { "Fn::GetAtt": ["HttpApi", "ApiEndpoint"] },
         esbuild: {

@@ -4,6 +4,7 @@ import {
     IExpenseItem,
     IExpenseJoinRequest,
     IExpenseUserDetails,
+    IPayerShare,
     IScanResult,
     QueueMessage,
 } from "@splitsies/shared-models";
@@ -134,5 +135,13 @@ export class ExpenseService implements IExpenseService {
 
     async deleteUserData(userId: string): Promise<string[]> {
         return await this._expenseManager.deleteUserData(userId);
+    }
+
+    async setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto> {
+        return await this._expenseManager.setExpensePayers(expenseId, payerShares);
+    }
+
+    async setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto> {
+        return await this._expenseManager.setExpensePayerStatus(expenseId, userId, settled);
     }
 }
