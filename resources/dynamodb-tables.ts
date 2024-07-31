@@ -3,7 +3,7 @@ export default {
         Type: "AWS::DynamoDB::Table",
         DeletionPolicy: "Delete",
         Properties: {
-            TableName: "Splitsies-ExpensePayer-${sls:stage}",
+            TableName: "Splitsies-ExpensePayer-${param:RTENV}",
             AttributeDefinitions: [
                 { AttributeName: "expenseId", AttributeType: "S" },
                 { AttributeName: "userId", AttributeType: "S" },
@@ -19,7 +19,7 @@ export default {
         Type: "AWS::DynamoDB::Table",
         DeletionPolicy: "Delete",
         Properties: {
-            TableName: "Splitsies-ExpensePayerStatus-${sls:stage}",
+            TableName: "Splitsies-ExpensePayerStatus-${param:RTENV}",
             AttributeDefinitions: [
                 { AttributeName: "expenseId", AttributeType: "S" },
                 { AttributeName: "userId", AttributeType: "S" },
