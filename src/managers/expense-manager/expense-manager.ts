@@ -140,7 +140,7 @@ export class ExpenseManager implements IExpenseManager {
     async removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {
         const payerRecord = await this._expensePayerDao.read({ expenseId, userId });
         if (payerRecord) {
-            throw new InvalidStateError("Could not remove user while they are marked as a payer");
+            await this._expensePayerDao.delete({ expenseId, userId });
         }
 
         const items = await this._expenseItemDao.getForExpense(expenseId);
