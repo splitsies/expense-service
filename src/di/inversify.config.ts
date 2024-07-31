@@ -54,6 +54,8 @@ import { IConnectionTokenDaoStatements } from "src/dao/connection-token-dao/conn
 import { ConnectionTokenDaoStatements } from "src/dao/connection-token-dao/connection-token-dao-statements";
 import { IExpensePayerDao } from "src/dao/expense-payer-dao/expense-payer-dao-interface";
 import { ExpensePayerDao } from "src/dao/expense-payer-dao/expense-payer-dao";
+import { ExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-payer-status-dao";
+import { IExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-payer-status-dao-interface";
 const container = new Container({ defaultScope: "Singleton" });
 
 container.bind<ILogger>(ILogger).to(Logger);
@@ -88,4 +90,5 @@ container.bind<IConnectionTokenDaoStatements>(IConnectionTokenDaoStatements).to(
 container.bind<IMessageQueueClient>(IMessageQueueClient).to(MessageQueueClient);
 
 container.bind<IExpensePayerDao>(IExpensePayerDao).to(ExpensePayerDao);
+container.bind<IExpensePayerStatusDao>(IExpensePayerStatusDao).to(ExpensePayerStatusDao);
 export { container };

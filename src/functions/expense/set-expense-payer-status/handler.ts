@@ -19,18 +19,12 @@ export const main = middyfy(
     SplitsiesFunctionHandlerFactory.create<typeof schema, IExpenseDto>(
         logger,
         async (event) => {
-            const userExpense = await expenseService.getUserExpense(
-                event.requestContext.authorizer.userId,
-                event.pathParameters.expenseId,
-            );
+            const { expenseId, userId } = event.pathParameters;
+            const userExpense = await expenseService.getUserExpense(event.requestContext.authorizer.userId, expenseId);
 
             if (!userExpense) throw new UnauthorizedUserError();
-            const result = await expenseService.setExpensePayers(
-                event.pathParameters.expenseId,
-                event.body.payerShares,
-            );
+            const result = await expenseService.setExpensePayerStatus(expenseId, userId, event.body.settled);
             await expenseBroadcaster.broadcast(result);
-
             return new DataResponse(HttpStatusCode.CREATED, result).toJson();
         },
         expectedErrors,

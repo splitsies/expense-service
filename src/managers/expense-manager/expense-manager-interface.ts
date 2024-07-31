@@ -39,7 +39,7 @@ export interface IExpenseManager {
     queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void>;
     deleteUserData(userId: string): Promise<string[]>;
     setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto>;
-    
+    setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto>;
 }
 
 export const IExpenseManager = Symbol.for("IExpenseManager");

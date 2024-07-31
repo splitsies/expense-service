@@ -11,6 +11,7 @@ export interface IDbConfiguration {
     readonly pgDatabaseName: string;
     readonly connectionTokenTableName: string;
     readonly expensePayerTableName: string;
+    readonly expensePayerStatusTableName: string;
 }
 
 export const IDbConfiguration = Symbol.for("IDbConfiguration");

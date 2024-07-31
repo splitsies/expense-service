@@ -1,20 +1,19 @@
 import { inject, injectable } from "inversify";
-import { IExpensePayerDao } from "./expense-payer-dao-interface";
 import { DaoBase, ILogger } from "@splitsies/utils";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
-import { IExpensePayer } from "src/models/expense-payer/expense-payer-interface";
 import { QueryCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { ExpensePayerStatus } from "@splitsies/shared-models";
+import { IExpensePayerStatusDao } from "./expense-payer-status-dao-interface";
 
 @injectable()
-export class ExpensePayerDao extends DaoBase<IExpensePayer> implements IExpensePayerDao {
+export class ExpensePayerStatusDao extends DaoBase<ExpensePayerStatus> implements IExpensePayerStatusDao {
     constructor(@inject(ILogger) logger: ILogger, @inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
-        console.log({ name: dbConfiguration.expensePayerTableName });
-        const keySelector = (c: IExpensePayer) => ({ expenseId: c.expenseId, userId: c.userId });
-        super(logger, dbConfiguration, dbConfiguration.expensePayerTableName, keySelector);
+        const keySelector = (c: ExpensePayerStatus) => ({ expenseId: c.expenseId, userId: c.userId });
+        super(logger, dbConfiguration, dbConfiguration.expensePayerStatusTableName, keySelector);
     }
 
-    async getForExpense(expenseId: string): Promise<IExpensePayer[]> {
+    async getForExpense(expenseId: string): Promise<ExpensePayerStatus[]> {
         const result = await this._client.send(
             new QueryCommand({
                 TableName: this._tableName,
@@ -28,6 +27,6 @@ export class ExpensePayerDao extends DaoBase<IExpensePayer> implements IExpenseP
             }),
         );
 
-        return result.Items?.length ? result.Items.map((i) => unmarshall(i) as IExpensePayer) : [];
+        return result.Items?.length ? result.Items.map((i) => unmarshall(i) as ExpensePayerStatus) : [];
     }
 }

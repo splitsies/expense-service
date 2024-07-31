@@ -10,7 +10,7 @@ const payerShareSchema = {
 export default {
     type: "object",
     properties: {
-        payerShares: { type: "array", items: payerShareSchema },        
+        payerShares: { type: "array", items: payerShareSchema },
     },
     required: ["payerShares"],
 } as const;
