@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  expense-service-database
+
+  SAM Template for expense-service database
+
+Parameters:
+  RtEnv:
+    Type: String
+
+Resources:  
+  ExpensePayer:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: !Sub Splitsies-ExpensePayer-${RtEnv}
+      AttributeDefinitions: 
+        - AttributeName: expenseId
+          AttributeType: S
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: expenseId
+          KeyType: HASH
+        - AttributeName: userId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+  ExpensePayerStatus:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: !Sub Splitsies-ExpensePayerStatus-${RtEnv}
+      AttributeDefinitions: 
+        - AttributeName: expenseId
+          AttributeType: S
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: expenseId
+          KeyType: HASH
+        - AttributeName: userId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
