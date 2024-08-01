@@ -14,3 +14,5 @@ jspm_packages
 .DS_Store
 
 **/startup-dev-pr.sh
+
+**/.aws-sam

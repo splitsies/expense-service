@@ -1,7 +1,5 @@
 import type { AWS } from "@serverless/typescript";
 
-import dynamoDbTables from "./resources/dynamodb-tables";
-
 import dbConfig from "./src/config/db.config.json";
 import connectionConfig from "./src/config/connection.config.json";
 import firebaseConfig from "./src/config/firebase.config.json";
@@ -91,11 +89,6 @@ const serverlessConfiguration: AWS = {
         setExpensePayerStatus,
     },
     package: { individually: true },
-    resources: {
-        Resources: {
-            ...dynamoDbTables,
-        },
-    },
     custom: {
         apigUri: { "Fn::GetAtt": ["HttpApi", "ApiEndpoint"] },
         esbuild: {
