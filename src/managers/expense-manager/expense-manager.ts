@@ -153,16 +153,16 @@ export class ExpenseManager implements IExpenseManager {
             return;
         }
 
-        if (!(await this._expensePayerStatusDao.read({ expenseId, userId }))) {
-            await this._expensePayerStatusDao.create(new ExpensePayerStatus(expenseId, userId, false));
-        }
-
         if (
             userId !== requestingUserId &&
             !(await this._userExpenseDao.read({ userId: requestingUserId, expenseId: expenseId }))
         ) {
             this._logger.warn(`User ${requestingUserId} not authorized to add users to expense ${expenseId}`);
             return;
+        }
+
+        if (!(await this._expensePayerStatusDao.read({ expenseId, userId }))) {
+            await this._expensePayerStatusDao.create(new ExpensePayerStatus(expenseId, userId, false));
         }
 
         await this._userExpenseDao.create(
