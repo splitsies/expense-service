@@ -32,13 +32,16 @@ export const main = middyfyWs(
     SplitsiesFunctionHandlerFactory.create<typeof schema, any>(
         logger,
         async (event) => {
+            if (event.body.method === "ping") {
+                return new DataResponse(HttpStatusCode.OK, null).toJson();
+            }
+
             await connectionService.refreshTtl(event.requestContext.connectionId);
 
             const paramsDto = event.body.params as IExpenseMessageParametersDto;
             const params = expenseMessageParametersMapper.toDomainModel(paramsDto);
 
             const updated = await expenseMessageStrategy.execute(event.body.method as ExpenseOperation, params);
-
             await expenseBroadcaster.broadcast(updated);
             return new DataResponse(HttpStatusCode.OK, updated).toJson();
         },
