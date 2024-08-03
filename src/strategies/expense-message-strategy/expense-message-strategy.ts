@@ -39,6 +39,13 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
                 return this.updateExpenseName(params.expenseId, params.expenseName);
             case "updateTransactionDate":
                 return this.updateExpenseTransactionDate(params.expenseId, params.transactionDate);
+            case "updateSingleItemSelected":
+                return this.updateSingleItemSelected(
+                    params.expenseId,
+                    params.user,
+                    params.item.id,
+                    params.itemSelected,
+                );
         }
     }
 
@@ -81,6 +88,27 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         }
 
         await this._expenseService.saveUpdatedItems(updated);
+        return this._expenseService.getExpense(expenseId);
+    }
+
+    private async updateSingleItemSelected(
+        expenseId: string,
+        user: IExpenseUserDetails,
+        itemId: string,
+        selected: boolean,
+    ): Promise<IExpenseDto> {
+        const expenseItems = await this._expenseService.getExpenseItems(expenseId);
+        const targetItem = expenseItems.find((i) => i.id === itemId);
+        if (selected && !targetItem.owners.find((o) => o.id === user.id)) {
+            targetItem.owners.push(user);
+        } else if (!selected) {
+            const index = targetItem.owners.findIndex((o) => o.id === user.id);
+            if (index !== -1) {
+                targetItem.owners.splice(index, 1);
+            }
+        }
+
+        await this._expenseService.saveUpdatedItems([targetItem]);
         return this._expenseService.getExpense(expenseId);
     }
 
