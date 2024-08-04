@@ -6,10 +6,12 @@ import { DataResponse, HttpStatusCode, IExpenseDto, InvalidArgumentsError } from
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 import { IExpenseService } from "src/services/expense-service/expense-service-interface";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
+import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
 
 const logger = container.get<ILogger>(ILogger);
 const connectionService = container.get<IConnectionService>(IConnectionService);
 const expenseService = container.get<IExpenseService>(IExpenseService);
+const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
 
 const expectedErrors = [
     new ExpectedError(InvalidArgumentsError, HttpStatusCode.BAD_REQUEST, "invalid request"),
@@ -36,6 +38,7 @@ export const main = SplitsiesFunctionHandlerFactory.create<typeof schema, IExpen
 
         const expense = await expenseService.getExpense(userExpense.expenseId);
         await connectionService.create(connectionId, expenseId);
+        await expenseBroadcaster.broadcast(expense);
         return new DataResponse(HttpStatusCode.OK, expense).toJson();
     },
     expectedErrors,
