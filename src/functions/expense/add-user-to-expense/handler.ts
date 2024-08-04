@@ -19,7 +19,9 @@ export const main = middyfy(
         async (event) => {
             const expenseId = event.pathParameters.expenseId;
             const userId = event.body.userId;
-            await expenseService.addUserToExpense(userId, expenseId, event.requestContext.authorizer.userId);
+            const requestingUserId = event.body.requestingUserId || event.requestContext.authorizer.userId;
+
+            await expenseService.addUserToExpense(userId, expenseId, requestingUserId);
 
             const expense = await expenseService.getExpense(expenseId);
             await expenseBroadcaster.broadcast(expense);
