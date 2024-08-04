@@ -38,7 +38,7 @@ export const main = SplitsiesFunctionHandlerFactory.create<typeof schema, IExpen
 
         const expense = await expenseService.getExpense(userExpense.expenseId);
         await connectionService.create(connectionId, expenseId);
-        expenseBroadcaster.broadcast(expense);
+        await expenseBroadcaster.broadcast(expense);
         return new DataResponse(HttpStatusCode.OK, expense).toJson();
     },
     expectedErrors,
