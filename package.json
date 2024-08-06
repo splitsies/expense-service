@@ -1,6 +1,6 @@
 {
   "name": "expense-service",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
