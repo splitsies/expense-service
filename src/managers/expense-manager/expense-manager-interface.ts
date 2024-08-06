@@ -2,7 +2,6 @@ import {
     IExpenseDto,
     IExpenseItem,
     IExpenseJoinRequest,
-    IExpensePayerDto,
     IExpenseUserDetails,
     IPayerShare,
     IScanResult,
@@ -15,6 +14,7 @@ export interface IExpenseManager {
     getExpense(id: string): Promise<IExpenseDto>;
     createExpense(userId: string): Promise<IExpenseDto>;
     createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
+    addToExpenseGroup(parentExpenseId: string, userId: string, childExpense?: IExpenseDto | undefined): Promise<IExpenseDto>
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
     getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDto>>;
     getUsersForExpense(expenseId: string): Promise<string[]>;
