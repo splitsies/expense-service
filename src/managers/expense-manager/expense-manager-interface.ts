@@ -18,7 +18,12 @@ export interface IExpenseManager {
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
     getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDto>>;
     getUsersForExpense(expenseId: string): Promise<string[]>;
-    addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
+    addUserToExpense(
+        userId: string,
+        expenseId: string,
+        requestingUserId: string,
+        authorizedUserId: string,
+    ): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;
     getExpenseJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpenseDto>>;
     getJoinRequestCountForUser(userId: string): Promise<number>;

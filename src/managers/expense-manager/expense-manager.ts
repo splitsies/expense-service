@@ -148,7 +148,12 @@ export class ExpenseManager implements IExpenseManager {
         return await this._userExpenseDao.getUsersForExpense(expenseId);
     }
 
-    async addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
+    async addUserToExpense(
+        userId: string,
+        expenseId: string,
+        requestingUserId: string,
+        authorizedUserId: string,
+    ): Promise<void> {
         if (await this._userExpenseDao.read({ userId, expenseId })) {
             return;
         }
@@ -166,7 +171,7 @@ export class ExpenseManager implements IExpenseManager {
         }
 
         await this._userExpenseDao.create(
-            new UserExpense(expenseId, userId, userId !== requestingUserId, requestingUserId, new Date(Date.now())),
+            new UserExpense(expenseId, userId, userId !== authorizedUserId, requestingUserId, new Date(Date.now())),
         );
     }
 

@@ -69,8 +69,13 @@ export class ExpenseService implements IExpenseService {
         return await this._expenseManager.getUsersForExpense(expenseId);
     }
 
-    async addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
-        await this._expenseManager.addUserToExpense(userId, expenseId, requestingUserId);
+    async addUserToExpense(
+        userId: string,
+        expenseId: string,
+        requestingUserId: string,
+        authorizedUserId: string,
+    ): Promise<void> {
+        await this._expenseManager.addUserToExpense(userId, expenseId, requestingUserId, authorizedUserId);
     }
 
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {

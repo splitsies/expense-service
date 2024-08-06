@@ -21,7 +21,12 @@ export const main = middyfy(
             const userId = event.body.userId;
             const requestingUserId = event.body.requestingUserId || event.requestContext.authorizer.userId;
 
-            await expenseService.addUserToExpense(userId, expenseId, requestingUserId);
+            await expenseService.addUserToExpense(
+                userId,
+                expenseId,
+                requestingUserId,
+                event.requestContext.authorizer.userId,
+            );
 
             const expense = await expenseService.getExpense(expenseId);
             await expenseBroadcaster.broadcast(expense);
