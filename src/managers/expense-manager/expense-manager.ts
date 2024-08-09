@@ -491,7 +491,7 @@ export class ExpenseManager implements IExpenseManager {
                 return;
             }
 
-            if (!(await this._expensePayerStatusDao.read({ id: childId, userId }))) {
+            if (!(await this._expensePayerStatusDao.read({ expenseId: childId, userId }))) {
                 await this._expensePayerStatusDao.create(new ExpensePayerStatus(expenseId, userId, false));
             }
 
