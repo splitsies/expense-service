@@ -203,17 +203,7 @@ export class ExpenseManager implements IExpenseManager {
             await this._expensePayerStatusDao.create(new ExpensePayerStatus(expenseId, userId, false));
         }
 
-        const childExpenseIds = await this._expenseDao.getChildExpenseIds(expenseId);
-        await Promise.all(childExpenseIds.map(async id => {
-            if (await this._userExpenseDao.read({ userId, expenseId: id })) {
-                return;
-            }
-
-            await this._userExpenseDao.create(
-                new UserExpense(id, userId, false, requestingUserId, new Date(Date.now())),
-            );
-        }));
-
+        await this.addUserToChildren(expenseId, userId, requestingUserId);
         await this._userExpenseDao.create(
             new UserExpense(expenseId, userId, userId !== authorizedUserId, requestingUserId, new Date(Date.now())),
         );
@@ -248,6 +238,11 @@ export class ExpenseManager implements IExpenseManager {
         if (userExpenses.length === 0) {
             // If the last user was deleted, delete the expense as well
             await this._expenseDao.delete({ id: expenseId });
+        }
+
+        const childIds = await this._expenseDao.getChildExpenseIds(expenseId);
+        if (childIds.length > 0) {
+            await Promise.all(childIds.map(cid => this.removeUserFromExpense(cid, userId)));
         }
 
         return expense;
@@ -300,6 +295,7 @@ export class ExpenseManager implements IExpenseManager {
         }
 
         await this._userExpenseDao.create(request);
+        await this.addUserToChildren(expenseId, userId, requestingUserId);
 
         if (!(await this._expensePayerStatusDao.read({ expenseId, userId }))) {
             await this._expensePayerStatusDao.create(new ExpensePayerStatus(expenseId, userId, false));
@@ -486,5 +482,22 @@ export class ExpenseManager implements IExpenseManager {
 
     async getLeadingExpenseId(expenseId: string): Promise<string> {
         return (await this._expenseGroupDao.getParentExpenseId(expenseId)) ?? expenseId;
+    }
+
+    private async addUserToChildren(expenseId: string, userId: string, requestingUserId: string): Promise<void> {
+        const childExpenseIds = await this._expenseDao.getChildExpenseIds(expenseId);
+        await Promise.all(childExpenseIds.map(async childId => {
+            if (await this._userExpenseDao.read({ userId, expenseId: childId })) {
+                return;
+            }
+
+            if (!(await this._expensePayerStatusDao.read({ expenseId: childId, userId }))) {
+                await this._expensePayerStatusDao.create(new ExpensePayerStatus(expenseId, userId, false));
+            }
+
+            await this._userExpenseDao.create(
+                new UserExpense(childId, userId, false, requestingUserId, new Date(Date.now())),
+            );
+        }));
     }
 }
