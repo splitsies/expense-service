@@ -61,8 +61,6 @@ const expenseSchema = {
 export default {
     type: "object",
     properties: {
-        userId: { type: "string" },
-        expense: expenseSchema,
-    },
-    required: ["userId"],
+        expense: expenseSchema
+    }
 } as const;

@@ -56,6 +56,8 @@ import { IExpensePayerDao } from "src/dao/expense-payer-dao/expense-payer-dao-in
 import { ExpensePayerDao } from "src/dao/expense-payer-dao/expense-payer-dao";
 import { ExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-payer-status-dao";
 import { IExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-payer-status-dao-interface";
+import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
+import { ExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao";
 const container = new Container({ defaultScope: "Singleton" });
 
 container.bind<ILogger>(ILogger).to(Logger);
@@ -91,4 +93,5 @@ container.bind<IMessageQueueClient>(IMessageQueueClient).to(MessageQueueClient);
 
 container.bind<IExpensePayerDao>(IExpensePayerDao).to(ExpensePayerDao);
 container.bind<IExpensePayerStatusDao>(IExpensePayerStatusDao).to(ExpensePayerStatusDao);
+container.bind<IExpenseGroupDao>(IExpenseGroupDao).to(ExpenseGroupDao);
 export { container };

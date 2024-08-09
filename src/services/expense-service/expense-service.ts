@@ -57,6 +57,10 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.createExpenseFromScan(expense, userId);
     }
 
+    async addToExpenseGroup(parentExpenseId: string, userId: string, childExpense: IExpenseDto | undefined = undefined): Promise<IExpenseDto> {
+        return this._expenseManager.addToExpenseGroup(parentExpenseId, userId, childExpense);
+    }
+
     async updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto> {
         return await this._expenseManager.updateExpense(id, updated);
     }
@@ -148,5 +152,9 @@ export class ExpenseService implements IExpenseService {
 
     async setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto> {
         return await this._expenseManager.setExpensePayerStatus(expenseId, userId, settled);
+    }
+
+    async getLeadingExpenseId(expenseId: string): Promise<string> {
+        return this._expenseManager.getLeadingExpenseId(expenseId);
     }
 }

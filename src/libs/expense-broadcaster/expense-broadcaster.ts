@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { IExpenseBroadcaster } from "./expense-broadcaster-interface";
 import { IExpenseDto } from "@splitsies/shared-models";
-import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 import { sendMessage } from "@libs/broadcast";
 import { ILogger } from "@splitsies/utils";
@@ -12,13 +11,17 @@ import { IConnection } from "src/models/connection/connection-interface";
 export class ExpenseBroadcaster implements IExpenseBroadcaster {
     constructor(
         @inject(ILogger) private readonly _logger: ILogger,
-        @inject(IConnectionConfiguration) private readonly _connectionConfiguration: IConnectionConfiguration,
         @inject(IConnectionService) private readonly _connectionService: IConnectionService,
         @inject(IExpenseService) private readonly _expenseService: IExpenseService,
     ) {}
 
     async broadcast(expense: IExpenseDto): Promise<void> {
-        const connections = await this._connectionService.getConnectionsForExpenseId(expense.id);
+        const leadingExpenseId = await this._expenseService.getLeadingExpenseId(expense.id);
+        const connections = await this._connectionService.getConnectionsForExpenseId(leadingExpenseId);
+
+        if (expense.id !== leadingExpenseId) {
+            expense = await this._expenseService.getExpense(leadingExpenseId);
+        }
 
         // See local-emulation/queue-runner for setting up local listening to DynamoDB Stream
         return this._expenseService.queueExpenseUpdate(expense, connections);
