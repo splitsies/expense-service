@@ -45,6 +45,7 @@ export interface IExpenseManager {
     deleteUserData(userId: string): Promise<string[]>;
     setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto>;
     setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto>;
+    getLeadingExpenseId(expenseId: string): Promise<string>;
 }
 
 export const IExpenseManager = Symbol.for("IExpenseManager");

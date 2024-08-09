@@ -153,4 +153,8 @@ export class ExpenseService implements IExpenseService {
     async setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto> {
         return await this._expenseManager.setExpensePayerStatus(expenseId, userId, settled);
     }
+
+    async getLeadingExpenseId(expenseId: string): Promise<string> {
+        return this._expenseManager.getLeadingExpenseId(expenseId);
+    }
 }

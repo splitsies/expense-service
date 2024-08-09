@@ -27,6 +27,7 @@ import deleteUserData from "@functions/expense/delete-user-data";
 import getJoinRequestCountForUser from "@functions/expense/get-join-request-count";
 import setExpensePayers from "@functions/expense/set-expense-payers";
 import setExpensePayerStatus from "@functions/expense/set-expense-payer-status";
+import addToExpenseGroup from "@functions/expense/add-to-expense-group";
 
 const serverlessConfiguration: AWS = {
     org: "splitsies",
@@ -87,6 +88,7 @@ const serverlessConfiguration: AWS = {
         getJoinRequestCountForUser,
         setExpensePayers,
         setExpensePayerStatus,
+        addToExpenseGroup,
     },
     package: { individually: true },
     custom: {
