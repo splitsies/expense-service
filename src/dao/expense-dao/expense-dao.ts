@@ -63,10 +63,14 @@ export class ExpenseDao implements IExpenseDao {
     async getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDa>> {
         const res = await this._client<IExpenseDa[]>`
             SELECT e.*
-              FROM "Expense" e, "UserExpense" ue
-             WHERE e."id" = ue."expenseId"
-               AND ue."userId" = ${userId}
+              FROM "Expense" e
+              JOIN "UserExpense" ue
+                ON e."id" = ue."expenseId"
+         LEFT JOIN "ExpenseGroup" eg
+                ON eg."childExpenseId" = e."id"
+             WHERE ue."userId" = ${userId}
                AND ue."pendingJoin" = FALSE
+               AND eg."parentExpenseId" IS NULL
           ORDER BY e."transactionDate" DESC
              LIMIT ${limit} OFFSET ${offset}
         `;
@@ -84,5 +88,16 @@ export class ExpenseDao implements IExpenseDao {
         `;
 
         return res.length ? res : [];
+    }
+
+    async getChildExpenseIds(parentExpenseId: string): Promise<string[]> {
+        const res = await this._client<{ childExpenseId: string }[]>`
+            SELECT "childExpenseId"
+              FROM "ExpenseGroup"         
+             WHERE "parentExpenseId" = ${parentExpenseId};
+        `;
+
+
+        return res.length ? res.map(r => r.childExpenseId) : [];
     }
 }

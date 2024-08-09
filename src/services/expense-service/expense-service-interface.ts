@@ -2,7 +2,6 @@ import {
     IExpenseDto,
     IExpenseItem,
     IExpenseJoinRequest,
-    IExpensePayerDto,
     IExpenseUserDetails,
     IPayerShare,
     IScanResult,
@@ -16,6 +15,7 @@ export interface IExpenseService {
     getUserExpense(userId: string, expenseId: string): Promise<IUserExpense>;
     createExpense(userId: string): Promise<IExpenseDto>;
     createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
+    addToExpenseGroup(parentExpenseId: string, userId: string, childExpense?: IExpenseDto | undefined): Promise<IExpenseDto>
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
     getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDto>>;
     addUserToExpense(
@@ -45,6 +45,7 @@ export interface IExpenseService {
     deleteUserData(userId: string): Promise<string[]>;
     setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto>;
     setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto>;
+    getLeadingExpenseId(expenseId: string): Promise<string>;
 }
 
 export const IExpenseService: symbol = Symbol.for("IExpenseService");

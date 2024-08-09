@@ -8,6 +8,7 @@ export interface IExpenseDtoMapper {
         items: IExpenseItem[],
         payers: IPayerShare[],
         payerStatuses: ExpensePayerStatus[],
+        children: IExpenseDto[],
     ): IExpenseDto;
 }
 export const IExpenseDtoMapper = Symbol.for("IExpenseDtoMapper");

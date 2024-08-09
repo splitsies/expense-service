@@ -43,9 +43,9 @@ export const main = SplitsiesFunctionHandlerFactory.create<typeof schema, IExpen
             logger.error(`No expense found for user ${userId} expense ${expenseId}`);
             throw new UnauthorizedUserError();
         }
-
-        const expense = await expenseService.getExpense(userExpense.expenseId);
-        await connectionService.create(connectionId, expenseId);
+        const leadingExpenseId = await expenseService.getLeadingExpenseId(userExpense.expenseId);
+        const expense = await expenseService.getExpense(leadingExpenseId);
+        await connectionService.create(connectionId, expense.id);
         await expenseBroadcaster.broadcast(expense);
         return new DataResponse(HttpStatusCode.OK, expense).toJson();
     },
