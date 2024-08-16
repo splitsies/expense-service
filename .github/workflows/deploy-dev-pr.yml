@@ -19,6 +19,15 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+    
+    - uses: actions/setup-python@v3
+    - uses: aws-actions/setup-sam@v2
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY }}
+        aws-region: us-east-1
+
     - run: npm ci
     - name: serverless deploy
       uses: serverless/github-action@v3.1
@@ -54,10 +63,22 @@ jobs:
                 --param="FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY_DEV_PR }}" \
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_DEV_PR }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_DEV_PR }}" \
-                --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \                
+                --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \
+                --param="RTENV=dev-pr" \
                 --param="QUEUE_STAGE_NAME=devpr"
 
-      env:
-        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY }}
+    - run: npm ci
+      working-directory: ./resources
+    - run: sam build
+      working-directory: ./resources
+    - run: |
+        sam deploy --stack-name expense-service-database-dev-pr \
+        --no-confirm-changeset \
+        --no-fail-on-empty-changeset \
+        --parameter-overrides "Stage=devpr" "RtEnv=dev-pr"
+      working-directory: ./resources
+
+    env:
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY }}

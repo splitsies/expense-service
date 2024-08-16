@@ -18,10 +18,10 @@ export default {
                             Keys: { queueName: { S: [QueueConfig.expenseUpdate] } },
                             NewImage: {
                                 data: {
-                                    "M": {
-                                        connection: { "M": { gatewayUrl: { S: ["${param:APIG_URL}"] } } },
-                                    }
-                                }
+                                    M: {
+                                        connection: { M: { gatewayUrl: { S: ["${param:APIG_URL}"] } } },
+                                    },
+                                },
                             },
                         },
                     },

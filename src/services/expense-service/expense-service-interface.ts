@@ -2,7 +2,9 @@ import {
     IExpenseDto,
     IExpenseItem,
     IExpenseJoinRequest,
+    IExpensePayerDto,
     IExpenseUserDetails,
+    IPayerShare,
     IScanResult,
 } from "@splitsies/shared-models";
 import { IConnection } from "src/models/connection/connection-interface";
@@ -16,9 +18,15 @@ export interface IExpenseService {
     createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
     getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDto>>;
-    addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
+    addUserToExpense(
+        userId: string,
+        expenseId: string,
+        requestingUserId: string,
+        authorizedUserId: string,
+    ): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;
-    getExpenseJoinRequestsForUser(userId: string): Promise<IUserExpenseDto[]>;
+    getExpenseJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpenseDto>>;
+    getJoinRequestCountForUser(userId: string): Promise<number>;
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
     removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]>;
@@ -35,6 +43,8 @@ export interface IExpenseService {
     replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]>;
     queueExpenseUpdate(expenseUpdate: IExpenseDto, connections: IConnection[]): Promise<void>;
     deleteUserData(userId: string): Promise<string[]>;
+    setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto>;
+    setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto>;
 }
 
 export const IExpenseService: symbol = Symbol.for("IExpenseService");

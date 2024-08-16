@@ -4,6 +4,7 @@ import {
     IExpenseItem,
     IExpenseJoinRequest,
     IExpenseUserDetails,
+    IPayerShare,
     IScanResult,
     QueueMessage,
 } from "@splitsies/shared-models";
@@ -36,7 +37,7 @@ export class ExpenseService implements IExpenseService {
                 ),
             ),
         );
-        
+
         await Promise.all(messages);
     }
 
@@ -68,8 +69,13 @@ export class ExpenseService implements IExpenseService {
         return await this._expenseManager.getUsersForExpense(expenseId);
     }
 
-    async addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
-        await this._expenseManager.addUserToExpense(userId, expenseId, requestingUserId);
+    async addUserToExpense(
+        userId: string,
+        expenseId: string,
+        requestingUserId: string,
+        authorizedUserId: string,
+    ): Promise<void> {
+        await this._expenseManager.addUserToExpense(userId, expenseId, requestingUserId, authorizedUserId);
     }
 
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {
@@ -98,8 +104,16 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.saveUpdatedItems(updatedItems);
     }
 
-    async getExpenseJoinRequestsForUser(userId: string): Promise<IUserExpenseDto[]> {
-        return await this._expenseManager.getExpenseJoinRequestsForUser(userId);
+    async getExpenseJoinRequestsForUser(
+        userId: string,
+        limit: number,
+        offset: number,
+    ): Promise<IScanResult<IUserExpenseDto>> {
+        return await this._expenseManager.getExpenseJoinRequestsForUser(userId, limit, offset);
+    }
+
+    async getJoinRequestCountForUser(userId: string): Promise<number> {
+        return await this._expenseManager.getJoinRequestCountForUser(userId);
     }
 
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]> {
@@ -126,5 +140,13 @@ export class ExpenseService implements IExpenseService {
 
     async deleteUserData(userId: string): Promise<string[]> {
         return await this._expenseManager.deleteUserData(userId);
+    }
+
+    async setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto> {
+        return await this._expenseManager.setExpensePayers(expenseId, payerShares);
+    }
+
+    async setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto> {
+        return await this._expenseManager.setExpensePayerStatus(expenseId, userId, settled);
     }
 }
