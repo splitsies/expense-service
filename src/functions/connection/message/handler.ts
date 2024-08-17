@@ -36,13 +36,19 @@ export const main = middyfyWs(
                 return new DataResponse(HttpStatusCode.OK, null).toJson();
             }
 
-            await connectionService.refreshTtl(event.requestContext.connectionId);
-
             const paramsDto = event.body.params as IExpenseMessageParametersDto;
             const params = expenseMessageParametersMapper.toDomainModel(paramsDto);
 
             const updated = await expenseMessageStrategy.execute(event.body.method as ExpenseOperation, params);
-            await expenseBroadcaster.broadcast(updated);
+            await connectionService.refreshTtl(event.requestContext.connectionId);
+            
+            const ignored = [];
+            if (params.ignoreResponse) {
+                console.log(`ignoring connection=${event.requestContext.connectionId}`);
+                ignored.push(event.requestContext.connectionId);
+            }
+
+            await expenseBroadcaster.broadcast(updated, ignored);
             return new DataResponse(HttpStatusCode.OK, updated).toJson();
         },
         expectedErrors,

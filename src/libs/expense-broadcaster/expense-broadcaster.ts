@@ -15,7 +15,7 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
         @inject(IExpenseService) private readonly _expenseService: IExpenseService,
     ) {}
 
-    async broadcast(expense: IExpenseDto): Promise<void> {
+    async broadcast(expense: IExpenseDto, ignoredConnectionIds: string[] = []): Promise<void> {
         const leadingExpenseId = await this._expenseService.getLeadingExpenseId(expense.id);
         const connections = await this._connectionService.getConnectionsForExpenseId(leadingExpenseId);
 
@@ -23,8 +23,13 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
             expense = await this._expenseService.getExpense(leadingExpenseId);
         }
 
+        const ignored = new Set(ignoredConnectionIds);
+
         // See local-emulation/queue-runner for setting up local listening to DynamoDB Stream
-        return this._expenseService.queueExpenseUpdate(expense, connections);
+        return this._expenseService.queueExpenseUpdate(
+            expense,
+            connections.filter(c => !ignored.has(c.connectionId))
+        );
     }
 
     async notify(expense: IExpenseDto, connection: IConnection): Promise<void> {
