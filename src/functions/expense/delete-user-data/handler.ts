@@ -1,6 +1,6 @@
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
-import { IQueueMessage } from "@splitsies/shared-models";
+import { ExpenseMessage, ExpenseMessageType, IQueueMessage } from "@splitsies/shared-models";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
 import { DynamoDBStreamHandler } from "aws-lambda/trigger/dynamodb-stream";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
@@ -26,8 +26,12 @@ export const main: DynamoDBStreamHandler = async (event, context, callback) => {
     }
 
     for (const id of expenseIds) {
-        const expense = await expenseService.getExpense(id);
-        await expenseBroadcaster.broadcast(expense);
+        const expense = await expenseService.getLeadingExpense(id);
+        await expenseBroadcaster.broadcast(new ExpenseMessage({
+            type: ExpenseMessageType.ExpenseDto,
+            connectedExpenseId: expense.id,
+            expenseDto: expense,
+        }));
     }
 
     await messageQueueClient.deleteBatch(messages);

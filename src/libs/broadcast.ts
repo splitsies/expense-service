@@ -1,7 +1,7 @@
-import { IExpenseDto } from "@splitsies/shared-models";
+import { ExpenseMessage } from "@splitsies/shared-models";
 import { ApiGatewayManagementApi } from "@aws-sdk/client-apigatewaymanagementapi";
 
-export async function sendMessage(endpoint: string, connectionId: string, body: IExpenseDto): Promise<void> {
+export async function sendMessage(endpoint: string, connectionId: string, body: ExpenseMessage): Promise<void> {
     try {
         const apig = new ApiGatewayManagementApi({
             apiVersion: "2018-11-29",

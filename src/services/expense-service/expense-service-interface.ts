@@ -1,4 +1,5 @@
 import {
+    ExpenseMessage,
     IExpenseDto,
     IExpenseItem,
     IExpenseJoinRequest,
@@ -41,11 +42,12 @@ export interface IExpenseService {
     getExpenseItems(expenseId: string): Promise<IExpenseItem[]>;
     saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]>;
     replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]>;
-    queueExpenseUpdate(expenseUpdate: IExpenseDto, connections: IConnection[]): Promise<void>;
+    queueExpenseUpdate(expenseUpdate: ExpenseMessage, connections: IConnection[]): Promise<void>;
     deleteUserData(userId: string): Promise<string[]>;
     setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto>;
     setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto>;
     getLeadingExpenseId(expenseId: string): Promise<string>;
+    getLeadingExpense(expenseId: string): Promise<IExpenseDto>;
 }
 
 export const IExpenseService: symbol = Symbol.for("IExpenseService");

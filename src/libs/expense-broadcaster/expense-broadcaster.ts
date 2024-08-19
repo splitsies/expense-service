@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { IExpenseBroadcaster } from "./expense-broadcaster-interface";
-import { IExpenseDto } from "@splitsies/shared-models";
+import { ExpenseMessage, IExpenseDto } from "@splitsies/shared-models";
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 import { sendMessage } from "@libs/broadcast";
 import { ILogger } from "@splitsies/utils";
@@ -15,13 +15,8 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
         @inject(IExpenseService) private readonly _expenseService: IExpenseService,
     ) {}
 
-    async broadcast(expense: IExpenseDto, ignoredConnectionIds: string[] = []): Promise<void> {
-        const leadingExpenseId = await this._expenseService.getLeadingExpenseId(expense.id);
-        const connections = await this._connectionService.getConnectionsForExpenseId(leadingExpenseId);
-
-        if (expense.id !== leadingExpenseId) {
-            expense = await this._expenseService.getExpense(leadingExpenseId);
-        }
+    async broadcast(expense: ExpenseMessage, ignoredConnectionIds: string[] = []): Promise<void> {
+        const connections = await this._connectionService.getConnectionsForExpenseId(expense.connectedExpenseId);
 
         const ignored = new Set(ignoredConnectionIds);
 
@@ -32,7 +27,7 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
         );
     }
 
-    async notify(expense: IExpenseDto, connection: IConnection): Promise<void> {
+    async notify(expense: ExpenseMessage, connection: IConnection): Promise<void> {
         try {
             await sendMessage(connection.gatewayUrl, connection.connectionId, expense);
         } catch (e) {
