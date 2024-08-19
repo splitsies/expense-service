@@ -51,7 +51,6 @@ export const main = middyfyWs(
 
             const ignored = [];
             if (params.ignoreResponse) {
-                console.log(`ignoring connection=${event.requestContext.connectionId}`);
                 ignored.push(event.requestContext.connectionId);
             }
 
