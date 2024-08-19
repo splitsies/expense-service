@@ -23,7 +23,7 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
         // See local-emulation/queue-runner for setting up local listening to DynamoDB Stream
         return this._expenseService.queueExpenseUpdate(
             expense,
-            connections.filter(c => !ignored.has(c.connectionId))
+            connections.filter((c) => !ignored.has(c.connectionId)),
         );
     }
 

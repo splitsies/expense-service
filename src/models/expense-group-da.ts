@@ -1,6 +1,3 @@
 export class ExpenseGroupDa {
-    constructor(
-        readonly parentExpenseId: string,
-        readonly childExpenseId: string
-    ) { }
+    constructor(readonly parentExpenseId: string, readonly childExpenseId: string) {}
 }

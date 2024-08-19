@@ -47,8 +47,10 @@ export class ConnectionManager implements IConnectionManager {
         const expenseId = await this._connectionDao.getExpenseIdForConnection(connectionId);
 
         this._logger.debug(`deleting connection ${connectionId} for expense ${expenseId}`);
-        if (!connectionId || !expenseId) { return; }
-        
+        if (!connectionId || !expenseId) {
+            return;
+        }
+
         await this._connectionDao.delete({ connectionId, expenseId });
     }
 

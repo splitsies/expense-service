@@ -30,12 +30,14 @@ export const main = middyfy(
             await expenseService.addExpenseJoinRequest(event.body.userId, event.body.expenseId, tokenUserId);
 
             const expense = await expenseService.getLeadingExpense(event.body.expenseId);
-            await expenseBroadcaster.broadcast(new ExpenseMessage({
-                type: ExpenseMessageType.ExpenseDto,
-                connectedExpenseId: expense.id,
-                expenseDto: expense,
-            }));
-            
+            await expenseBroadcaster.broadcast(
+                new ExpenseMessage({
+                    type: ExpenseMessageType.ExpenseDto,
+                    connectedExpenseId: expense.id,
+                    expenseDto: expense,
+                }),
+            );
+
             return new DataResponse(HttpStatusCode.OK, null).toJson();
         },
         expectedErrors,

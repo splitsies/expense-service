@@ -32,16 +32,16 @@ const payerStatusSchema = {
         userId: { type: "string" },
         settled: { type: "boolean" },
     },
-    required: ["expenseId", "userId", "settled"]
+    required: ["expenseId", "userId", "settled"],
 } as const;
 
 const payerSchema = {
     type: "object",
     properties: {
-        "userId": { type: "string" },
-        "share": { type: "number" }
+        userId: { type: "string" },
+        share: { type: "number" },
     },
-    required: ["userId", "share"]
+    required: ["userId", "share"],
 } as const;
 
 export const expenseSchema = {
@@ -55,5 +55,5 @@ export const expenseSchema = {
         payers: { type: "array", items: payerSchema },
         payerStatuses: { type: "array", items: payerStatusSchema },
     },
-    required: ["id", "name", "transactionDate", "items", "userIds", "payers", "payerStatuses"],    
+    required: ["id", "name", "transactionDate", "items", "userIds", "payers", "payerStatuses"],
 } as const;

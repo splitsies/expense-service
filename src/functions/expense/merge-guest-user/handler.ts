@@ -29,13 +29,16 @@ export const main: DynamoDBStreamHandler = async (event, context, callback) => {
 
             for (const e of expenses) {
                 const expense = await expenseService.getLeadingExpense(e.id);
-                promises.push(expenseBroadcaster.broadcast(new ExpenseMessage({
-                    type: ExpenseMessageType.ExpenseDto,
-                    connectedExpenseId: expense.id,
-                    expenseDto: expense,
-                })));
+                promises.push(
+                    expenseBroadcaster.broadcast(
+                        new ExpenseMessage({
+                            type: ExpenseMessageType.ExpenseDto,
+                            connectedExpenseId: expense.id,
+                            expenseDto: expense,
+                        }),
+                    ),
+                );
             }
-            
         }
     }
 

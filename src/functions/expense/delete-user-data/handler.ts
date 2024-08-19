@@ -27,11 +27,13 @@ export const main: DynamoDBStreamHandler = async (event, context, callback) => {
 
     for (const id of expenseIds) {
         const expense = await expenseService.getLeadingExpense(id);
-        await expenseBroadcaster.broadcast(new ExpenseMessage({
-            type: ExpenseMessageType.ExpenseDto,
-            connectedExpenseId: expense.id,
-            expenseDto: expense,
-        }));
+        await expenseBroadcaster.broadcast(
+            new ExpenseMessage({
+                type: ExpenseMessageType.ExpenseDto,
+                connectedExpenseId: expense.id,
+                expenseDto: expense,
+            }),
+        );
     }
 
     await messageQueueClient.deleteBatch(messages);

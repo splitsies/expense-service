@@ -43,10 +43,12 @@ export const main = middyfyWs(
             let updated: ExpenseMessage;
 
             await Promise.all([
-                expenseMessageStrategy.execute(event.body.method as ExpenseOperation, params).then(result => updated = result),
-                connectionService.refreshTtl(event.requestContext.connectionId)
+                expenseMessageStrategy
+                    .execute(event.body.method as ExpenseOperation, params)
+                    .then((result) => (updated = result)),
+                connectionService.refreshTtl(event.requestContext.connectionId),
             ]);
-            
+
             const ignored = [];
             if (params.ignoreResponse) {
                 console.log(`ignoring connection=${event.requestContext.connectionId}`);

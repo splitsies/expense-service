@@ -27,13 +27,15 @@ export const main = middyfy(
                 requestingUserId,
                 event.requestContext.authorizer.userId,
             );
-            
+
             const expense = await expenseService.getLeadingExpense(expenseId);
-            await expenseBroadcaster.broadcast(new ExpenseMessage({
-                type: ExpenseMessageType.ExpenseDto,
-                connectedExpenseId: expense.id,
-                expenseDto: expense,
-            }));
+            await expenseBroadcaster.broadcast(
+                new ExpenseMessage({
+                    type: ExpenseMessageType.ExpenseDto,
+                    connectedExpenseId: expense.id,
+                    expenseDto: expense,
+                }),
+            );
             return new DataResponse(HttpStatusCode.OK, null).toJson();
         },
         [

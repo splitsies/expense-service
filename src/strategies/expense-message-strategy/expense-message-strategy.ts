@@ -106,7 +106,7 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         }
 
         await this._expenseService.saveUpdatedItems(updated);
-        
+
         const expense = await this._expenseService.getLeadingExpense(expenseId);
         return new ExpenseMessage({
             type: ExpenseMessageType.ExpenseDto,
@@ -137,7 +137,7 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         return new ExpenseMessage({
             type: ExpenseMessageType.ItemSelection,
             connectedExpenseId: await this._expenseService.getLeadingExpenseId(expenseId),
-            itemSelectionUpdate: new ExpenseItemSelectionUpdate(expenseId, itemId, user.id, selected)
+            itemSelectionUpdate: new ExpenseItemSelectionUpdate(expenseId, itemId, user.id, selected),
         });
     }
 
@@ -158,7 +158,7 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         return new ExpenseMessage({
             type: ExpenseMessageType.ItemDetails,
             connectedExpenseId: await this._expenseService.getLeadingExpenseId(expenseId),
-            itemDetailsUpdate: new ExpenseItemDetailsUpdate(expenseId, updatedItem)
+            itemDetailsUpdate: new ExpenseItemDetailsUpdate(expenseId, updatedItem),
         });
     }
 

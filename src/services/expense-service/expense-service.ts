@@ -58,7 +58,11 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.createExpenseFromScan(expense, userId);
     }
 
-    async addToExpenseGroup(parentExpenseId: string, userId: string, childExpense: IExpenseDto | undefined = undefined): Promise<IExpenseDto> {
+    async addToExpenseGroup(
+        parentExpenseId: string,
+        userId: string,
+        childExpense: IExpenseDto | undefined = undefined,
+    ): Promise<IExpenseDto> {
         return this._expenseManager.addToExpenseGroup(parentExpenseId, userId, childExpense);
     }
 

@@ -23,18 +23,24 @@ export const main = middyfy(
             await expenseService.addToExpenseGroup(expenseId, userId, event.body.expense);
 
             const expense = await expenseService.getLeadingExpense(expenseId);
-            
-            await expenseBroadcaster.broadcast(new ExpenseMessage({
-                type: ExpenseMessageType.ExpenseDto,
-                connectedExpenseId: expense.id,
-                expenseDto: expense,
-            }));
-            
+
+            await expenseBroadcaster.broadcast(
+                new ExpenseMessage({
+                    type: ExpenseMessageType.ExpenseDto,
+                    connectedExpenseId: expense.id,
+                    expenseDto: expense,
+                }),
+            );
+
             return new DataResponse(HttpStatusCode.OK, null).toJson();
         },
         [
             new ExpectedError(UnauthorizedUserError, HttpStatusCode.UNAUTHORIZED, "User cannot modify this expense"),
-            new ExpectedError(InvalidStateError, HttpStatusCode.BAD_REQUEST, "Unable to add a child to a non-existent expense"),
+            new ExpectedError(
+                InvalidStateError,
+                HttpStatusCode.BAD_REQUEST,
+                "Unable to add a child to a non-existent expense",
+            ),
             new ExpectedError(ApiCommunicationError, HttpStatusCode.BAD_GATEWAY, "Communication error"),
         ],
     ),

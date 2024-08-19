@@ -25,11 +25,13 @@ export const main = middyfy(
 
             await expenseService.removeUserFromExpense(expenseId, userId);
             const expense = await expenseService.getLeadingExpense(expenseId);
-            await broadcaster.broadcast(new ExpenseMessage({
-                type: ExpenseMessageType.ExpenseDto,
-                connectedExpenseId: expense.id,
-                expenseDto: expense,
-            }));
+            await broadcaster.broadcast(
+                new ExpenseMessage({
+                    type: ExpenseMessageType.ExpenseDto,
+                    connectedExpenseId: expense.id,
+                    expenseDto: expense,
+                }),
+            );
 
             return new DataResponse(HttpStatusCode.OK, null).toJson();
         },
