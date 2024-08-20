@@ -24,7 +24,7 @@ export const main: DynamoDBStreamHandler = async (event, _, callback) => {
         updates.push(update);
 
         if (Date.now() > update.ttl) continue;
-        promises.push(expenseBroadcaster.notify(update.data.expenseDto, update.data.connection));
+        promises.push(expenseBroadcaster.notify(update.data.message, update.data.connection));
     }
 
     promises.push(messageQueueClient.deleteBatch(updates));

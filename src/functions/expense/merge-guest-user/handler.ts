@@ -1,6 +1,6 @@
 import { container } from "../../../di/inversify.config";
 import { IExpenseService } from "../../../services/expense-service/expense-service-interface";
-import { IExpenseUserDetails, IQueueMessage } from "@splitsies/shared-models";
+import { ExpenseMessage, ExpenseMessageType, IExpenseUserDetails, IQueueMessage } from "@splitsies/shared-models";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
 import { DynamoDBStreamHandler } from "aws-lambda/trigger/dynamodb-stream";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
@@ -25,11 +25,20 @@ export const main: DynamoDBStreamHandler = async (event, context, callback) => {
         messages.push(message);
 
         for (const payload of message.data) {
-            await expenseService.replaceGuestUserInfo(payload.deletedGuestId, payload.user).then((expenses) => {
-                for (const expense of expenses) {
-                    promises.push(expenseBroadcaster.broadcast(expense));
-                }
-            });
+            const expenses = await expenseService.replaceGuestUserInfo(payload.deletedGuestId, payload.user);
+
+            for (const e of expenses) {
+                const expense = await expenseService.getLeadingExpense(e.id);
+                promises.push(
+                    expenseBroadcaster.broadcast(
+                        new ExpenseMessage({
+                            type: ExpenseMessageType.ExpenseDto,
+                            connectedExpenseId: expense.id,
+                            expenseDto: expense,
+                        }),
+                    ),
+                );
+            }
         }
     }
 

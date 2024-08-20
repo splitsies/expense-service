@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import {
+    ExpenseMessage,
     IExpenseDto,
     IExpenseItem,
     IExpenseJoinRequest,
@@ -27,7 +28,7 @@ export class ExpenseService implements IExpenseService {
         @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient,
     ) {}
 
-    async queueExpenseUpdate(expenseUpdate: IExpenseDto, connections: IConnection[]): Promise<void> {
+    async queueExpenseUpdate(expenseUpdate: ExpenseMessage, connections: IConnection[]): Promise<void> {
         const messages = connections.map((connection) =>
             this._messageQueueClient.send(
                 new QueueMessage<IExpensePublishRequest>(
@@ -57,7 +58,11 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.createExpenseFromScan(expense, userId);
     }
 
-    async addToExpenseGroup(parentExpenseId: string, userId: string, childExpense: IExpenseDto | undefined = undefined): Promise<IExpenseDto> {
+    async addToExpenseGroup(
+        parentExpenseId: string,
+        userId: string,
+        childExpense: IExpenseDto | undefined = undefined,
+    ): Promise<IExpenseDto> {
         return this._expenseManager.addToExpenseGroup(parentExpenseId, userId, childExpense);
     }
 
@@ -156,5 +161,10 @@ export class ExpenseService implements IExpenseService {
 
     async getLeadingExpenseId(expenseId: string): Promise<string> {
         return this._expenseManager.getLeadingExpenseId(expenseId);
+    }
+
+    async getLeadingExpense(expenseId: string): Promise<IExpenseDto> {
+        const leadingExpenseId = await this.getLeadingExpenseId(expenseId);
+        return this.getExpense(leadingExpenseId);
     }
 }

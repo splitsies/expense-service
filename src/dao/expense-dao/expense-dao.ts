@@ -97,7 +97,6 @@ export class ExpenseDao implements IExpenseDao {
              WHERE "parentExpenseId" = ${parentExpenseId};
         `;
 
-
-        return res.length ? res.map(r => r.childExpenseId) : [];
+        return res.length ? res.map((r) => r.childExpenseId) : [];
     }
 }

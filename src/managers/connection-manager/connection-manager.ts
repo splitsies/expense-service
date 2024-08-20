@@ -44,9 +44,13 @@ export class ConnectionManager implements IConnectionManager {
     }
 
     async deleteConnection(connectionId: string): Promise<void> {
-        this._logger.debug(`deleting connection ${connectionId}`);
-
         const expenseId = await this._connectionDao.getExpenseIdForConnection(connectionId);
+
+        this._logger.debug(`deleting connection ${connectionId} for expense ${expenseId}`);
+        if (!connectionId || !expenseId) {
+            return;
+        }
+
         await this._connectionDao.delete({ connectionId, expenseId });
     }
 
