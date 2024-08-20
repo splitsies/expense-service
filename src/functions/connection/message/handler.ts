@@ -4,6 +4,7 @@ import { ExpectedError, ILogger, SplitsiesFunctionHandlerFactory } from "@splits
 import { container } from "src/di/inversify.config";
 import {
     DataResponse,
+    ExpenseMessage,
     ExpenseOperation,
     HttpStatusCode,
     IExpenseMessageParametersMapper,
@@ -36,13 +37,24 @@ export const main = middyfyWs(
                 return new DataResponse(HttpStatusCode.OK, null).toJson();
             }
 
-            await connectionService.refreshTtl(event.requestContext.connectionId);
-
             const paramsDto = event.body.params as IExpenseMessageParametersDto;
             const params = expenseMessageParametersMapper.toDomainModel(paramsDto);
 
-            const updated = await expenseMessageStrategy.execute(event.body.method as ExpenseOperation, params);
-            await expenseBroadcaster.broadcast(updated);
+            let updated: ExpenseMessage;
+
+            await Promise.all([
+                expenseMessageStrategy
+                    .execute(event.body.method as ExpenseOperation, params)
+                    .then((result) => (updated = result)),
+                connectionService.refreshTtl(event.requestContext.connectionId),
+            ]);
+
+            const ignored = [];
+            if (params.ignoreResponse) {
+                ignored.push(event.requestContext.connectionId);
+            }
+
+            await expenseBroadcaster.broadcast(updated, ignored);
             return new DataResponse(HttpStatusCode.OK, updated).toJson();
         },
         expectedErrors,

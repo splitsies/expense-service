@@ -44,7 +44,7 @@ const payerSchema = {
     required: ["userId", "share"],
 } as const;
 
-const expenseSchema = {
+export const expenseSchema = {
     type: "object",
     properties: {
         id: { type: "string" },
@@ -56,13 +56,4 @@ const expenseSchema = {
         payerStatuses: { type: "array", items: payerStatusSchema },
     },
     required: ["id", "name", "transactionDate", "items", "userIds", "payers", "payerStatuses"],
-} as const;
-
-export default {
-    type: "object",
-    properties: {
-        userId: { type: "string" },
-        expense: expenseSchema,
-    },
-    required: ["userId"],
 } as const;
