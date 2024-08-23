@@ -19,9 +19,10 @@ import { randomUUID } from "crypto";
 import { IExpensePublishRequest } from "src/models/expense-publish-request/expense-publish-request-interface";
 import { ExpensePublishRequest } from "src/models/expense-publish-request/expense-publish-request";
 import { IConnection } from "src/models/connection/connection-interface";
-import { IExpenseOwnershipValidator } from "src/validators/expense-ownership-validator.i";
+import { IExpenseOwnershipValidator } from "src/validators/expense-ownership-validator/expense-ownership-validator.i";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
-import { group } from "console";
+import { ILeadingExpenseValidator } from "src/validators/leading-expense-validator/leading-expense-validator.i";
+import { InvalidStateError } from "src/models/error/invalid-state-error";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -30,6 +31,7 @@ export class ExpenseService implements IExpenseService {
         @inject(IExpenseManager) private readonly _expenseManager: IExpenseManager,
         @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient,
         @inject(IExpenseOwnershipValidator) private readonly _expenseOwnershipValidator: IExpenseOwnershipValidator,
+        @inject(ILeadingExpenseValidator) private readonly _leadingExpenseValidator: ILeadingExpenseValidator,
     ) {}
 
     async queueExpenseUpdate(expenseUpdate: ExpenseMessage, connections: IConnection[]): Promise<void> {
@@ -63,12 +65,12 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.createExpenseFromScan(expense, userId);
     }
 
-    async addToExpenseGroup(
+    async addNewExpenseToGroup(
         parentExpenseId: string,
         userId: string,
         childExpense: IExpenseDto | undefined = undefined,
     ): Promise<IExpenseDto> {
-        return this._expenseManager.addToExpenseGroup(parentExpenseId, userId, childExpense);
+        return this._expenseManager.addNewExpenseToGroup(parentExpenseId, userId, childExpense);
     }
 
     async addExistingExpenseToGroup(groupExpenseId: string, childExpenseId: string, requestingUserId: string): Promise<void> {
@@ -105,9 +107,12 @@ export class ExpenseService implements IExpenseService {
         userId: string,
         expenseId: string,
         requestingUserId: string,
-        authorizedUserId: string,
     ): Promise<void> {
-        await this._expenseManager.addUserToExpense(userId, expenseId, requestingUserId, authorizedUserId);
+        if (!(await this._expenseOwnershipValidator.validateForUserAdd(expenseId, userId, requestingUserId))) {
+            throw new UnauthorizedUserError();
+        }
+
+        await this._expenseManager.addUserToExpense(userId, expenseId);
     }
 
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {
@@ -153,6 +158,10 @@ export class ExpenseService implements IExpenseService {
     }
 
     async addExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
+        if (!(await this._leadingExpenseValidator.validate(expenseId))) {
+            throw new InvalidStateError("Cannot add join request to a non-leading expense");
+        }
+
         await this._expenseManager.addExpenseJoinRequest(userId, expenseId, requestingUserId);
         if (userId.startsWith("@splitsies-guest")) return;
 

@@ -20,7 +20,7 @@ export const main = middyfy(
             const expenseId = event.pathParameters.expenseId;
             const userId = event.requestContext.authorizer.userId;
 
-            await expenseService.addToExpenseGroup(expenseId, userId, event.body.expense);
+            await expenseService.addNewExpenseToGroup(expenseId, userId, event.body.expense);
 
             const expense = await expenseService.getLeadingExpense(expenseId);
 

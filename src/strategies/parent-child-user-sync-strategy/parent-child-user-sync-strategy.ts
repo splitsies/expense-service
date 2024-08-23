@@ -15,13 +15,13 @@ export class ParentChildUserSyncStrategy implements IParentChildUserSyncStrategy
     async sync(parentExpenseId: string): Promise<void> {
         const users = await this._userExpenseDao.getUsersForExpense(parentExpenseId);
         const childIds = await this._expenseGroupDao.getChildExpenseIds(parentExpenseId);
-        const promises: Promise<void[]>[] = [];
+        const promises: Promise<void>[] = [];
 
         // Add each of the parent's users to each child
         promises.push(
             ...childIds.map(async childId => {
-                return await Promise.all(
-                    users.map((userId) => this._userExpenseStrategy.addUserToExpense(userId, childId)));
+                await Promise.all(
+                    users.map((userId) => this._userExpenseStrategy.addUserToExpense(userId, childId, false)));
             })
         );
 
@@ -29,8 +29,8 @@ export class ParentChildUserSyncStrategy implements IParentChildUserSyncStrategy
         promises.push(
             ...childIds.map(async childId => {
                 const userIds = await this._userExpenseDao.getUsersForExpense(childId);
-                return await Promise.all(
-                    userIds.map(userId => this._userExpenseStrategy.addUserToExpense(userId, parentExpenseId)));
+                await Promise.all(
+                    userIds.map(userId => this._userExpenseStrategy.addUserToExpense(userId, parentExpenseId, false)));
             })
         );
 

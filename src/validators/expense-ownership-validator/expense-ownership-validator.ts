@@ -4,7 +4,6 @@ import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-inter
 
 @injectable()
 export class ExpenseOwnershipValidator implements IExpenseOwnershipValidator {
-    
     constructor(
         @inject(IUserExpenseDao) private readonly _dao: IUserExpenseDao,
     ) {}
@@ -13,4 +12,14 @@ export class ExpenseOwnershipValidator implements IExpenseOwnershipValidator {
         return !!(await this._dao.read({ expenseId, userId }));
     }
 
+    async validateForUserAdd(expenseId: string, userId: string, requestingUserId: string): Promise<boolean> {
+        const userIsAddingSelf = userId === requestingUserId;
+        const existingUserExpense = await this._dao.read({ userId: requestingUserId, expenseId });
+
+        if (!userIsAddingSelf && !existingUserExpense) {
+            return false;
+        }
+
+        return true;
+    }
 }

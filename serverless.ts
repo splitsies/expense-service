@@ -27,7 +27,7 @@ import deleteUserData from "@functions/expense/delete-user-data";
 import getJoinRequestCountForUser from "@functions/expense/get-join-request-count";
 import setExpensePayers from "@functions/expense/set-expense-payers";
 import setExpensePayerStatus from "@functions/expense/set-expense-payer-status";
-import addToExpenseGroup from "@functions/expense/add-to-expense-group";
+import addNewExpenseToGroup from "@functions/expense/add-new-expense-to-group";
 import addExistingExpenseToGroup from "@functions/expense/add-existing-expense-to-group";
 import removeExpenseFromGroup from "@functions/expense/remove-expense-from-group";
 
@@ -90,7 +90,7 @@ const serverlessConfiguration: AWS = {
         getJoinRequestCountForUser,
         setExpensePayers,
         setExpensePayerStatus,
-        addToExpenseGroup,
+        addNewExpenseToGroup,
         addExistingExpenseToGroup,
         removeExpenseFromGroup,
     },
