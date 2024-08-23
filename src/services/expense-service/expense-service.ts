@@ -19,6 +19,9 @@ import { randomUUID } from "crypto";
 import { IExpensePublishRequest } from "src/models/expense-publish-request/expense-publish-request-interface";
 import { ExpensePublishRequest } from "src/models/expense-publish-request/expense-publish-request";
 import { IConnection } from "src/models/connection/connection-interface";
+import { IExpenseOwnershipValidator } from "src/validators/expense-ownership-validator.i";
+import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
+import { group } from "console";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -26,6 +29,7 @@ export class ExpenseService implements IExpenseService {
         @inject(ILogger) private readonly _logger: ILogger,
         @inject(IExpenseManager) private readonly _expenseManager: IExpenseManager,
         @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient,
+        @inject(IExpenseOwnershipValidator) private readonly _expenseOwnershipValidator: IExpenseOwnershipValidator,
     ) {}
 
     async queueExpenseUpdate(expenseUpdate: ExpenseMessage, connections: IConnection[]): Promise<void> {
@@ -41,6 +45,7 @@ export class ExpenseService implements IExpenseService {
 
         await Promise.all(messages);
     }
+    
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
         return this._expenseManager.getUserExpense(userId, expenseId);
@@ -64,6 +69,24 @@ export class ExpenseService implements IExpenseService {
         childExpense: IExpenseDto | undefined = undefined,
     ): Promise<IExpenseDto> {
         return this._expenseManager.addToExpenseGroup(parentExpenseId, userId, childExpense);
+    }
+
+    async addExistingExpenseToGroup(groupExpenseId: string, childExpenseId: string, requestingUserId: string): Promise<void> {
+        if (!(await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId)) ||
+            !(await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId))) {
+            throw new UnauthorizedUserError(`User ${requestingUserId} not authorized to edit expenses`);
+        }
+
+        return this._expenseManager.addExistingExpenseToGroup(groupExpenseId, childExpenseId);
+    }
+
+    async removeExpenseFromGroup(groupExpenseId: string, childExpenseId: string, requestingUserId: string): Promise<void> {
+        if (!(await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId)) ||
+            !(await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId))) {
+            throw new UnauthorizedUserError(`User ${requestingUserId} not authorized to edit expenses`);
+        }
+
+        return this._expenseManager.removeExpenseFromGroup(groupExpenseId, childExpenseId);
     }
 
     async updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto> {
