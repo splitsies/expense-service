@@ -31,8 +31,6 @@ export const main = middyfy(
 
             return new DataResponse(HttpStatusCode.OK, null).toJson();
         },
-        [
-            new ExpectedError(UnauthorizedUserError, HttpStatusCode.UNAUTHORIZED, "User cannot modify this expense"),
-        ],
+        [new ExpectedError(UnauthorizedUserError, HttpStatusCode.UNAUTHORIZED, "User cannot modify this expense")],
     ),
 );

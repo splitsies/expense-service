@@ -58,12 +58,15 @@ import { ExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-
 import { IExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-payer-status-dao-interface";
 import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
 import { ExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao";
-import { IExpenseOwnershipValidator } from "src/validators/expense-ownership-validator.i";
-import { ExpenseOwnershipValidator } from "src/validators/expense-ownership-validator";
+import { IExpenseOwnershipValidator } from "src/validators/expense-ownership-validator/expense-ownership-validator.i";
+import { ExpenseOwnershipValidator } from "src/validators/expense-ownership-validator/expense-ownership-validator";
 import { IParentChildUserSyncStrategy } from "src/strategies/parent-child-user-sync-strategy/parent-child-user-sync-strategy.i";
 import { ParentChildUserSyncStrategy } from "src/strategies/parent-child-user-sync-strategy/parent-child-user-sync-strategy";
 import { IUserExpenseStrategy } from "src/strategies/user-expense-strategy/user-expense-strategy.i";
 import { UserExpenseStrategy } from "src/strategies/user-expense-strategy/user-expense-strategy";
+import { ILeadingExpenseValidator } from "src/validators/leading-expense-validator/leading-expense-validator.i";
+import { LeadingExpenseValidator } from "src/validators/leading-expense-validator/leading-expense-validator";
+
 const container = new Container({ defaultScope: "Singleton" });
 
 container.bind<ILogger>(ILogger).to(Logger);
@@ -103,4 +106,5 @@ container.bind<IExpenseGroupDao>(IExpenseGroupDao).to(ExpenseGroupDao);
 container.bind<IExpenseOwnershipValidator>(IExpenseOwnershipValidator).to(ExpenseOwnershipValidator);
 container.bind<IParentChildUserSyncStrategy>(IParentChildUserSyncStrategy).to(ParentChildUserSyncStrategy);
 container.bind<IUserExpenseStrategy>(IUserExpenseStrategy).to(UserExpenseStrategy);
+container.bind<ILeadingExpenseValidator>(ILeadingExpenseValidator).to(LeadingExpenseValidator);
 export { container };
