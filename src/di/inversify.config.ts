@@ -62,6 +62,8 @@ import { IExpenseOwnershipValidator } from "src/validators/expense-ownership-val
 import { ExpenseOwnershipValidator } from "src/validators/expense-ownership-validator";
 import { IParentChildUserSyncStrategy } from "src/strategies/parent-child-user-sync-strategy/parent-child-user-sync-strategy.i";
 import { ParentChildUserSyncStrategy } from "src/strategies/parent-child-user-sync-strategy/parent-child-user-sync-strategy";
+import { IUserExpenseStrategy } from "src/strategies/user-expense-strategy/user-expense-strategy.i";
+import { UserExpenseStrategy } from "src/strategies/user-expense-strategy/user-expense-strategy";
 const container = new Container({ defaultScope: "Singleton" });
 
 container.bind<ILogger>(ILogger).to(Logger);
@@ -100,4 +102,5 @@ container.bind<IExpensePayerStatusDao>(IExpensePayerStatusDao).to(ExpensePayerSt
 container.bind<IExpenseGroupDao>(IExpenseGroupDao).to(ExpenseGroupDao);
 container.bind<IExpenseOwnershipValidator>(IExpenseOwnershipValidator).to(ExpenseOwnershipValidator);
 container.bind<IParentChildUserSyncStrategy>(IParentChildUserSyncStrategy).to(ParentChildUserSyncStrategy);
+container.bind<IUserExpenseStrategy>(IUserExpenseStrategy).to(UserExpenseStrategy);
 export { container };
