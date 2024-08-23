@@ -68,4 +68,14 @@ export class ExpenseGroupDao implements IExpenseGroupDao {
 
         return res.length ? res[0].parentExpenseId : undefined;
     }
+
+    async getChildExpenseIds(parentExpenseId: string): Promise<string[]> {
+        const res = await this._client<{ childExpenseId: string }[]>`
+            SELECT "childExpenseId"
+              FROM "ExpenseGroup"         
+             WHERE "parentExpenseId" = ${parentExpenseId};
+        `;
+
+        return res.length ? res.map((r) => r.childExpenseId) : [];
+    }
 }

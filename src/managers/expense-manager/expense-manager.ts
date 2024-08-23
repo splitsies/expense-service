@@ -32,6 +32,7 @@ import { InvalidStateError } from "src/models/error/invalid-state-error";
 import { IExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-payer-status-dao-interface";
 import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
 import { ExpenseGroupDa } from "src/models/expense-group-da";
+import { IParentChildUserSyncStrategy } from "src/strategies/parent-child-user-sync-strategy/parent-child-user-sync-strategy.i";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -45,6 +46,7 @@ export class ExpenseManager implements IExpenseManager {
         @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient,
         @inject(IExpensePayerStatusDao) private readonly _expensePayerStatusDao: IExpensePayerStatusDao,
         @inject(IExpenseGroupDao) private readonly _expenseGroupDao: IExpenseGroupDao,
+        @inject(IParentChildUserSyncStrategy) private readonly _parentChildSyncStrategy: IParentChildUserSyncStrategy,
     ) {}
 
     async queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void> {
@@ -52,6 +54,7 @@ export class ExpenseManager implements IExpenseManager {
             new QueueMessage<IExpenseDto>(QueueConfig.expenseUpdate, randomUUID(), expenseUpdate),
         );
     }
+
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
         const userExpense = { userId, expenseId } as IUserExpense;
         const key = this._userExpenseDao.key(userExpense);
@@ -134,6 +137,23 @@ export class ExpenseManager implements IExpenseManager {
         await Promise.all(users.map((uid) => this.addUserToExpense(uid, childExpense.id, userId, uid)));
         await Promise.all(childUsers.map((uid) => this.addUserToExpense(uid, parentExpenseId, userId, uid)));
         return this.getExpense(parentExpenseId);
+    }
+
+    async addExistingExpenseToGroup(groupExpenseId: string, childExpenseId: string): Promise<void> {
+        if (await this._expenseGroupDao.read({ parentExpenseId: groupExpenseId, childExpenseId })) {
+            return;
+        }
+
+        await this._expenseGroupDao.create(new ExpenseGroupDa(groupExpenseId, childExpenseId));
+        await this._parentChildSyncStrategy.sync(groupExpenseId);
+    }
+
+    async removeExpenseFromGroup(groupExpenseId: string, childExpenseId: string): Promise<void> {
+        if (!(await this._expenseGroupDao.read({ parentExpenseId: groupExpenseId, childExpenseId }))) {
+            return;
+        }
+
+        await this._expenseGroupDao.delete({ parentExpenseId: groupExpenseId, childExpenseId });
     }
 
     async updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto> {
