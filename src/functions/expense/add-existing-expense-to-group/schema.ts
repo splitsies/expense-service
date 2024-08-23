@@ -3,5 +3,5 @@ export default {
     properties: {
         childExpenseId: { type: "string" },
     },
-    required: ["childExpenseId"]
+    required: ["childExpenseId"],
 } as const;

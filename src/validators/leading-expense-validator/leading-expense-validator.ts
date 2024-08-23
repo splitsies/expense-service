@@ -4,9 +4,7 @@ import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-in
 
 @injectable()
 export class LeadingExpenseValidator implements ILeadingExpenseValidator {
-    constructor(
-        @inject(IExpenseGroupDao) private readonly _expenseGroupDao: IExpenseGroupDao,
-    ) { }
+    constructor(@inject(IExpenseGroupDao) private readonly _expenseGroupDao: IExpenseGroupDao) {}
 
     async validate(expenseId: string): Promise<boolean> {
         const hasParent = !!(await this._expenseGroupDao.getParentExpenseId(expenseId));

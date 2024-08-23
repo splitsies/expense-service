@@ -1,12 +1,12 @@
 export interface IUserExpenseStrategy {
     /**
-     * Adds a user to an expense. 
+     * Adds a user to an expense.
      * @param userId The id of the user being added
      * @param expenseId The expense to add to
      * @param addToChildren [default=true] Extends the user add to the children (if exists)
      */
     addUserToExpense(userId: string, expenseId: string, addToChildren?: boolean): Promise<void>;
-    
+
     addUserToChildren(userId: string, expenseId: string): Promise<void>;
 
     /**

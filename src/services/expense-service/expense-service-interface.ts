@@ -25,11 +25,7 @@ export interface IExpenseService {
     removeExpenseFromGroup(groupExpenseId: string, childExpenseId: string, requestingUserId: string): Promise<void>;
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
     getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDto>>;
-    addUserToExpense(
-        userId: string,
-        expenseId: string,
-        requestingUserId: string,
-    ): Promise<void>;
+    addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;
     getExpenseJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpenseDto>>;
     getJoinRequestCountForUser(userId: string): Promise<number>;

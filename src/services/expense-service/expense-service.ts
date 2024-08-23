@@ -47,7 +47,6 @@ export class ExpenseService implements IExpenseService {
 
         await Promise.all(messages);
     }
-    
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
         return this._expenseManager.getUserExpense(userId, expenseId);
@@ -73,18 +72,30 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.addNewExpenseToGroup(parentExpenseId, userId, childExpense);
     }
 
-    async addExistingExpenseToGroup(groupExpenseId: string, childExpenseId: string, requestingUserId: string): Promise<void> {
-        if (!(await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId)) ||
-            !(await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId))) {
+    async addExistingExpenseToGroup(
+        groupExpenseId: string,
+        childExpenseId: string,
+        requestingUserId: string,
+    ): Promise<void> {
+        if (
+            !(await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId)) ||
+            !(await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId))
+        ) {
             throw new UnauthorizedUserError(`User ${requestingUserId} not authorized to edit expenses`);
         }
 
         return this._expenseManager.addExistingExpenseToGroup(groupExpenseId, childExpenseId);
     }
 
-    async removeExpenseFromGroup(groupExpenseId: string, childExpenseId: string, requestingUserId: string): Promise<void> {
-        if (!(await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId)) ||
-            !(await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId))) {
+    async removeExpenseFromGroup(
+        groupExpenseId: string,
+        childExpenseId: string,
+        requestingUserId: string,
+    ): Promise<void> {
+        if (
+            !(await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId)) ||
+            !(await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId))
+        ) {
             throw new UnauthorizedUserError(`User ${requestingUserId} not authorized to edit expenses`);
         }
 
@@ -103,11 +114,7 @@ export class ExpenseService implements IExpenseService {
         return await this._expenseManager.getUsersForExpense(expenseId);
     }
 
-    async addUserToExpense(
-        userId: string,
-        expenseId: string,
-        requestingUserId: string,
-    ): Promise<void> {
+    async addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
         if (!(await this._expenseOwnershipValidator.validateForUserAdd(expenseId, userId, requestingUserId))) {
             throw new UnauthorizedUserError();
         }
