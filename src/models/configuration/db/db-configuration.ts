@@ -17,6 +17,9 @@ export class DbConfiguration implements IDbConfiguration {
     readonly connectionTokenTableName: string;
     readonly expensePayerTableName: string;
     readonly expensePayerStatusTableName: string;
+    readonly pgIdleTimeoutSec: number;
+    readonly pgMaxLifetimeSec: number;
+    readonly pgMaxConnections: number;
 
     constructor() {
         assert(!!process.env.dbAccessKeyId, "db access key was undefined");
@@ -32,7 +35,9 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.pgDatabaseName, "PG_DATABASE_NAME was undefined");
         assert(!!process.env.expensePayerTableName, "Expense Payer table name was undefined");
         assert(!!process.env.expensePayerStatusTableName, "ExpensePayerStatus table name was undefined");
-
+        assert(!!process.env.pgIdleTimeoutSec, "pgIdleTimeoutSec was undefined");
+        assert(!!process.env.pgMaxLifetimeSec, "pgMaxLifetimeSec was undefined");
+        assert(!!process.env.pgMaxConnections, "pgMaxConnections was undefined");
         this._dbAccessKeyId = process.env.dbAccessKeyId;
         this._dbSecretAccessKey = process.env.dbSecretAccessKey;
         this._dbRegion = process.env.dbRegion;
@@ -46,6 +51,9 @@ export class DbConfiguration implements IDbConfiguration {
         this.connectionTokenTableName = process.env.connectionTokenTableName;
         this.expensePayerTableName = process.env.expensePayerTableName;
         this.expensePayerStatusTableName = process.env.expensePayerStatusTableName;
+        this.pgIdleTimeoutSec = parseInt(process.env.pgIdleTimeoutSec);
+        this.pgMaxLifetimeSec = parseInt(process.env.pgMaxLifetimeSec);
+        this.pgMaxConnections = parseInt(process.env.pgMaxConnections);
     }
 
     get dbAccessKeyId(): string {
