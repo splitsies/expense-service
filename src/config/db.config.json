@@ -15,7 +15,7 @@
     "messageQueueResourceName": "${param:MESSAGE_QUEUE_RESOURCE_NAME}",
     "expensePayerTableName": "Splitsies-ExpensePayer-${param:RTENV}",
     "expensePayerStatusTableName": "Splitsies-ExpensePayerStatus-${param:RTENV}",
-    "pgIdleTimeoutSec": "1",
+    "pgIdleTimeoutSec": "10",
     "pgMaxLifetimeSec": "30",
-    "pgMaxConnections": "25"
+    "pgMaxConnections": "100"
 }
