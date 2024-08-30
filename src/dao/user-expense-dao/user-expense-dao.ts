@@ -17,6 +17,9 @@ export class UserExpenseDao implements IUserExpenseDao {
             hostname: dbConfiguration.pgHost,
             port: dbConfiguration.pgPort,
             database: dbConfiguration.pgDatabaseName,
+            idle_timeout: dbConfiguration.pgIdleTimeoutSec,
+            max_lifetime: dbConfiguration.pgMaxLifetimeSec,
+            max: dbConfiguration.pgMaxConnections,
         });
     }
     key: (model: IUserExpense) => Record<string, string | number>;
