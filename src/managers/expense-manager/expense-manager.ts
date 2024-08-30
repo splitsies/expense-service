@@ -64,9 +64,10 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async getExpense(id: string): Promise<IExpenseDto> {
-        let expenseDa: IExpenseDa;
+        
+        let expenseDa: IExpenseDa = await this._expenseDao.read({ id });
+        let userIds: string[] = await this._userExpenseDao.getUsersForExpense(id);
         let items: IExpenseItem[];
-        let userIds: string[];
         let payers: IPayerShare[];
         let payerStatuses: ExpensePayerStatus[];
         let children: IExpenseDto[];
@@ -74,11 +75,8 @@ export class ExpenseManager implements IExpenseManager {
         const childExpenseIds = await this._expenseGroupDao.getChildExpenseIds(id);
 
         await Promise.all([
-            this._expenseDao.read({ id }).then((e) => (expenseDa = e)),
-            this._userExpenseDao.getUsersForExpense(id).then((u) => (userIds = u)),
             this._expenseItemDao.getForExpense(id).then((e) => (items = e)),
-            this._expensePayerDao
-                .getForExpense(id)
+            this._expensePayerDao.getForExpense(id)
                 .then((ep) => (payers = ep.map((ep) => new PayerShare(ep.userId, ep.share)))),
             this._expensePayerStatusDao.getForExpense(id).then((ep) => (payerStatuses = ep)),
             Promise.all(childExpenseIds.map((cid) => this.getExpense(cid))).then((value) => (children = value)),
