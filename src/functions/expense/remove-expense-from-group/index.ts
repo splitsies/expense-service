@@ -10,11 +10,6 @@ export default {
                 method: "delete",
                 path: "expenses/{expenseId}/children/{childExpenseId}",
                 authorizer: { name: "verifyToken" },
-                request: {
-                    schemas: {
-                        "application/json": {},
-                    },
-                },
             },
         },
     ],

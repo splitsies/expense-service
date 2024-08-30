@@ -69,9 +69,6 @@ export class ExpenseManager implements IExpenseManager {
         let items: IExpenseItem[];
         let payers: IPayerShare[];
         let payerStatuses: ExpensePayerStatus[];
-        let children: IExpenseDto[];
-
-        const childExpenseIds = await this._expenseGroupDao.getChildExpenseIds(id);
 
         await Promise.all([
             this._expenseItemDao.getForExpense(id).then((e) => (items = e)),
@@ -79,8 +76,13 @@ export class ExpenseManager implements IExpenseManager {
                 .getForExpense(id)
                 .then((ep) => (payers = ep.map((ep) => new PayerShare(ep.userId, ep.share)))),
             this._expensePayerStatusDao.getForExpense(id).then((ep) => (payerStatuses = ep)),
-            Promise.all(childExpenseIds.map((cid) => this.getExpense(cid))).then((value) => (children = value)),
         ]).catch((e) => this._logger.error(`Error fetching expense ${id}`, e));
+
+        const children: IExpenseDto[] = [];
+        const childExpenseIds = await this._expenseGroupDao.getChildExpenseIds(id);
+        for (const cid of childExpenseIds) {
+            children.push(await this.getExpense(cid));
+        }
 
         return expenseDa !== undefined && items !== undefined && userIds !== undefined
             ? this._dtoMapper.toDto(expenseDa, userIds, items, payers, payerStatuses, children)
