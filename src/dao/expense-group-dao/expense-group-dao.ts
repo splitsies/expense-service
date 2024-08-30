@@ -4,20 +4,18 @@ import { ILogger } from "@splitsies/utils";
 import postgres, { Sql } from "postgres";
 import { ExpenseGroupDa } from "src/models/expense-group-da";
 import { IExpenseGroupDao } from "./expense-group-dao-interface";
+import { IPgProvider } from "src/providers/pg-provider.i";
 
 @injectable()
 export class ExpenseGroupDao implements IExpenseGroupDao {
     private readonly _client: Sql;
 
-    constructor(@inject(ILogger) logger: ILogger, @inject(IDbConfiguration) _dbConfiguration: IDbConfiguration) {
-        this._client = postgres({
-            hostname: _dbConfiguration.pgHost,
-            port: _dbConfiguration.pgPort,
-            database: _dbConfiguration.pgDatabaseName,
-            idle_timeout: _dbConfiguration.pgIdleTimeoutSec,
-            max_lifetime: _dbConfiguration.pgMaxLifetimeSec,
-            max: _dbConfiguration.pgMaxConnections,
-        });
+    constructor(
+        @inject(ILogger) logger: ILogger,
+        @inject(IDbConfiguration) _dbConfiguration: IDbConfiguration,
+        @inject(IPgProvider) private readonly _pgProvider: IPgProvider,
+    ) {
+        this._client = this._pgProvider.provide();
     }
 
     async create(model: ExpenseGroupDa): Promise<ExpenseGroupDa> {

@@ -64,9 +64,9 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async getExpense(id: string): Promise<IExpenseDto> {
-        let expenseDa: IExpenseDa;
+        let expenseDa: IExpenseDa = await this._expenseDao.read({ id });
+        let userIds: string[] = await this._userExpenseDao.getUsersForExpense(id);
         let items: IExpenseItem[];
-        let userIds: string[];
         let payers: IPayerShare[];
         let payerStatuses: ExpensePayerStatus[];
         let children: IExpenseDto[];
@@ -74,8 +74,6 @@ export class ExpenseManager implements IExpenseManager {
         const childExpenseIds = await this._expenseGroupDao.getChildExpenseIds(id);
 
         await Promise.all([
-            this._expenseDao.read({ id }).then((e) => (expenseDa = e)),
-            this._userExpenseDao.getUsersForExpense(id).then((u) => (userIds = u)),
             this._expenseItemDao.getForExpense(id).then((e) => (items = e)),
             this._expensePayerDao
                 .getForExpense(id)
@@ -166,32 +164,33 @@ export class ExpenseManager implements IExpenseManager {
         const expenseToChildren = new Map<string, IExpenseDto[]>();
         const expenses = await this._expenseDao.getExpensesForUser(userId, limit, offset);
 
-        await Promise.all(
-            expenses.result.map(async (e) => {
-                const items = await this._expenseItemDao.getForExpense(e.id);
-                expenseToItems.set(e.id, items);
-                const users = await this._userExpenseDao.getUsersForExpense(e.id);
-                expenseToUsers.set(e.id, users);
-                const payers = await this._expensePayerDao.getForExpense(e.id);
-                expenseToPayers.set(e.id, payers);
-                const payerStatuses = await this._expensePayerStatusDao.getForExpense(e.id);
-                expenseToPayerStatuses.set(e.id, payerStatuses);
-                const childIds = await this._expenseGroupDao.getChildExpenseIds(e.id);
-                const children = await Promise.all(childIds.map((id) => this.getExpense(id)));
-                expenseToChildren.set(e.id, children);
-            }),
-        );
+        for (const e of expenses.result) {
+            const items = await this._expenseItemDao.getForExpense(e.id);
+            expenseToItems.set(e.id, items);
+            const users = await this._userExpenseDao.getUsersForExpense(e.id);
+            expenseToUsers.set(e.id, users);
+            const payers = await this._expensePayerDao.getForExpense(e.id);
+            expenseToPayers.set(e.id, payers);
+            const payerStatuses = await this._expensePayerStatusDao.getForExpense(e.id);
+            expenseToPayerStatuses.set(e.id, payerStatuses);
+            const childIds = await this._expenseGroupDao.getChildExpenseIds(e.id);
+            const children = [];
 
-        const items = await Promise.all(
-            expenses.result.map((e) =>
-                this._dtoMapper.toDto(
-                    e,
-                    expenseToUsers.get(e.id),
-                    expenseToItems.get(e.id),
-                    expenseToPayers.get(e.id),
-                    expenseToPayerStatuses.get(e.id),
-                    expenseToChildren.get(e.id),
-                ),
+            for (const id of childIds) {
+                children.push(await this.getExpense(id));
+            }
+
+            expenseToChildren.set(e.id, children);
+        }
+
+        const items = expenses.result.map((e) =>
+            this._dtoMapper.toDto(
+                e,
+                expenseToUsers.get(e.id),
+                expenseToItems.get(e.id),
+                expenseToPayers.get(e.id),
+                expenseToPayerStatuses.get(e.id),
+                expenseToChildren.get(e.id),
             ),
         );
 
