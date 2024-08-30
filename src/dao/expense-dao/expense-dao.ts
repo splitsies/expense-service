@@ -15,6 +15,9 @@ export class ExpenseDao implements IExpenseDao {
             hostname: _dbConfiguration.pgHost,
             port: _dbConfiguration.pgPort,
             database: _dbConfiguration.pgDatabaseName,
+            idle_timeout: _dbConfiguration.pgIdleTimeoutSec,
+            max_lifetime: _dbConfiguration.pgMaxLifetimeSec,
+            max: _dbConfiguration.pgMaxConnections,
         });
     }
 
