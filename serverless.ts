@@ -30,6 +30,7 @@ import setExpensePayerStatus from "@functions/expense/set-expense-payer-status";
 import addNewExpenseToGroup from "@functions/expense/add-new-expense-to-group";
 import addExistingExpenseToGroup from "@functions/expense/add-existing-expense-to-group";
 import removeExpenseFromGroup from "@functions/expense/remove-expense-from-group";
+import deleteExpense from "@functions/expense/delete";
 
 const serverlessConfiguration: AWS = {
     org: "splitsies",
@@ -93,6 +94,7 @@ const serverlessConfiguration: AWS = {
         addNewExpenseToGroup,
         addExistingExpenseToGroup,
         removeExpenseFromGroup,
+        deleteExpense,
     },
     package: { individually: true },
     custom: {

@@ -34,6 +34,7 @@ import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-in
 import { ExpenseGroupDa } from "src/models/expense-group-da";
 import { IParentChildUserSyncStrategy } from "src/strategies/parent-child-user-sync-strategy/parent-child-user-sync-strategy.i";
 import { IUserExpenseStrategy } from "src/strategies/user-expense-strategy/user-expense-strategy.i";
+import { IExpenseWriteStrategy } from "src/strategies/expense-write-strategy/expense-write-strategy.i";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -49,6 +50,7 @@ export class ExpenseManager implements IExpenseManager {
         @inject(IExpenseGroupDao) private readonly _expenseGroupDao: IExpenseGroupDao,
         @inject(IParentChildUserSyncStrategy) private readonly _parentChildSyncStrategy: IParentChildUserSyncStrategy,
         @inject(IUserExpenseStrategy) private readonly _userExpenseStrategy: IUserExpenseStrategy,
+        @inject(IExpenseWriteStrategy) private readonly _expenseWriteStrategy: IExpenseWriteStrategy,
     ) {}
 
     async queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void> {
@@ -80,6 +82,7 @@ export class ExpenseManager implements IExpenseManager {
 
         const children: IExpenseDto[] = [];
         const childExpenseIds = await this._expenseGroupDao.getChildExpenseIds(id);
+
         for (const cid of childExpenseIds) {
             children.push(await this.getExpense(cid));
         }
@@ -90,30 +93,17 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async createExpense(userId: string): Promise<IExpenseDto> {
-        const id = randomUUID();
-        const created = await this._expenseDao.create(new ExpenseDa(id, "Untitled", new Date()));
-        await Promise.all([
-            this._userExpenseDao.create({ expenseId: created.id, userId, pendingJoin: false }),
-            this._expensePayerDao.create(new ExpensePayer(id, userId, 1)),
-            this._expensePayerStatusDao.create(new ExpensePayerStatus(id, userId, false)),
-        ]);
-
-        return this.getExpense(id);
+        const expenseDa = await this._expenseWriteStrategy.create(userId);
+        return this.getExpense(expenseDa.id);
     }
 
     async createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto> {
-        await this._expenseDao.create(new ExpenseDa(expense.id, expense.name, new Date(expense.transactionDate)));
-        await Promise.all(expense.items.map((i) => this._expenseItemDao.create(i))).catch((e) =>
-            this._logger.error(`Error creating expense item`, e),
-        );
+        const expenseDa = await this._expenseWriteStrategy.create(userId, expense);
+        return this.getExpense(expenseDa.id);
+    }
 
-        await Promise.all([
-            this._userExpenseDao.create(new UserExpense(expense.id, userId, false)),
-            this._expensePayerDao.create(new ExpensePayer(expense.id, userId, 1)),
-            this._expensePayerStatusDao.create(new ExpensePayerStatus(expense.id, userId, false)),
-        ]);
-
-        return this.getExpense(expense.id);
+    async deleteExpense(id: string): Promise<void> {
+        return await this._expenseWriteStrategy.delete(id);
     }
 
     async addNewExpenseToGroup(
@@ -125,11 +115,9 @@ export class ExpenseManager implements IExpenseManager {
             throw new InvalidStateError("Unable to add child to a non-existent expense");
         }
 
-        if (!childExpense) {
-            childExpense = await this.createExpense(userId);
-        } else {
-            await this.createExpenseFromScan(childExpense, userId);
-        }
+        childExpense = !childExpense
+            ? await this.createExpense(userId)
+            : await this.createExpenseFromScan(childExpense, userId);
 
         this._expenseGroupDao.create(new ExpenseGroupDa(parentExpenseId, childExpense.id));
         await this._parentChildSyncStrategy.sync(parentExpenseId);

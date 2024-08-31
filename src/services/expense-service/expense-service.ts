@@ -20,9 +20,7 @@ import { IExpensePublishRequest } from "src/models/expense-publish-request/expen
 import { ExpensePublishRequest } from "src/models/expense-publish-request/expense-publish-request";
 import { IConnection } from "src/models/connection/connection-interface";
 import { IExpenseOwnershipValidator } from "src/validators/expense-ownership-validator/expense-ownership-validator.i";
-import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
 import { ILeadingExpenseValidator } from "src/validators/leading-expense-validator/leading-expense-validator.i";
-import { InvalidStateError } from "src/models/error/invalid-state-error";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -64,6 +62,11 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.createExpenseFromScan(expense, userId);
     }
 
+    async deleteExpense(id: string, requestingUserId: string): Promise<void> {
+        await this._expenseOwnershipValidator.validate(id, requestingUserId);
+        return this._expenseManager.deleteExpense(id);
+    }
+
     async addNewExpenseToGroup(
         parentExpenseId: string,
         userId: string,
@@ -77,12 +80,8 @@ export class ExpenseService implements IExpenseService {
         childExpenseId: string,
         requestingUserId: string,
     ): Promise<void> {
-        if (
-            !(await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId)) ||
-            !(await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId))
-        ) {
-            throw new UnauthorizedUserError(`User ${requestingUserId} not authorized to edit expenses`);
-        }
+        await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId);
+        await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId);
 
         return this._expenseManager.addExistingExpenseToGroup(groupExpenseId, childExpenseId);
     }
@@ -92,12 +91,8 @@ export class ExpenseService implements IExpenseService {
         childExpenseId: string,
         requestingUserId: string,
     ): Promise<void> {
-        if (
-            !(await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId)) ||
-            !(await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId))
-        ) {
-            throw new UnauthorizedUserError(`User ${requestingUserId} not authorized to edit expenses`);
-        }
+        await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId);
+        await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId);
 
         return this._expenseManager.removeExpenseFromGroup(groupExpenseId, childExpenseId);
     }
@@ -115,10 +110,7 @@ export class ExpenseService implements IExpenseService {
     }
 
     async addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
-        if (!(await this._expenseOwnershipValidator.validateForUserAdd(expenseId, userId, requestingUserId))) {
-            throw new UnauthorizedUserError();
-        }
-
+        await this._expenseOwnershipValidator.validateForUserAdd(expenseId, userId, requestingUserId);
         await this._expenseManager.addUserToExpense(userId, expenseId);
     }
 
@@ -165,10 +157,7 @@ export class ExpenseService implements IExpenseService {
     }
 
     async addExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
-        if (!(await this._leadingExpenseValidator.validate(expenseId))) {
-            throw new InvalidStateError("Cannot add join request to a non-leading expense");
-        }
-
+        await this._leadingExpenseValidator.validate(expenseId);
         await this._expenseManager.addExpenseJoinRequest(userId, expenseId, requestingUserId);
         if (userId.startsWith("@splitsies-guest")) return;
 

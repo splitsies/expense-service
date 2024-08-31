@@ -68,6 +68,8 @@ import { ILeadingExpenseValidator } from "src/validators/leading-expense-validat
 import { LeadingExpenseValidator } from "src/validators/leading-expense-validator/leading-expense-validator";
 import { IPgProvider } from "src/providers/pg-provider.i";
 import { PgProvider } from "src/providers/pg-provider";
+import { IExpenseWriteStrategy } from "src/strategies/expense-write-strategy/expense-write-strategy.i";
+import { ExpenseWriteStrategy } from "src/strategies/expense-write-strategy/expense-write-strategy";
 
 const container = new Container({ defaultScope: "Singleton" });
 
@@ -110,5 +112,6 @@ container.bind<IParentChildUserSyncStrategy>(IParentChildUserSyncStrategy).to(Pa
 container.bind<IUserExpenseStrategy>(IUserExpenseStrategy).to(UserExpenseStrategy);
 container.bind<ILeadingExpenseValidator>(ILeadingExpenseValidator).to(LeadingExpenseValidator);
 container.bind<IPgProvider>(IPgProvider).to(PgProvider);
+container.bind<IExpenseWriteStrategy>(IExpenseWriteStrategy).to(ExpenseWriteStrategy);
 
 export { container };
