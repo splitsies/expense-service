@@ -16,6 +16,7 @@ export interface IExpenseService {
     getUserExpense(userId: string, expenseId: string): Promise<IUserExpense>;
     createExpense(userId: string): Promise<IExpenseDto>;
     createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
+    deleteExpense(id: string, requestingUserId: string): Promise<void>;
     addNewExpenseToGroup(
         parentExpenseId: string,
         userId: string,
