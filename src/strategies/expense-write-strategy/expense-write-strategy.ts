@@ -51,7 +51,7 @@ export class ExpenseWriteStrategy implements IExpenseWriteStrategy {
         }
 
         const parentExpenseId = await this._expenseGroupDao.getParentExpenseId(id);
-        console.log({ parentExpenseId, time: Date.now() });
+
         if (parentExpenseId) {
             await this._expenseGroupDao.delete({ parentExpenseId, childExpenseId: id });
         }
@@ -68,11 +68,11 @@ export class ExpenseWriteStrategy implements IExpenseWriteStrategy {
 
         if (dto) {
             await Promise.all(
-                dto.items.map((i) =>
-                    this._expenseItemDao
-                        .create(i)
-                        .catch((e) => this._logger.error(`Error creating expense item ${i.id} - ${i.name}`, e)),
-                ),
+                dto.items.map((i) => {
+                    return this._expenseItemDao
+                        .create({ ...i, expenseId: id })
+                        .catch((e) => this._logger.error(`Error creating expense item ${i.id} - ${i.name}`, e));
+                }),
             );
         }
 
