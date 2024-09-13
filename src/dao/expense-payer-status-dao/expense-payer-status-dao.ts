@@ -7,7 +7,10 @@ import { ExpensePayerStatus } from "@splitsies/shared-models";
 import { IExpensePayerStatusDao } from "./expense-payer-status-dao-interface";
 
 @injectable()
-export class ExpensePayerStatusDao extends DaoBase<ExpensePayerStatus> implements IExpensePayerStatusDao {
+export class ExpensePayerStatusDao
+    extends DaoBase<ExpensePayerStatus, { expenseId: string; userId: string }>
+    implements IExpensePayerStatusDao
+{
     constructor(@inject(ILogger) logger: ILogger, @inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
         const keySelector = (c: ExpensePayerStatus) => ({ expenseId: c.expenseId, userId: c.userId });
         super(logger, dbConfiguration, dbConfiguration.expensePayerStatusTableName, keySelector);

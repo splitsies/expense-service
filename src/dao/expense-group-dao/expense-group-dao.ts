@@ -30,7 +30,7 @@ export class ExpenseGroupDao implements IExpenseGroupDao {
         return res[0];
     }
 
-    async read(key: Record<string, string | number>): Promise<ExpenseGroupDa> {
+    async read(key: { parentExpenseId: string; childExpenseId: string }): Promise<ExpenseGroupDa> {
         const res = await this._client<ExpenseGroupDa[]>`
             SELECT *
               FROM "ExpenseGroup"
@@ -52,7 +52,7 @@ export class ExpenseGroupDao implements IExpenseGroupDao {
         return res.length ? res[0] : undefined;
     }
 
-    async delete(key: Record<string, string | number>): Promise<void> {
+    async delete(key: { parentExpenseId: string; childExpenseId: string }): Promise<void> {
         await this._client`
             DELETE FROM "ExpenseGroup"
             WHERE "parentExpenseId" = ${key.parentExpenseId}

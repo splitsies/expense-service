@@ -7,7 +7,10 @@ import { QueryCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 @injectable()
-export class ExpenseItemDao extends DaoBase<IExpenseItem> implements IExpenseItemDao {
+export class ExpenseItemDao
+    extends DaoBase<IExpenseItem, { id: string; expenseId: string }>
+    implements IExpenseItemDao
+{
     constructor(
         @inject(ILogger) logger: ILogger,
         @inject(IDbConfiguration) private readonly dbConfiguration: IDbConfiguration,
