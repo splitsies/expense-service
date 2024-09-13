@@ -7,7 +7,10 @@ import { QueryCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 @injectable()
-export class ExpensePayerDao extends DaoBase<IExpensePayer> implements IExpensePayerDao {
+export class ExpensePayerDao
+    extends DaoBase<IExpensePayer, { expenseId: string; userId: string }>
+    implements IExpensePayerDao
+{
     constructor(@inject(ILogger) logger: ILogger, @inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
         const keySelector = (c: IExpensePayer) => ({ expenseId: c.expenseId, userId: c.userId });
         super(logger, dbConfiguration, dbConfiguration.expensePayerTableName, keySelector);

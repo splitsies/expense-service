@@ -7,7 +7,10 @@ import { IDbConfiguration } from "src/models/configuration/db/db-configuration-i
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { IConnectionDaoStatements } from "./connection-dao-statements-interface";
 @injectable()
-export class ConnectionDao extends DaoBase<IConnection> implements IConnectionDao {
+export class ConnectionDao
+    extends DaoBase<IConnection, { connectionId: string; expenseId: string }>
+    implements IConnectionDao
+{
     constructor(
         @inject(ILogger) logger: ILogger,
         @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,

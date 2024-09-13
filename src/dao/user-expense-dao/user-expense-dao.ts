@@ -21,7 +21,7 @@ export class UserExpenseDao implements IUserExpenseDao {
         const keySelector = (e: IUserExpense) => ({ expenseId: e.expenseId, userId: e.userId });
         this.key = keySelector;
     }
-    key: (model: IUserExpense) => Record<string, string | number>;
+    key: (model: IUserExpense) => { expenseId: string; userId: string };
 
     async create(model: IUserExpense): Promise<IUserExpense> {
         const res = await this._client<IUserExpense[]>`
@@ -37,7 +37,7 @@ export class UserExpenseDao implements IUserExpenseDao {
         return res.length ? res[0] : undefined;
     }
 
-    async read(key: Record<string, string | number>): Promise<IUserExpense> {
+    async read(key: { expenseId: string; userId: string }): Promise<IUserExpense> {
         const id = key.expenseId;
         const userId = key.userId;
 
@@ -63,7 +63,7 @@ export class UserExpenseDao implements IUserExpenseDao {
         return res.length ? res[0] : undefined;
     }
 
-    async delete(key: Record<string, string | number>): Promise<void> {
+    async delete(key: { expenseId: string; userId: string }): Promise<void> {
         await this._client<IUserExpense[]>`
             DELETE FROM "UserExpense"
              WHERE "expenseId" = ${key.expenseId}

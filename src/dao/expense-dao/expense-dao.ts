@@ -2,10 +2,10 @@ import { inject, injectable } from "inversify";
 import { IExpenseDao } from "./expense-dao-interface";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { ILogger } from "@splitsies/utils";
-import postgres, { Sql } from "postgres";
 import { IExpenseDa } from "src/models/expense/expense-da-interface";
 import { IScanResult, ScanResult } from "@splitsies/shared-models";
 import { IPgProvider } from "src/providers/pg-provider.i";
+import { Sql } from "postgres";
 
 @injectable()
 export class ExpenseDao implements IExpenseDao {
@@ -31,7 +31,7 @@ export class ExpenseDao implements IExpenseDao {
         return res[0];
     }
 
-    async read(key: Record<string, string | number>): Promise<IExpenseDa> {
+    async read(key: { id: string }): Promise<IExpenseDa> {
         const id = key.id;
         const res = await this._client<IExpenseDa[]>`
             SELECT *
@@ -54,7 +54,7 @@ export class ExpenseDao implements IExpenseDao {
         return res.length ? res[0] : undefined;
     }
 
-    async delete(key: Record<string, string | number>): Promise<void> {
+    async delete(key: { id: string }): Promise<void> {
         await this._client`
             DELETE FROM "Expense"
             WHERE id = ${key.id};

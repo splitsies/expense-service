@@ -8,7 +8,10 @@ import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { IConnectionTokenDaoStatements } from "./connection-token-dao-statements-interface";
 
 @injectable()
-export class ConnectionTokenDao extends DaoBase<IConnection> implements IConnectionTokenDao {
+export class ConnectionTokenDao
+    extends DaoBase<IConnection, { connectionId: string; expenseId: string }>
+    implements IConnectionTokenDao
+{
     readonly key: (c: IConnection) => Record<string, string>;
 
     constructor(
