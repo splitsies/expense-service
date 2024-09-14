@@ -50,6 +50,7 @@ export interface IExpenseService {
     setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto>;
     getLeadingExpenseId(expenseId: string): Promise<string>;
     getLeadingExpense(expenseId: string): Promise<IExpenseDto>;
+    updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<IExpenseDto>;
 }
 
 export const IExpenseService: symbol = Symbol.for("IExpenseService");

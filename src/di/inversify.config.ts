@@ -6,6 +6,7 @@ import { IExpenseManager } from "../managers/expense-manager/expense-manager-int
 import {
     ApiKeyConfiguration,
     IApiKeyConfiguration,
+    IDynamoDbConfiguration,
     ILogger,
     IMessageQueueClient,
     Logger,
@@ -70,6 +71,12 @@ import { IPgProvider } from "src/providers/pg-provider.i";
 import { PgProvider } from "src/providers/pg-provider";
 import { IExpenseWriteStrategy } from "src/strategies/expense-write-strategy/expense-write-strategy.i";
 import { ExpenseWriteStrategy } from "src/strategies/expense-write-strategy/expense-write-strategy";
+import { ILeadingExpenseDao } from "src/dao/leading-expense-dao/leading-expense-dao.i";
+import { LeadingExpenseDao } from "src/dao/leading-expense-dao/leading-expense-dao";
+import { ILeadingExpenseMapper } from "src/mappers/leading-expense-mapper/leading-expense-mapper.i";
+import { LeadingExpenseMapper } from "src/mappers/leading-expense-mapper/leading-expense-mapper";
+import { IExpenseGroupStrategy } from "src/strategies/expense-group-strategy/expense-group-strategy.i";
+import { ExpenseGroupStrategy } from "src/strategies/expense-group-strategy/expense-group-strategy";
 
 const container = new Container({ defaultScope: "Singleton" });
 
@@ -77,6 +84,7 @@ container.bind<ILogger>(ILogger).to(Logger);
 
 container.bind<IExpenseService>(IExpenseService).to(ExpenseService);
 container.bind<IExpenseManager>(IExpenseManager).to(ExpenseManager);
+container.bind<IDynamoDbConfiguration>(IDynamoDbConfiguration).to(DbConfiguration);
 container.bind<IDbConfiguration>(IDbConfiguration).to(DbConfiguration);
 container.bind<IConnectionConfiguration>(IConnectionConfiguration).to(ConnectionConfiguration);
 container.bind<IExpenseDao>(IExpenseDao).to(ExpenseDao);
@@ -113,5 +121,8 @@ container.bind<IUserExpenseStrategy>(IUserExpenseStrategy).to(UserExpenseStrateg
 container.bind<ILeadingExpenseValidator>(ILeadingExpenseValidator).to(LeadingExpenseValidator);
 container.bind<IPgProvider>(IPgProvider).to(PgProvider);
 container.bind<IExpenseWriteStrategy>(IExpenseWriteStrategy).to(ExpenseWriteStrategy);
+container.bind<ILeadingExpenseDao>(ILeadingExpenseDao).to(LeadingExpenseDao);
+container.bind<ILeadingExpenseMapper>(ILeadingExpenseMapper).to(LeadingExpenseMapper);
+container.bind<IExpenseGroupStrategy>(IExpenseGroupStrategy).to(ExpenseGroupStrategy);
 
 export { container };

@@ -18,6 +18,10 @@ export class ExpenseDao implements IExpenseDao {
     ) {
         this._client = this._pgProvider.provide();
     }
+    
+    keyFrom(model: IExpenseDa): { id: string; } {
+        return { id: model.id };
+    }
 
     async create(model: IExpenseDa): Promise<IExpenseDa> {
         const res = await this._client<IExpenseDa[]>`

@@ -4,6 +4,7 @@ import { IExpenseDa } from "src/models/expense/expense-da-interface";
 export interface IExpenseWriteStrategy {
     delete(id: string): Promise<void>;
     create(userId: string, dto?: IExpenseDto): Promise<IExpenseDa>;
+    updateTransactionDate(id: string, newTransactionDate: Date): Promise<void>;
 }
 
 export const IExpenseWriteStrategy = Symbol.for("IExpenseWriteStrategy");

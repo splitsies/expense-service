@@ -1,3 +1,4 @@
+import { AttributeValue } from "@aws-sdk/client-dynamodb";
 import {
     IExpenseDto,
     IExpenseItem,
@@ -23,11 +24,11 @@ export interface IExpenseManager {
     addExistingExpenseToGroup(groupExpenseId: string, childExpenseId: string): Promise<void>;
     removeExpenseFromGroup(groupExpenseId: string, childExpenseId: string): Promise<void>;
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
-    getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDto>>;
+    getExpensesForUser(userId: string, limit: number, offset?: Record<string, AttributeValue>): Promise<IScanResult<IExpenseDto>>;
     getUsersForExpense(expenseId: string): Promise<string[]>;
     addUserToExpense(userId: string, expenseId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;
-    getExpenseJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpenseDto>>;
+    getExpenseJoinRequestsForUser(userId: string, limit: number, offset?: Record<string, AttributeValue>): Promise<IScanResult<IUserExpenseDto>>;
     getJoinRequestCountForUser(userId: string): Promise<number>;
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
     removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
@@ -48,6 +49,7 @@ export interface IExpenseManager {
     setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto>;
     setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto>;
     getLeadingExpenseId(expenseId: string): Promise<string>;
+    updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<IExpenseDto>;
 }
 
 export const IExpenseManager = Symbol.for("IExpenseManager");
