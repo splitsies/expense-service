@@ -195,4 +195,8 @@ export class ExpenseService implements IExpenseService {
         const leadingExpenseId = await this.getLeadingExpenseId(expenseId);
         return this.getExpense(leadingExpenseId);
     }
+
+    async updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<IExpenseDto> {
+        return this._expenseManager.updateExpenseTransactionDate(expenseId, transactionDate);
+    }
 }

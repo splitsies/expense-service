@@ -167,10 +167,12 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
     }
 
     private async updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<ExpenseMessage> {
-        return this.updateExpense(
-            expenseId,
-            (e) => ({ ...e, transactionDate: transactionDate.toISOString() } as IExpenseDto),
-        );
+        const updatedExpense = await this._expenseService.updateExpenseTransactionDate(expenseId, transactionDate);
+        return new ExpenseMessage({
+            type: ExpenseMessageType.ExpenseDto,
+            connectedExpenseId: await this._expenseService.getLeadingExpenseId(expenseId),
+            expenseDto: updatedExpense,
+        });
     }
 
     private async updateExpense(
@@ -184,7 +186,7 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         const updatedExpense = await this._expenseService.getLeadingExpense(expenseId);
         return new ExpenseMessage({
             type: ExpenseMessageType.ExpenseDto,
-            connectedExpenseId: expense.id,
+            connectedExpenseId: await this._expenseService.getLeadingExpenseId(expense.id),
             expenseDto: updatedExpense,
         });
     }
