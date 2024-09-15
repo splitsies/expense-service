@@ -5,12 +5,16 @@ import { ExpenseService } from "../services/expense-service/expense-service";
 import { IExpenseManager } from "../managers/expense-manager/expense-manager-interface";
 import {
     ApiKeyConfiguration,
+    DynamoDbTransactionStrategy,
     IApiKeyConfiguration,
     IDynamoDbConfiguration,
+    IDynamoDbTransactionStrategy,
     ILogger,
     IMessageQueueClient,
+    IPageInfoMapper,
     Logger,
     MessageQueueClient,
+    PageInfoMapper,
 } from "@splitsies/utils";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import { DbConfiguration } from "src/models/configuration/db/db-configuration";
@@ -37,8 +41,6 @@ import {
     IExpenseMessageParametersMapper,
     IExpenseUserDetailsMapper,
 } from "@splitsies/shared-models";
-import { IExpenseStatements } from "src/dao/expense-dao/expense-statements-interface";
-import { ExpenseStatements } from "src/dao/expense-dao/expense-statements";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
 import { ExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster";
 import { IExpenseMessageStrategy } from "src/strategies/expense-message-strategy/expense-message-strategy-interface";
@@ -57,8 +59,6 @@ import { IExpensePayerDao } from "src/dao/expense-payer-dao/expense-payer-dao-in
 import { ExpensePayerDao } from "src/dao/expense-payer-dao/expense-payer-dao";
 import { ExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-payer-status-dao";
 import { IExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-payer-status-dao-interface";
-import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
-import { ExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao";
 import { IExpenseOwnershipValidator } from "src/validators/expense-ownership-validator/expense-ownership-validator.i";
 import { ExpenseOwnershipValidator } from "src/validators/expense-ownership-validator/expense-ownership-validator";
 import { IParentChildUserSyncStrategy } from "src/strategies/parent-child-user-sync-strategy/parent-child-user-sync-strategy.i";
@@ -77,6 +77,10 @@ import { ILeadingExpenseMapper } from "src/mappers/leading-expense-mapper/leadin
 import { LeadingExpenseMapper } from "src/mappers/leading-expense-mapper/leading-expense-mapper";
 import { IExpenseGroupStrategy } from "src/strategies/expense-group-strategy/expense-group-strategy.i";
 import { ExpenseGroupStrategy } from "src/strategies/expense-group-strategy/expense-group-strategy";
+import { IUserExpenseDaMapper } from "src/mappers/user-expense-mapper/user-expense-mapper.i";
+import { UserExpenseDaMapper } from "src/mappers/user-expense-mapper/user-expense-mapper";
+import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
+import { ExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao";
 
 const container = new Container({ defaultScope: "Singleton" });
 
@@ -96,7 +100,6 @@ container.bind<IConnectionDao>(IConnectionDao).to(ConnectionDao);
 container.bind<IConnectionDaoStatements>(IConnectionDaoStatements).to(ConnectionDaoStatements);
 
 container.bind<IUserExpenseDao>(IUserExpenseDao).to(UserExpenseDao);
-container.bind<IExpenseStatements>(IExpenseStatements).to(ExpenseStatements);
 container.bind<IExpenseUserDetailsMapper>(IExpenseUserDetailsMapper).to(ExpenseUserDetailsMapper);
 container.bind<IExpenseJoinRequestDaMapper>(IExpenseJoinRequestDaMapper).to(ExpenseJoinRequestDaMapper);
 container.bind<IExpenseBroadcaster>(IExpenseBroadcaster).to(ExpenseBroadcaster);
@@ -124,5 +127,8 @@ container.bind<IExpenseWriteStrategy>(IExpenseWriteStrategy).to(ExpenseWriteStra
 container.bind<ILeadingExpenseDao>(ILeadingExpenseDao).to(LeadingExpenseDao);
 container.bind<ILeadingExpenseMapper>(ILeadingExpenseMapper).to(LeadingExpenseMapper);
 container.bind<IExpenseGroupStrategy>(IExpenseGroupStrategy).to(ExpenseGroupStrategy);
+container.bind<IDynamoDbTransactionStrategy>(IDynamoDbTransactionStrategy).to(DynamoDbTransactionStrategy);
+container.bind<IUserExpenseDaMapper>(IUserExpenseDaMapper).to(UserExpenseDaMapper);
+container.bind<IPageInfoMapper>(IPageInfoMapper).to(PageInfoMapper);
 
 export { container };

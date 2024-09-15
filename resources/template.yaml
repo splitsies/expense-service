@@ -40,3 +40,101 @@ Resources:
         - AttributeName: userId
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
+
+  SplitsiesLeadingExpenseTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Splitsies-LeadingExpense-${RtEnv}
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: transactionDateExpenseId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: transactionDateExpenseId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD
+
+  SplitsiesExpenseTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Splitsies-Expense-${RtEnv}
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD
+
+  SplitsiesExpenseGroupTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Splitsies-ExpenseGroup-${RtEnv}
+      AttributeDefinitions:
+        - AttributeName: parentExpenseId
+          AttributeType: S
+        - AttributeName: childExpenseId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: parentExpenseId
+          KeyType: HASH
+        - AttributeName: childExpenseId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD
+
+  SplitsiesExpenseGroupChildIndexTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Splitsies-ExpenseGroupChildIndex-${RtEnv}
+      AttributeDefinitions:
+        - AttributeName: childExpenseId
+          AttributeType: S
+        - AttributeName: parentExpenseId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: childExpenseId
+          KeyType: HASH
+        - AttributeName: parentExpenseId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD
+
+  SplitsiesUserExpenseTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Splitsies-UserExpense-${RtEnv}
+      AttributeDefinitions:
+        - AttributeName: expenseId
+          AttributeType: S
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: expenseId
+          KeyType: HASH
+        - AttributeName: userId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD
+
+  SplitsiesUserExpenseUserIndexTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Splitsies-UserExpenseUserIndex-${RtEnv}
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: expenseId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: expenseId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD

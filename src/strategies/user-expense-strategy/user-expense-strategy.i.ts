@@ -16,6 +16,8 @@ export interface IUserExpenseStrategy {
      * @param requestingUserId The id of the user sending the request
      */
     addUserToExpenseAsJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
+    removeUserFromExpense(expenseId: string, userId: string): Promise<void>;
+    acceptExpenseJoinRequest(userId: string, expenseId: string): Promise<void>;
 }
 
 export const IUserExpenseStrategy = Symbol.for("IUserExpenseStrategy");

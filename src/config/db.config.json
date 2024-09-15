@@ -15,6 +15,12 @@
     "messageQueueResourceName": "${param:MESSAGE_QUEUE_RESOURCE_NAME}",
     "expensePayerTableName": "Splitsies-ExpensePayer-${param:RTENV}",
     "expensePayerStatusTableName": "Splitsies-ExpensePayerStatus-${param:RTENV}",
+    "expenseTableName": "Splitsies-Expense-${param:RTENV}",
+    "expenseGroupTableName": "Splitsies-ExpenseGroup-${param:RTENV}",
+    "expenseGroupChildIndexName": "Splitsies-ExpenseGroupChildIndex-${param:RTENV}",
+    "userExpenseTableName": "Splitsies-UserExpense-${param:RTENV}",
+    "userExpenseUserIndexName": "Splitsies-UserExpenseUserIndex-${param:RTENV}",
+    "leadingExpenseTableName": "Splitsies-LeadingExpense-${param:RTENV}",
     "pgIdleTimeoutSec": "10",
     "pgMaxLifetimeSec": "30",
     "pgMaxConnections": "100"

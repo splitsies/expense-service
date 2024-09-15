@@ -1,5 +1,5 @@
 import { ExpensePayerStatus, IExpenseDto } from "@splitsies/shared-models";
-import { ILogger } from "@splitsies/utils";
+import { IDynamoDbTransactionStrategy, ILogger } from "@splitsies/utils";
 import { randomUUID } from "crypto";
 import { inject, injectable } from "inversify";
 import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
@@ -11,10 +11,11 @@ import { ExpensePayer } from "src/models/expense-payer/expense-payer";
 import { ExpenseDa } from "src/models/expense/expense-da";
 import { IExpenseDa } from "src/models/expense/expense-da-interface";
 import { IExpenseWriteStrategy } from "./expense-write-strategy.i";
-import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
 import { ILeadingExpenseDao } from "src/dao/leading-expense-dao/leading-expense-dao.i";
 import { LeadingExpense } from "src/models/leading-expense";
 import { UserExpense } from "src/models/user-expense/user-expense";
+import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
+import { Expense } from "src/models/expense";
 
 @injectable()
 export class ExpenseWriteStrategy implements IExpenseWriteStrategy {
@@ -26,31 +27,49 @@ export class ExpenseWriteStrategy implements IExpenseWriteStrategy {
         @inject(IExpensePayerStatusDao) private readonly _expensePayerStatusDao: IExpensePayerStatusDao,
         @inject(IExpenseItemDao) private readonly _expenseItemDao: IExpenseItemDao,
         @inject(IExpenseGroupDao) private readonly _expenseGroupDao: IExpenseGroupDao,
-        @inject(ILeadingExpenseDao) private readonly _leadingExpenseDao: ILeadingExpenseDao
-    ) { }
-    
+        @inject(ILeadingExpenseDao) private readonly _leadingExpenseDao: ILeadingExpenseDao,
+        @inject(IDynamoDbTransactionStrategy) private readonly _transactionStrategy: IDynamoDbTransactionStrategy,
+    ) {}
+
     async updateTransactionDate(id: string, newTransactionDate: Date): Promise<void> {
         const expense = await this._expenseDao.read({ id });
         const userIds = await this._userExpenseDao.getUsersForExpense(id);
+        const writes = [this._expenseDao.putCommand(new Expense(expense.id, expense.name, newTransactionDate))];
 
-        await Promise.all(userIds.map(async userId => {
-            const key = this._leadingExpenseDao.keyFrom(new LeadingExpense(userId, expense.transactionDate, expense.id));
-            const leadingExpenseRecord = await this._leadingExpenseDao.read(key);
-            if (!leadingExpenseRecord) return;
+        if (!(await this._expenseGroupDao.getParentExpenseId(id))) {
+            await Promise.all(
+                userIds.map(async (userId) => {
+                    const key = this._leadingExpenseDao.keyFrom(
+                        new LeadingExpense(userId, expense.transactionDate, expense.id),
+                    );
+                    const leadingExpenseRecord = await this._leadingExpenseDao.read(key);
+                    if (!leadingExpenseRecord) return;
 
-            await this._leadingExpenseDao.delete(key);
-            await this._leadingExpenseDao.create(new LeadingExpense(userId, newTransactionDate, expense.id));
-        }));
+                    writes.push(this._leadingExpenseDao.deleteCommand(key));
+                    writes.push(
+                        this._leadingExpenseDao.putCommand(new LeadingExpense(userId, newTransactionDate, expense.id)),
+                    );
+                }),
+            );
+        }
+
+        await this._transactionStrategy.execute(writes);
+
+        console.log(writes);
     }
 
     async delete(id: string): Promise<void> {
         const expense = await this._expenseDao.read({ id });
         const userIds = await this._userExpenseDao.getUsersForExpense(id);
 
-        await Promise.all(userIds.map(async userId => {
-            await this._leadingExpenseDao.delete(this._leadingExpenseDao.keyFrom(new LeadingExpense(userId, expense.transactionDate, expense.id)));        
-            await this._userExpenseDao.delete({ userId, expenseId: id });
-        }));
+        await Promise.all(
+            userIds.map(async (userId) => {
+                await this._leadingExpenseDao.delete(
+                    this._leadingExpenseDao.keyFrom(new LeadingExpense(userId, expense.transactionDate, expense.id)),
+                );
+                await this._userExpenseDao.delete({ userId, expenseId: id });
+            }),
+        );
 
         const payers = await this._expensePayerDao.getForExpense(id);
         const payerStatuses = await this._expensePayerStatusDao.getForExpense(id);
@@ -88,9 +107,10 @@ export class ExpenseWriteStrategy implements IExpenseWriteStrategy {
 
         if (dto) {
             await Promise.all(
-                dto.items.map((i) => this._expenseItemDao
-                    .create({ ...i, expenseId: id })
-                    .catch((e) => this._logger.error(`Error creating expense item ${i.id} - ${i.name}`, e))
+                dto.items.map((i) =>
+                    this._expenseItemDao
+                        .create({ ...i, expenseId: id })
+                        .catch((e) => this._logger.error(`Error creating expense item ${i.id} - ${i.name}`, e)),
                 ),
             );
         }
