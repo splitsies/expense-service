@@ -2,18 +2,16 @@ import { inject, injectable } from "inversify";
 import { IExpensePayerDao } from "./expense-payer-dao-interface";
 import { DaoBase, ILogger } from "@splitsies/utils";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
-import { IExpensePayer } from "src/models/expense-payer/expense-payer-interface";
+import { IExpensePayer, Key } from "src/models/expense-payer/expense-payer-interface";
 import { QueryCommand } from "@aws-sdk/client-dynamodb";
-import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 @injectable()
-export class ExpensePayerDao
-    extends DaoBase<IExpensePayer, { expenseId: string; userId: string }>
-    implements IExpensePayerDao
-{
+export class ExpensePayerDao extends DaoBase<IExpensePayer, Key> implements IExpensePayerDao {
     constructor(@inject(ILogger) logger: ILogger, @inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
-        const keySelector = (c: IExpensePayer) => ({ expenseId: c.expenseId, userId: c.userId });
-        super(logger, dbConfiguration, dbConfiguration.expensePayerTableName, keySelector);
+        super(logger, dbConfiguration, dbConfiguration.expensePayerTableName, (m) => ({
+            expenseId: m.expenseId,
+            userId: m.userId,
+        }));
     }
 
     async getForExpense(expenseId: string): Promise<IExpensePayer[]> {
@@ -30,6 +28,6 @@ export class ExpensePayerDao
             }),
         );
 
-        return result.Items?.length ? result.Items.map((i) => unmarshall(i) as IExpensePayer) : [];
+        return this.unmarshallResults(result);
     }
 }

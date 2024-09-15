@@ -1,4 +1,3 @@
-import { AttributeValue } from "@aws-sdk/client-dynamodb";
 import {
     IExpenseDto,
     IExpenseItem,
@@ -24,14 +23,22 @@ export interface IExpenseManager {
     addExistingExpenseToGroup(groupExpenseId: string, childExpenseId: string): Promise<void>;
     removeExpenseFromGroup(groupExpenseId: string, childExpenseId: string): Promise<void>;
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
-    getExpensesForUser(userId: string, limit: number, offset?: Record<string, AttributeValue>): Promise<IScanResult<IExpenseDto>>;
+    getExpensesForUser(
+        userId: string,
+        limit: number,
+        offset?: Record<string, object>,
+    ): Promise<IScanResult<IExpenseDto>>;
     getUsersForExpense(expenseId: string): Promise<string[]>;
     addUserToExpense(userId: string, expenseId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;
-    getExpenseJoinRequestsForUser(userId: string, limit: number, offset?: Record<string, AttributeValue>): Promise<IScanResult<IUserExpenseDto>>;
+    getExpenseJoinRequestsForUser(
+        userId: string,
+        limit: number,
+        offset?: Record<string, object>,
+    ): Promise<IScanResult<IUserExpenseDto>>;
     getJoinRequestCountForUser(userId: string): Promise<number>;
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
-    removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
+    removeExpenseJoinRequest(userId: string, expenseId: string): Promise<void>;
     getJoinRequestsForExpense(expenseId: string): Promise<IExpenseJoinRequest[]>;
     addExpenseItem(
         name: string,

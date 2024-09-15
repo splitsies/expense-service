@@ -4,3 +4,5 @@ export interface IConnection {
     readonly ttl: number;
     readonly gatewayUrl: string;
 }
+
+export type Key = Pick<IConnection, "connectionId" | "expenseId">;

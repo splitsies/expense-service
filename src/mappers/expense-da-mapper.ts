@@ -1,17 +1,15 @@
-import { IExpenseItem } from "@splitsies/shared-models/lib/src/expense/expense-item/expense-item-interface";
 import { injectable } from "inversify";
-import { IExpenseDa } from "../models/expense/expense-da-interface";
-import { Expense, IExpense } from "@splitsies/shared-models";
 import { IExpenseDaMapper } from "./expense-da-mapper-interface";
+import { Expense } from "src/models/expense";
+import { ExpenseDa } from "src/models/expense-da";
 
 @injectable()
 export class ExpenseDaMapper implements IExpenseDaMapper {
-    fromDa(expenseDa: IExpenseDa, items: IExpenseItem[]): IExpense {
-        return new Expense(
-            expenseDa.id,
-            expenseDa.name,
-            expenseDa.transactionDate,
-            items.sort((a, b) => a.createdAt - b.createdAt),
-        );
+    toDomain(da: ExpenseDa): Expense {
+        return new Expense(da.id, da.name, new Date(Date.parse(da.transactionDate)));
+    }
+
+    toDa(domain: Expense): ExpenseDa {
+        return new ExpenseDa(domain.id, domain.name, domain.transactionDate.toISOString());
     }
 }

@@ -1,7 +1,6 @@
-import { IExpenseItem, IExpense } from "@splitsies/shared-models";
-import { IExpenseDa } from "src/models/expense/expense-da-interface";
+import { IDaMapper } from "@splitsies/utils";
+import { Expense } from "src/models/expense";
+import { ExpenseDa } from "src/models/expense-da";
 
-export interface IExpenseDaMapper {
-    fromDa(expenseDa: IExpenseDa, items: IExpenseItem[]): IExpense;
-}
+export interface IExpenseDaMapper extends IDaMapper<Expense, ExpenseDa> {}
 export const IExpenseDaMapper = Symbol.for("IExpenseDaMapper");

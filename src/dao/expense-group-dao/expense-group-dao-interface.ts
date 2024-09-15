@@ -1,7 +1,7 @@
-import { IDao } from "@splitsies/utils";
-import { ExpenseGroupDa } from "src/models/expense-group-da";
+import { IDynamoDbDao } from "@splitsies/utils";
+import { ExpenseGroup, Key } from "src/models/expense-group";
 
-export interface IExpenseGroupDao extends IDao<ExpenseGroupDa, { parentExpenseId: string; childExpenseId: string }> {
+export interface IExpenseGroupDao extends IDynamoDbDao<ExpenseGroup, Key> {
     getParentExpenseId(childExpenseId: string): Promise<string | undefined>;
     getChildExpenseIds(parentExpenseId: string): Promise<string[]>;
 }

@@ -20,6 +20,12 @@ export class DbConfiguration implements IDbConfiguration {
     readonly pgIdleTimeoutSec: number;
     readonly pgMaxLifetimeSec: number;
     readonly pgMaxConnections: number;
+    readonly expenseTableName: string;
+    readonly expenseGroupTableName: string;
+    readonly expenseGroupChildIndexName: string;
+    readonly userExpenseTableName: string;
+    readonly userExpenseUserIndexName: string;
+    readonly leadingExpenseTableName: string;
 
     constructor() {
         assert(!!process.env.dbAccessKeyId, "db access key was undefined");
@@ -38,6 +44,12 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.pgIdleTimeoutSec, "pgIdleTimeoutSec was undefined");
         assert(!!process.env.pgMaxLifetimeSec, "pgMaxLifetimeSec was undefined");
         assert(!!process.env.pgMaxConnections, "pgMaxConnections was undefined");
+        assert(!!process.env.expenseTableName, "expenseTableName was undefined");
+        assert(!!process.env.expenseGroupTableName, "expenseGroupTableName was undefined");
+        assert(!!process.env.expenseGroupChildIndexName, "expenseGroupChildIndexName was undefined");
+        assert(!!process.env.userExpenseTableName, "userExpenseTableName was undefined");
+        assert(!!process.env.userExpenseUserIndexName, "userExpenseUserIndexName was undefined");
+        assert(!!process.env.leadingExpenseTableName, "leadingExpenseTableName was undefined");
         this._dbAccessKeyId = process.env.dbAccessKeyId;
         this._dbSecretAccessKey = process.env.dbSecretAccessKey;
         this._dbRegion = process.env.dbRegion;
@@ -54,6 +66,12 @@ export class DbConfiguration implements IDbConfiguration {
         this.pgIdleTimeoutSec = parseInt(process.env.pgIdleTimeoutSec);
         this.pgMaxLifetimeSec = parseInt(process.env.pgMaxLifetimeSec);
         this.pgMaxConnections = parseInt(process.env.pgMaxConnections);
+        this.expenseTableName = process.env.expenseTableName;
+        this.expenseGroupTableName = process.env.expenseGroupTableName;
+        this.expenseGroupChildIndexName = process.env.expenseGroupChildIndexName;
+        this.userExpenseTableName = process.env.userExpenseTableName;
+        this.userExpenseUserIndexName = process.env.userExpenseUserIndexName;
+        this.leadingExpenseTableName = process.env.leadingExpenseTableName;
     }
 
     get dbAccessKeyId(): string {

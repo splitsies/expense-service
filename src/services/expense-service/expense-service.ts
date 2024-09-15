@@ -101,7 +101,11 @@ export class ExpenseService implements IExpenseService {
         return await this._expenseManager.updateExpense(id, updated);
     }
 
-    async getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDto>> {
+    async getExpensesForUser(
+        userId: string,
+        limit: number,
+        offset: Record<string, object>,
+    ): Promise<IScanResult<IExpenseDto>> {
         return await this._expenseManager.getExpensesForUser(userId, limit, offset);
     }
 
@@ -143,7 +147,7 @@ export class ExpenseService implements IExpenseService {
     async getExpenseJoinRequestsForUser(
         userId: string,
         limit: number,
-        offset: number,
+        offset: Record<string, object>,
     ): Promise<IScanResult<IUserExpenseDto>> {
         return await this._expenseManager.getExpenseJoinRequestsForUser(userId, limit, offset);
     }
@@ -167,8 +171,9 @@ export class ExpenseService implements IExpenseService {
         );
     }
 
-    removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
-        return this._expenseManager.removeExpenseJoinRequest(userId, expenseId, requestingUserId);
+    async removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
+        await this._expenseOwnershipValidator.validate(expenseId, requestingUserId);
+        return this._expenseManager.removeExpenseJoinRequest(userId, expenseId);
     }
 
     async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]> {

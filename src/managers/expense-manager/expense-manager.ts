@@ -30,12 +30,12 @@ import { IExpensePayerDao } from "src/dao/expense-payer-dao/expense-payer-dao-in
 import { ExpensePayer } from "src/models/expense-payer/expense-payer";
 import { InvalidStateError } from "src/models/error/invalid-state-error";
 import { IExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-payer-status-dao-interface";
-import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
 import { IUserExpenseStrategy } from "src/strategies/user-expense-strategy/user-expense-strategy.i";
 import { IExpenseWriteStrategy } from "src/strategies/expense-write-strategy/expense-write-strategy.i";
 import { ILeadingExpenseDao } from "src/dao/leading-expense-dao/leading-expense-dao.i";
 import { AttributeValue } from "@aws-sdk/client-dynamodb";
 import { IExpenseGroupStrategy } from "src/strategies/expense-group-strategy/expense-group-strategy.i";
+import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -63,7 +63,7 @@ export class ExpenseManager implements IExpenseManager {
 
     async getUserExpense(userId: string, expenseId: string): Promise<IUserExpense> {
         const userExpense = { userId, expenseId } as IUserExpense;
-        const key = this._userExpenseDao.key(userExpense);
+        const key = this._userExpenseDao.keyFrom(userExpense);
         return await this._userExpenseDao.read(key);
     }
 
@@ -78,14 +78,14 @@ export class ExpenseManager implements IExpenseManager {
         const childExpenseIds = await this._expenseGroupDao.getChildExpenseIds(id);
 
         await Promise.all([
-            this._expenseDao.read({ id }).then(e => expenseDa = e),
-            this._userExpenseDao.getUsersForExpense(id).then(uids => userIds = uids),
+            this._expenseDao.read({ id }).then((e) => (expenseDa = e)),
+            this._userExpenseDao.getUsersForExpense(id).then((uids) => (userIds = uids)),
             this._expenseItemDao.getForExpense(id).then((e) => (items = e)),
             this._expensePayerDao
                 .getForExpense(id)
                 .then((ep) => (payers = ep.map((ep) => new PayerShare(ep.userId, ep.share)))),
             this._expensePayerStatusDao.getForExpense(id).then((ep) => (payerStatuses = ep)),
-            Promise.all(childExpenseIds.map(childId => this.getExpense(childId))).then(c => children = c),
+            Promise.all(childExpenseIds.map((childId) => this.getExpense(childId))).then((c) => (children = c)),
         ]).catch((e) => this._logger.error(`Error fetching expense ${id}`, e));
 
         return expenseDa !== undefined && items !== undefined && userIds !== undefined
@@ -119,8 +119,7 @@ export class ExpenseManager implements IExpenseManager {
         childExpense = !childExpense
             ? await this.createExpense(userId)
             : await this.createExpenseFromScan(childExpense, userId);
-        
-        
+
         await this._expenseGroupStrategy.addExpenseToGroup(parentExpenseId, childExpense.id);
         return this.getExpense(parentExpenseId);
     }
@@ -146,54 +145,14 @@ export class ExpenseManager implements IExpenseManager {
         return this.getExpense(id);
     }
 
-    async getExpensesForUser(userId: string, limit: number, offset: Record<string, AttributeValue> | undefined): Promise<IScanResult<IExpenseDto>> {
+    async getExpensesForUser(
+        userId: string,
+        limit: number,
+        offset: Record<string, AttributeValue> | undefined,
+    ): Promise<IScanResult<IExpenseDto>> {
         const leadingExpenses = await this._leadingExpenseDao.getForUser(userId, limit, offset);
-        const expenses = await Promise.all(leadingExpenses.result.map(le => this.getExpense(le.expenseId)));
+        const expenses = await Promise.all(leadingExpenses.result.map((le) => this.getExpense(le.expenseId)));
         return new ScanResult(expenses, leadingExpenses.lastEvaluatedKey);
-        // const expenseToItems = new Map<string, IExpenseItem[]>();
-        // const expenseToUsers = new Map<string, string[]>();
-        // const expenseToPayers = new Map<string, IPayerShare[]>();
-        // const expenseToPayerStatuses = new Map<string, ExpensePayerStatus[]>();
-        // const expenseToChildren = new Map<string, IExpenseDto[]>();
-        // const leadingExpenses = await this._leadingExpenseDao.getForUser(userId, limit, offset);
-        // const expenses = await Promise.all(leadingExpenses.result.map(le => this._expenseDao.read({ id: le.expenseId })));
-
-        // for (const e of expenses) {
-        //     this._expenseItemDao.getForExpense(e.id).then(items =>
-        //         expenseToItems.set(e.id, items));
-            
-        //     await this._userExpenseDao.getUsersForExpense(e.id).then(users =>
-        //         expenseToUsers.set(e.id, users));
-            
-        //     await this._expensePayerDao.getForExpense(e.id).then(payers =>
-        //         expenseToPayers.set(e.id, payers));
-            
-        //     await this._expensePayerStatusDao.getForExpense(e.id).then(payerStatuses =>
-        //         expenseToPayerStatuses.set(e.id, payerStatuses));
-            
-        //     this._expenseGroupDao.getChildExpenseIds(e.id).then(async childIds => {
-        //         const children = [];
-
-        //         for (const id of childIds) {
-        //             children.push(await this.getExpense(id));
-        //         }
-
-        //         expenseToChildren.set(e.id, children);
-        //     });
-        // }
-
-        // const items = expenses.map((e) =>
-        //     this._dtoMapper.toDto(
-        //         e,
-        //         expenseToUsers.get(e.id),
-        //         expenseToItems.get(e.id),
-        //         expenseToPayers.get(e.id),
-        //         expenseToPayerStatuses.get(e.id),
-        //         expenseToChildren.get(e.id),
-        //     ),
-        // );
-
-        // return new ScanResult(items, leadingExpenses.lastEvaluatedKey);
     }
 
     async getUsersForExpense(expenseId: string): Promise<string[]> {
@@ -205,42 +164,8 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {
-        const payerRecord = await this._expensePayerDao.read({ expenseId, userId });
-        if (payerRecord) {
-            await this._expensePayerDao.delete({ expenseId, userId });
-        }
-
-        const payerStatus = await this._expensePayerStatusDao.read({ expenseId, userId });
-        if (payerStatus) {
-            await this._expensePayerStatusDao.delete({ expenseId, userId });
-        }
-
-        const items = await this._expenseItemDao.getForExpense(expenseId);
-
-        for (const item of items) {
-            const userIndex = item.owners.findIndex((o) => o.id === userId);
-            if (userIndex !== -1) {
-                item.owners.splice(userIndex, 1);
-                await this._expenseItemDao.update(item);
-            }
-        }
-
-        const key = this._userExpenseDao.key({ expenseId, userId, pendingJoin: false });
-        await this._userExpenseDao.delete(key);
-
-        const expense = this.getExpense(expenseId);
-        const userExpenses = await this._userExpenseDao.getUsersForExpense(expenseId);
-        if (userExpenses.length === 0) {
-            // If the last user was deleted, delete the expense as well
-            await this._expenseDao.delete({ id: expenseId });
-        }
-
-        const childIds = await this._expenseDao.getChildExpenseIds(expenseId);
-        if (childIds.length > 0) {
-            await Promise.all(childIds.map((cid) => this.removeUserFromExpense(cid, userId)));
-        }
-
-        return expense;
+        await this._userExpenseStrategy.removeUserFromExpense(expenseId, userId);
+        return this.getExpense(expenseId);
     }
 
     async getExpenseJoinRequestsForUser(
@@ -279,9 +204,8 @@ export class ExpenseManager implements IExpenseManager {
         return this._userExpenseStrategy.addUserToExpenseAsJoinRequest(userId, expenseId, requestingUserId);
     }
 
-    async removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
-        const updatedUserExpense = { userId, expenseId, pendingJoin: false };
-        await this._userExpenseDao.update(updatedUserExpense);
+    async removeExpenseJoinRequest(userId: string, expenseId: string): Promise<void> {
+        await this._userExpenseStrategy.acceptExpenseJoinRequest(userId, expenseId);
     }
 
     async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]> {
@@ -291,7 +215,7 @@ export class ExpenseManager implements IExpenseManager {
         const ues = await this._userExpenseDao.getForUser(guestUserId);
 
         // Replace the existing guest id with registered id
-        updates.push(...ues.map((ue) => this._userExpenseDao.delete(this._userExpenseDao.key(ue))));
+        updates.push(...ues.map((ue) => this._userExpenseDao.delete(this._userExpenseDao.keyFrom(ue))));
         updates.push(
             ...ues.map((ue) =>
                 this._userExpenseDao.create(
@@ -368,29 +292,33 @@ export class ExpenseManager implements IExpenseManager {
         const limit = 500;
 
         const updatedItems = [];
-        let offset = 0;
-        let nextOffset = 0;
+        let offset = undefined;
+        let nextOffset: Record<string, object> | undefined = undefined;
 
         this._logger.log(`Deleting user data for ${userId}`);
 
         do {
-            const scanResult = await this._expenseDao.getExpensesForUser(userId, limit, nextOffset);
-            expenseIds.push(...scanResult.result.map((e) => e.id));
+            const scanResult = await this._leadingExpenseDao.getForUser(
+                userId,
+                limit,
+                nextOffset as Record<string, AttributeValue> | undefined,
+            );
+            expenseIds.push(...scanResult.result.map((e) => e.expenseId));
 
-            for (const expense of scanResult.result) {
-                const items = await this._expenseItemDao.getForExpense(expense.id);
+            for (const expenseId of scanResult.result.map((e) => e.expenseId)) {
+                const items = await this._expenseItemDao.getForExpense(expenseId);
 
-                const payer = await this._expensePayerDao.read({ expenseId: expense.id, userId });
+                const payer = await this._expensePayerDao.read({ expenseId, userId });
                 if (payer) {
-                    await this._expensePayerDao.delete({ expenseId: expense.id, userId });
-                    await this._expensePayerDao.create(new ExpensePayer(expense.id, userId, payer.share));
+                    await this._expensePayerDao.delete({ expenseId, userId });
+                    await this._expensePayerDao.create(new ExpensePayer(expenseId, userId, payer.share));
                 }
 
-                const payerStatus = await this._expensePayerStatusDao.read({ expenseId: expense.id, userId });
+                const payerStatus = await this._expensePayerStatusDao.read({ expenseId, userId });
                 if (payerStatus) {
-                    await this._expensePayerStatusDao.delete({ expenseId: expense.id, userId });
+                    await this._expensePayerStatusDao.delete({ expenseId, userId });
                     await this._expensePayerStatusDao.create(
-                        new ExpensePayerStatus(expense.id, userId, payerStatus.settled),
+                        new ExpensePayerStatus(expenseId, userId, payerStatus.settled),
                     );
                 }
 
@@ -404,7 +332,7 @@ export class ExpenseManager implements IExpenseManager {
             }
 
             offset = nextOffset;
-            nextOffset = (scanResult.lastEvaluatedKey.nextPage as { limit: number; offset: number }).offset;
+            nextOffset = scanResult.lastEvaluatedKey;
         } while (offset !== nextOffset);
 
         await Promise.all([this.saveUpdatedItems(updatedItems), this._userExpenseDao.deleteForUser(userId)]);
