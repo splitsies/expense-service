@@ -7,6 +7,7 @@ import { AttributeValue, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { IScanResult, ScanResult } from "@splitsies/shared-models";
 import { ILeadingExpenseMapper } from "src/mappers/leading-expense-mapper/leading-expense-mapper.i";
 import { Key, LeadingExpenseDa } from "src/models/leading-expense-da";
+import { Expense } from "src/models/expense";
 
 @injectable()
 export class LeadingExpenseDao extends DaoBase<LeadingExpenseDa, Key, LeadingExpense> implements ILeadingExpenseDao {
@@ -23,6 +24,18 @@ export class LeadingExpenseDao extends DaoBase<LeadingExpenseDa, Key, LeadingExp
             (m) => ({ userId: m.userId, transactionDateExpenseId: m.transactionDateExpenseId }),
             leadingExpenseMapper,
         );
+    }
+
+    readByValues(userId: string, expense: Expense): Promise<LeadingExpense> {
+        const model = new LeadingExpense(userId, expense.transactionDate, expense.id);
+        const key = this.keyFrom(model);
+        return this.read(key);
+    }
+
+    deleteByValues(userId: string, expense: Expense, shouldCommit: Promise<boolean> | undefined): Promise<void> {
+        const model = new LeadingExpense(userId, expense.transactionDate, expense.id);
+        const key = this.keyFrom(model);
+        return this.delete(key, shouldCommit);
     }
 
     async getForUser(

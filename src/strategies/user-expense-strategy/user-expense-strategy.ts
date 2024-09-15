@@ -29,7 +29,7 @@ export class UserExpenseStrategy implements IUserExpenseStrategy {
     async addUserToExpense(userId: string, expenseId: string, addToChildren = true): Promise<void> {
         await this.addSingleUserToExpense(userId, expenseId);
 
-        if (addToChildren) {
+        if (addToChildren) {    
             await this.addUserToChildren(userId, expenseId);
         }
     }
