@@ -6,11 +6,6 @@
     "connectionTableName": "${param:CONNECTION_TABLE_NAME}",
     "expenseItemTableName": "${param:EXPENSE_ITEM_TABLE_NAME}",
     "dbEndpoint": "${param:DB_ENDPOINT}",
-    "PGUSERNAME": "${param:PGUSERNAME}",
-    "PGPASSWORD": "${param:PGPASSWORD}",
-    "pgHost": "${param:PG_HOST}",
-    "pgPort": "${param:PG_PORT}",
-    "pgDatabaseName": "${param:PG_DATABASE_NAME}",
     "connectionTokenTableName": "${param:CONNECTION_TOKEN_TABLE_NAME}",
     "messageQueueResourceName": "${param:MESSAGE_QUEUE_RESOURCE_NAME}",
     "expensePayerTableName": "Splitsies-ExpensePayer-${param:RTENV}",
@@ -20,8 +15,5 @@
     "expenseGroupChildIndexName": "Splitsies-ExpenseGroupChildIndex-${param:RTENV}",
     "userExpenseTableName": "Splitsies-UserExpense-${param:RTENV}",
     "userExpenseUserIndexName": "Splitsies-UserExpenseUserIndex-${param:RTENV}",
-    "leadingExpenseTableName": "Splitsies-LeadingExpense-${param:RTENV}",
-    "pgIdleTimeoutSec": "10",
-    "pgMaxLifetimeSec": "30",
-    "pgMaxConnections": "100"
+    "leadingExpenseTableName": "Splitsies-LeadingExpense-${param:RTENV}"
 }

@@ -27,27 +27,94 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
         );
     }
 
-    async create(model: UserExpense): Promise<UserExpense> {
-        await this._transactionStrategy.execute([
-            this.putCommand(model),
-            this.putCommand(model, this._dbConfiguration.userExpenseUserIndexName),
-        ]);
+    async create(model: UserExpense, transactionSuccess?: Promise<boolean> | undefined): Promise<UserExpense> {
+        return await this.run(
+            async () => {
+                await this._transactionStrategy.execute([
+                    this.putCommand(model),
+                    this.putCommand(model, this._dbConfiguration.userExpenseUserIndexName),
+                ]);
 
-        return model;
+                return model;
+            },
+            transactionSuccess === undefined
+                ? undefined
+                : {
+                      success: transactionSuccess,
+                      onFail: async (id) => {
+                          this._logger.warn(
+                              `OPERATION ROLLBACK ${id}: CREATE failed on ${this._tableName}, ${this._dbConfiguration.userExpenseUserIndexName}. Attempting to DELETE item:`,
+                              this.keyFrom(model),
+                          );
+                          const rollbackOps = [
+                              this.deleteCommand(model),
+                              this.deleteCommand(model, this._dbConfiguration.userExpenseUserIndexName),
+                          ];
+
+                          await this._transactionStrategy.execute(rollbackOps);
+                      },
+                  },
+        );
     }
 
-    async update(updated: UserExpense): Promise<UserExpense> {
-        if (!this.read(this.keyFrom(updated))) {
+    async update(updated: UserExpense, transactionSuccess?: Promise<boolean> | undefined): Promise<UserExpense> {
+        const existing = await this.read(this.keyFrom(updated));
+        if (!existing) {
             throw new NotFoundError();
         }
-        return this.create(updated);
+
+        return await this.run(
+            async () => await this.create(updated),
+            transactionSuccess === undefined
+                ? undefined
+                : {
+                      success: transactionSuccess,
+                      onFail: async (id) => {
+                          this._logger.warn(
+                              `OPERATION ROLLBACK ${id}: UPDATE failed on ${this._tableName},${this._dbConfiguration.userExpenseUserIndexName}. Attempting to UPDATE item:`,
+                              existing,
+                          );
+                          const rollbackOps = [
+                              this.putCommand(existing),
+                              this.putCommand(existing, this._dbConfiguration.userExpenseUserIndexName),
+                          ];
+
+                          await this._transactionStrategy.execute(rollbackOps);
+                      },
+                  },
+        );
     }
 
-    async delete(key: { userId: string; expenseId: string }): Promise<void> {
-        await this._transactionStrategy.execute([
-            this.deleteCommand(key),
-            this.deleteCommand(key, this._dbConfiguration.userExpenseUserIndexName),
-        ]);
+    async delete(key: Key, transactionSuccess?: Promise<boolean> | undefined): Promise<void> {
+        const existing = await this.read(key);
+        if (!existing) return;
+
+        return await this.run(
+            async () => {
+                await this._transactionStrategy.execute([
+                    this.deleteCommand(key),
+                    this.deleteCommand(key, this._dbConfiguration.userExpenseUserIndexName),
+                ]);
+            },
+            transactionSuccess === undefined
+                ? undefined
+                : {
+                      success: transactionSuccess,
+                      onFail: async (id) => {
+                          if (await this.read(key)) return;
+                          this._logger.warn(
+                              `OPERATION ROLLBACK ${id}: DELETE failed on ${this._tableName},${this._dbConfiguration.userExpenseUserIndexName}. Attempting to CREATE item:`,
+                              existing,
+                          );
+                          const rollbackOps = [
+                              this.putCommand(existing),
+                              this.putCommand(existing, this._dbConfiguration.userExpenseUserIndexName),
+                          ];
+
+                          await this._transactionStrategy.execute(rollbackOps);
+                      },
+                  },
+        );
     }
 
     async getForUser(userId: string): Promise<IUserExpense[]> {

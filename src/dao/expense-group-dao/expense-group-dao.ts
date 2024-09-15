@@ -20,29 +20,84 @@ export class ExpenseGroupDao extends DaoBase<ExpenseGroup, Key> implements IExpe
         }));
     }
 
-    async create(model: ExpenseGroup): Promise<ExpenseGroup> {
+    async create(model: ExpenseGroup, shouldCommit?: Promise<boolean> | undefined): Promise<ExpenseGroup> {
         await this.validateExpenseGroup(model);
-        await this._transactionStrategy.execute([
-            this.putCommand(model),
-            this.putCommand(model, this._dbConfiguration.expenseGroupChildIndexName),
-        ]);
 
-        return model;
+        return await this.run(
+            async () => {
+                await this._transactionStrategy.execute([
+                    this.putCommand(model),
+                    this.putCommand(model, this._dbConfiguration.expenseGroupChildIndexName),
+                ]);
+
+                return model;
+            },
+            this._transactionFactory.create(shouldCommit, async (id) => {
+                this._logger.warn(
+                    `OPERATION ROLLBACK ${id}: CREATE failed on ${this._tableName}, ${this._dbConfiguration.expenseGroupChildIndexName}. Attempting to DELETE item:`,
+                    this.keyFrom(model),
+                );
+                const rollbackOps = [
+                    this.deleteCommand(model),
+                    this.deleteCommand(model, this._dbConfiguration.expenseGroupChildIndexName),
+                ];
+
+                await this._transactionStrategy.execute(rollbackOps);
+            }),
+        );
     }
 
-    async update(updated: ExpenseGroup): Promise<ExpenseGroup> {
+    async update(updated: ExpenseGroup, shouldCommit?: Promise<boolean> | undefined): Promise<ExpenseGroup> {
         await this.validateExpenseGroup(updated);
-        if (!this.read(this.keyFrom(updated))) {
+        const existing = await this.read(this.keyFrom(updated));
+        if (!existing) {
             throw new NotFoundError();
         }
-        return this.create(updated);
+
+        return await this.run(
+            async () => await this.create(updated),
+            this._transactionFactory.create(shouldCommit, async (id) => {
+                this._logger.warn(
+                    `OPERATION ROLLBACK ${id}: UPDATE failed on ${this._tableName},${this._dbConfiguration.expenseGroupChildIndexName}. Attempting to UPDATE item:`,
+                    existing,
+                );
+                const rollbackOps = [
+                    this.putCommand(existing),
+                    this.putCommand(existing, this._dbConfiguration.expenseGroupChildIndexName),
+                ];
+
+                await this._transactionStrategy.execute(rollbackOps);
+            }),
+        );
     }
 
-    async delete(key: { parentExpenseId: string; childExpenseId: string }): Promise<void> {
-        await this._transactionStrategy.execute([
-            this.deleteCommand(key),
-            this.deleteCommand(key, this._dbConfiguration.expenseGroupChildIndexName),
-        ]);
+    async delete(key: Key, shouldCommit?: Promise<boolean> | undefined): Promise<void> {
+        const existing = await this.read(key);
+        if (!existing) return;
+
+        return await this.run(
+            async () => {
+                await this._transactionStrategy.execute([
+                    this.deleteCommand(key),
+                    this.deleteCommand(key, this._dbConfiguration.expenseGroupChildIndexName),
+                ]);
+            },
+            this._transactionFactory.create(shouldCommit, async (id) => {
+                if (await this.read(key)) return;
+
+                this._logger.warn(
+                    `OPERATION ROLLBACK ${id}: DELETE failed on ${this._tableName} and ${this._dbConfiguration.expenseGroupChildIndexName}. Attempting to CREATE item:`,
+                    existing,
+                );
+
+                const rollbackOps = [
+                    this.putCommand(existing),
+                    this.putCommand(existing, this._dbConfiguration.expenseGroupChildIndexName),
+                ];
+
+                await this._transactionStrategy.execute(rollbackOps);
+            }),
+        );
     }
 
     async getParentExpenseId(childExpenseId: string): Promise<string | undefined> {

@@ -8,8 +8,6 @@ import { IExpensePayerDao } from "src/dao/expense-payer-dao/expense-payer-dao-in
 import { IExpensePayerStatusDao } from "src/dao/expense-payer-status-dao/expense-payer-status-dao-interface";
 import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-interface";
 import { ExpensePayer } from "src/models/expense-payer/expense-payer";
-import { ExpenseDa } from "src/models/expense/expense-da";
-import { IExpenseDa } from "src/models/expense/expense-da-interface";
 import { IExpenseWriteStrategy } from "./expense-write-strategy.i";
 import { ILeadingExpenseDao } from "src/dao/leading-expense-dao/leading-expense-dao.i";
 import { LeadingExpense } from "src/models/leading-expense";
@@ -34,94 +32,93 @@ export class ExpenseWriteStrategy implements IExpenseWriteStrategy {
     async updateTransactionDate(id: string, newTransactionDate: Date): Promise<void> {
         const expense = await this._expenseDao.read({ id });
         const userIds = await this._userExpenseDao.getUsersForExpense(id);
-        const writes = [this._expenseDao.putCommand(new Expense(expense.id, expense.name, newTransactionDate))];
 
-        if (!(await this._expenseGroupDao.getParentExpenseId(id))) {
-            await Promise.all(
-                userIds.map(async (userId) => {
-                    const key = this._leadingExpenseDao.keyFrom(
-                        new LeadingExpense(userId, expense.transactionDate, expense.id),
-                    );
-                    const leadingExpenseRecord = await this._leadingExpenseDao.read(key);
+        await this._transactionStrategy.runWithSimpleTransaction(async (success) => {
+            const ops: Promise<any>[] = [];
+
+            ops.push(this._expenseDao.update(new Expense(expense.id, expense.name, newTransactionDate), success));
+
+            if (!(await this._expenseGroupDao.getParentExpenseId(id))) {
+                for (const userId of userIds) {
+                    const leadingExpenseRecord = await this._leadingExpenseDao.readByValues(userId, expense);
                     if (!leadingExpenseRecord) return;
 
-                    writes.push(this._leadingExpenseDao.deleteCommand(key));
-                    writes.push(
-                        this._leadingExpenseDao.putCommand(new LeadingExpense(userId, newTransactionDate, expense.id)),
+                    ops.push(this._leadingExpenseDao.deleteByValues(userId, expense, success));
+                    ops.push(
+                        this._leadingExpenseDao.create(
+                            new LeadingExpense(userId, newTransactionDate, expense.id),
+                            success,
+                        ),
                     );
-                }),
-            );
-        }
+                }
+            }
 
-        await this._transactionStrategy.execute(writes);
-
-        console.log(writes);
+            await Promise.all(ops);
+        });
     }
 
-    async delete(id: string): Promise<void> {
+    async delete(id: string, parentTransaction: Promise<boolean> | undefined = undefined): Promise<void> {
         const expense = await this._expenseDao.read({ id });
         const userIds = await this._userExpenseDao.getUsersForExpense(id);
 
-        await Promise.all(
-            userIds.map(async (userId) => {
-                await this._leadingExpenseDao.delete(
-                    this._leadingExpenseDao.keyFrom(new LeadingExpense(userId, expense.transactionDate, expense.id)),
-                );
-                await this._userExpenseDao.delete({ userId, expenseId: id });
-            }),
-        );
+        const transaction = async (success: Promise<boolean>) => {
+            const ops: Promise<any>[] = [];
 
-        const payers = await this._expensePayerDao.getForExpense(id);
-        const payerStatuses = await this._expensePayerStatusDao.getForExpense(id);
-        const items = await this._expenseItemDao.getForExpense(id);
+            const payers = await this._expensePayerDao.getForExpense(id);
+            const payerStatuses = await this._expensePayerStatusDao.getForExpense(id);
+            const items = await this._expenseItemDao.getForExpense(id);
+            const children = await this._expenseGroupDao.getChildExpenseIds(id);
+            const parentExpenseId = await this._expenseGroupDao.getParentExpenseId(id);
 
-        await Promise.all([
-            ...items.map((i) => this._expenseItemDao.delete({ expenseId: id, id: i.id })),
-            ...payerStatuses.map((p) => this._expensePayerDao.delete({ userId: p.userId, expenseId: p.expenseId })),
-            ...payers.map((p) => this._expensePayerDao.delete({ userId: p.userId, expenseId: p.expenseId })),
-        ]);
+            ops.push(
+                ...items.map((i) => this._expenseItemDao.delete({ expenseId: id, id: i.id }, success)),
+                ...payerStatuses.map((p) =>
+                    this._expensePayerDao.delete({ userId: p.userId, expenseId: p.expenseId }, success),
+                ),
+                ...payers.map((p) =>
+                    this._expensePayerDao.delete({ userId: p.userId, expenseId: p.expenseId }, success),
+                ),
+                ...children.flatMap((child) => [
+                    this._expenseGroupDao.delete({ parentExpenseId: id, childExpenseId: child }, success),
+                    this.delete(child, success),
+                ]),
+                ...userIds.flatMap((userId) => [
+                    this._leadingExpenseDao.deleteByValues(userId, expense, success),
+                    this._userExpenseDao.delete({ userId, expenseId: id }, success),
+                ]),
+            );
 
-        const children = await this._expenseGroupDao.getChildExpenseIds(id);
-        if (children.length) {
-            for (const child of children) {
-                await this._expenseGroupDao.delete({ parentExpenseId: id, childExpenseId: child });
-                await this.delete(child);
+            await Promise.all(ops);
+            await this._expenseDao.delete({ id }, success);
+            if (parentExpenseId) {
+                await this._expenseGroupDao.delete({ parentExpenseId, childExpenseId: id }, success);
             }
-        }
+        };
 
-        const parentExpenseId = await this._expenseGroupDao.getParentExpenseId(id);
-
-        if (parentExpenseId) {
-            await this._expenseGroupDao.delete({ parentExpenseId, childExpenseId: id });
-        }
-
-        await this._expenseDao.delete({ id });
+        await (parentTransaction !== undefined
+            ? transaction(parentTransaction)
+            : this._transactionStrategy.runWithSimpleTransaction(transaction));
     }
 
-    async create(userId: string, dto: IExpenseDto | undefined = undefined): Promise<IExpenseDa> {
+    async create(userId: string, dto: IExpenseDto | undefined = undefined): Promise<Expense> {
         const id = randomUUID();
+        const transactionDate = dto ? new Date(dto.transactionDate) : new Date();
 
-        const created = dto
-            ? await this._expenseDao.create(new ExpenseDa(id, dto.name, new Date(dto.transactionDate)))
-            : await this._expenseDao.create(new ExpenseDa(id, "Untitled", new Date()));
-
-        if (dto) {
-            await Promise.all(
-                dto.items.map((i) =>
-                    this._expenseItemDao
-                        .create({ ...i, expenseId: id })
-                        .catch((e) => this._logger.error(`Error creating expense item ${i.id} - ${i.name}`, e)),
-                ),
+        await this._transactionStrategy.runWithSimpleTransaction(async (success) => {
+            const operations: Promise<any>[] = [];
+            operations.push(
+                this._expenseDao.create(new Expense(id, dto?.name ?? "Untitled", transactionDate), success),
             );
-        }
+            operations.push(
+                ...(dto?.items ?? []).map((i) => this._expenseItemDao.create({ ...i, expenseId: id }, success)),
+            );
+            operations.push(this._leadingExpenseDao.create(new LeadingExpense(userId, transactionDate, id), success));
+            operations.push(this._userExpenseDao.create(new UserExpense(id, userId, false), success));
+            operations.push(this._expensePayerDao.create(new ExpensePayer(id, userId, 1), success));
+            operations.push(this._expensePayerStatusDao.create(new ExpensePayerStatus(id, userId, false), success));
+            await Promise.all(operations);
+        });
 
-        await Promise.all([
-            this._leadingExpenseDao.create(new LeadingExpense(userId, created.transactionDate, created.id)),
-            this._userExpenseDao.create(new UserExpense(created.id, userId, false)),
-            this._expensePayerDao.create(new ExpensePayer(id, userId, 1)),
-            this._expensePayerStatusDao.create(new ExpensePayerStatus(id, userId, false)),
-        ]);
-
-        return created;
+        return this._expenseDao.read({ id });
     }
 }
