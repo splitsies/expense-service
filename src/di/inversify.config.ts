@@ -81,6 +81,8 @@ import { IUserExpenseDaMapper } from "src/mappers/user-expense-mapper/user-expen
 import { UserExpenseDaMapper } from "src/mappers/user-expense-mapper/user-expense-mapper";
 import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
 import { ExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao";
+import { IUserDataStrategy } from "src/strategies/user-data-strategy/user-data-strategy.i";
+import { UserDataStrategy } from "src/strategies/user-data-strategy/user-data-strategy";
 
 const container = new Container({ defaultScope: "Singleton" });
 
@@ -130,5 +132,6 @@ container.bind<IExpenseGroupStrategy>(IExpenseGroupStrategy).to(ExpenseGroupStra
 container.bind<IDynamoDbTransactionStrategy>(IDynamoDbTransactionStrategy).to(DynamoDbTransactionStrategy);
 container.bind<IUserExpenseDaMapper>(IUserExpenseDaMapper).to(UserExpenseDaMapper);
 container.bind<IPageInfoMapper>(IPageInfoMapper).to(PageInfoMapper);
+container.bind<IUserDataStrategy>(IUserDataStrategy).to(UserDataStrategy);
 
 export { container };

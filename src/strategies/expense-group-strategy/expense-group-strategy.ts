@@ -7,6 +7,7 @@ import { IExpenseDao } from "src/dao/expense-dao/expense-dao-interface";
 import { LeadingExpense } from "src/models/leading-expense";
 import { IParentChildUserSyncStrategy } from "../parent-child-user-sync-strategy/parent-child-user-sync-strategy.i";
 import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
+import { IDynamoDbTransactionStrategy } from "@splitsies/utils";
 
 @injectable()
 export class ExpenseGroupStrategy implements IExpenseGroupStrategy {
@@ -17,40 +18,47 @@ export class ExpenseGroupStrategy implements IExpenseGroupStrategy {
         @inject(ILeadingExpenseDao) private readonly _leadingExpenseDao: ILeadingExpenseDao,
         @inject(IParentChildUserSyncStrategy)
         private readonly _parentChildUserSyncStrategy: IParentChildUserSyncStrategy,
+        @inject(IDynamoDbTransactionStrategy) private readonly _transactionStrategy: IDynamoDbTransactionStrategy,
     ) {}
 
     async addExpenseToGroup(parentExpenseId: string, childExpenseId: string): Promise<void> {
-        await this._expenseGroupDao.create(new ExpenseGroup(parentExpenseId, childExpenseId));
+        await this._transactionStrategy.runWithSimpleTransaction(async (transaction) => {
+            const writes = [];
+            writes.push(this._expenseGroupDao.create(new ExpenseGroup(parentExpenseId, childExpenseId), transaction));
 
-        const childExpense = await this._expenseDao.read({ id: childExpenseId });
-        const childExpenseUserIds = await this._userExpenseDao.getUsersForExpense(childExpenseId);
+            const childExpense = await this._expenseDao.read({ id: childExpenseId });
+            const childExpenseUserIds = await this._userExpenseDao.getUsersForExpense(childExpenseId);
 
-        await Promise.all(
-            childExpenseUserIds.map(async (userId) => {
-                const key = this._leadingExpenseDao.keyFrom(
-                    new LeadingExpense(userId, childExpense.transactionDate, childExpense.id),
-                );
-                await this._leadingExpenseDao.delete(key);
-            }),
-        );
+            writes.push(
+                ...childExpenseUserIds.map(async (userId) => {
+                    this._leadingExpenseDao.deleteByValues(userId, childExpense, transaction);
+                }),
+            );
 
-        await this._parentChildUserSyncStrategy.sync(parentExpenseId);
+            writes.push(this._parentChildUserSyncStrategy.sync(parentExpenseId, transaction));
+            await Promise.all(writes);
+        });
     }
 
     async removeExpenseFromGroup(parentExpenseId: string, childExpenseId: string): Promise<void> {
-        await this._expenseGroupDao.delete(new ExpenseGroup(parentExpenseId, childExpenseId));
+        await this._transactionStrategy.runWithSimpleTransaction(async (transaction) => {
+            const writes = [];
+            writes.push(this._expenseGroupDao.delete(new ExpenseGroup(parentExpenseId, childExpenseId), transaction));
 
-        const childExpense = await this._expenseDao.read({ id: childExpenseId });
-        const childExpenseUserIds = await this._userExpenseDao.getUsersForExpense(childExpenseId);
+            const childExpense = await this._expenseDao.read({ id: childExpenseId });
+            const childExpenseUserIds = await this._userExpenseDao.getUsersForExpense(childExpenseId);
 
-        await Promise.all(
-            childExpenseUserIds.map((userId) =>
-                this._leadingExpenseDao.create(
-                    new LeadingExpense(userId, childExpense.transactionDate, childExpense.name),
+            writes.push(
+                ...childExpenseUserIds.map((userId) =>
+                    this._leadingExpenseDao.create(
+                        new LeadingExpense(userId, childExpense.transactionDate, childExpense.name),
+                        transaction,
+                    ),
                 ),
-            ),
-        );
+            );
 
-        await this._parentChildUserSyncStrategy.sync(parentExpenseId);
+            writes.push(this._parentChildUserSyncStrategy.sync(parentExpenseId, transaction));
+            await Promise.all(writes);
+        });
     }
 }
