@@ -37,23 +37,18 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
 
                 return model;
             },
-            transactionSuccess === undefined
-                ? undefined
-                : {
-                      success: transactionSuccess,
-                      onFail: async (id) => {
-                          this._logger.warn(
-                              `OPERATION ROLLBACK ${id}: CREATE failed on ${this._tableName}, ${this._dbConfiguration.userExpenseUserIndexName}. Attempting to DELETE item:`,
-                              this.keyFrom(model),
-                          );
-                          const rollbackOps = [
-                              this.deleteCommand(model),
-                              this.deleteCommand(model, this._dbConfiguration.userExpenseUserIndexName),
-                          ];
+            this._transactionFactory.create(transactionSuccess, async (id) => {
+                this._logger.warn(
+                    `OPERATION ROLLBACK ${id}: CREATE failed on ${this._tableName}, ${this._dbConfiguration.userExpenseUserIndexName}. Attempting to DELETE item:`,
+                    this.keyFrom(model),
+                );
+                const rollbackOps = [
+                    this.deleteCommand(model),
+                    this.deleteCommand(model, this._dbConfiguration.userExpenseUserIndexName),
+                ];
 
-                          await this._transactionStrategy.execute(rollbackOps);
-                      },
-                  },
+                await this._transactionStrategy.execute(rollbackOps);
+            })        
         );
     }
 
@@ -65,24 +60,19 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
 
         return await this.run(
             async () => await this.create(updated),
-            transactionSuccess === undefined
-                ? undefined
-                : {
-                      success: transactionSuccess,
-                      onFail: async (id) => {
-                          this._logger.warn(
-                              `OPERATION ROLLBACK ${id}: UPDATE failed on ${this._tableName},${this._dbConfiguration.userExpenseUserIndexName}. Attempting to UPDATE item:`,
-                              existing,
-                          );
-                          const rollbackOps = [
-                              this.putCommand(existing),
-                              this.putCommand(existing, this._dbConfiguration.userExpenseUserIndexName),
-                          ];
+            this._transactionFactory.create(transactionSuccess, async (id) => {
+                this._logger.warn(
+                    `OPERATION ROLLBACK ${id}: UPDATE failed on ${this._tableName},${this._dbConfiguration.userExpenseUserIndexName}. Attempting to UPDATE item:`,
+                    existing,
+                );
+                const rollbackOps = [
+                    this.putCommand(existing),
+                    this.putCommand(existing, this._dbConfiguration.userExpenseUserIndexName),
+                ];
 
-                          await this._transactionStrategy.execute(rollbackOps);
-                      },
-                  },
-        );
+                await this._transactionStrategy.execute(rollbackOps);
+            }));
+        
     }
 
     async delete(key: Key, transactionSuccess?: Promise<boolean> | undefined): Promise<void> {
@@ -96,24 +86,19 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
                     this.deleteCommand(key, this._dbConfiguration.userExpenseUserIndexName),
                 ]);
             },
-            transactionSuccess === undefined
-                ? undefined
-                : {
-                      success: transactionSuccess,
-                      onFail: async (id) => {
-                          if (await this.read(key)) return;
-                          this._logger.warn(
-                              `OPERATION ROLLBACK ${id}: DELETE failed on ${this._tableName},${this._dbConfiguration.userExpenseUserIndexName}. Attempting to CREATE item:`,
-                              existing,
-                          );
-                          const rollbackOps = [
-                              this.putCommand(existing),
-                              this.putCommand(existing, this._dbConfiguration.userExpenseUserIndexName),
-                          ];
+            this._transactionFactory.create(transactionSuccess, async (id) => {
+                if (await this.read(key)) return;
+                this._logger.warn(
+                    `OPERATION ROLLBACK ${id}: DELETE failed on ${this._tableName},${this._dbConfiguration.userExpenseUserIndexName}. Attempting to CREATE item:`,
+                    existing,
+                );
+                const rollbackOps = [
+                    this.putCommand(existing),
+                    this.putCommand(existing, this._dbConfiguration.userExpenseUserIndexName),
+                ];
 
-                          await this._transactionStrategy.execute(rollbackOps);
-                      },
-                  },
+                await this._transactionStrategy.execute(rollbackOps);
+            })
         );
     }
 
@@ -148,8 +133,9 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
             new QueryCommand({
                 TableName: this._dbConfiguration.userExpenseUserIndexName,
                 KeyConditionExpression: "#userId = :userId",
-                ExpressionAttributeNames: { "#userId": "userId" },
-                ExpressionAttributeValues: { ":userId": { S: userId } },
+                FilterExpression: "#pendingJoin = :pendingJoin",
+                ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
+                ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
                 ExclusiveStartKey: offset as Record<string, AttributeValue>,
             }),
         );

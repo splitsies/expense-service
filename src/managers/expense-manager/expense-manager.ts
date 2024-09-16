@@ -19,8 +19,6 @@ import { IUserExpenseDao } from "src/dao/user-expense-dao/user-expense-dao-inter
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { ILogger, IMessageQueueClient } from "@splitsies/utils";
 import { IExpenseItemDao } from "src/dao/expense-item-dao/expense-item-dao-interface";
-import { IExpenseDa } from "src/models/expense/expense-da-interface";
-import { UserExpense } from "src/models/user-expense/user-expense";
 import { IExpenseDtoMapper } from "src/mappers/expense-dto-mapper/expense-dto-mapper-interface";
 import { ExpenseDa } from "src/models/expense/expense-da";
 import { UserExpenseDto } from "src/models/user-expense-dto/user-expense-dto";
@@ -36,6 +34,8 @@ import { ILeadingExpenseDao } from "src/dao/leading-expense-dao/leading-expense-
 import { AttributeValue } from "@aws-sdk/client-dynamodb";
 import { IExpenseGroupStrategy } from "src/strategies/expense-group-strategy/expense-group-strategy.i";
 import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-interface";
+import { IUserDataStrategy } from "src/strategies/user-data-strategy/user-data-strategy.i";
+import { Expense } from "src/models/expense";
 
 @injectable()
 export class ExpenseManager implements IExpenseManager {
@@ -53,6 +53,7 @@ export class ExpenseManager implements IExpenseManager {
         @inject(IExpenseWriteStrategy) private readonly _expenseWriteStrategy: IExpenseWriteStrategy,
         @inject(ILeadingExpenseDao) private readonly _leadingExpenseDao: ILeadingExpenseDao,
         @inject(IExpenseGroupStrategy) private readonly _expenseGroupStrategy: IExpenseGroupStrategy,
+        @inject(IUserDataStrategy) private readonly _userDataStrategy: IUserDataStrategy,
     ) {}
 
     async queueExpenseUpdate(expenseUpdate: IExpenseDto): Promise<void> {
@@ -68,7 +69,7 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async getExpense(id: string): Promise<IExpenseDto> {
-        let expenseDa: IExpenseDa;
+        let expense: Expense;
         let userIds: string[];
         let items: IExpenseItem[];
         let payers: IPayerShare[];
@@ -78,7 +79,7 @@ export class ExpenseManager implements IExpenseManager {
         const childExpenseIds = await this._expenseGroupDao.getChildExpenseIds(id);
 
         await Promise.all([
-            this._expenseDao.read({ id }).then((e) => (expenseDa = e)),
+            this._expenseDao.read({ id }).then((e) => (expense = e)),
             this._userExpenseDao.getUsersForExpense(id).then((uids) => (userIds = uids)),
             this._expenseItemDao.getForExpense(id).then((e) => (items = e)),
             this._expensePayerDao
@@ -88,8 +89,8 @@ export class ExpenseManager implements IExpenseManager {
             Promise.all(childExpenseIds.map((childId) => this.getExpense(childId))).then((c) => (children = c)),
         ]).catch((e) => this._logger.error(`Error fetching expense ${id}`, e));
 
-        return expenseDa !== undefined && items !== undefined && userIds !== undefined
-            ? this._dtoMapper.toDto(expenseDa, userIds, items, payers, payerStatuses, children)
+        return expense !== undefined && items !== undefined && userIds !== undefined
+            ? this._dtoMapper.toDto(expense, userIds, items, payers, payerStatuses, children)
             : null;
     }
 
@@ -164,8 +165,9 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {
-        await this._userExpenseStrategy.removeUserFromExpense(expenseId, userId);
-        return this.getExpense(expenseId);
+        const leadingExpenseId = await this.getLeadingExpenseId(expenseId);
+        await this._userExpenseStrategy.removeUserFromExpense(leadingExpenseId, userId);
+        return this.getExpense(leadingExpenseId);
     }
 
     async getExpenseJoinRequestsForUser(
@@ -209,56 +211,7 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]> {
-        const updates: Promise<any>[] = [];
-
-        // Get user expense records
-        const ues = await this._userExpenseDao.getForUser(guestUserId);
-
-        // Replace the existing guest id with registered id
-        updates.push(...ues.map((ue) => this._userExpenseDao.delete(this._userExpenseDao.keyFrom(ue))));
-        updates.push(
-            ...ues.map((ue) =>
-                this._userExpenseDao.create(
-                    new UserExpense(ue.expenseId, registeredUser.id, false, ue.requestingUserId),
-                ),
-            ),
-        );
-
-        const updatedExpenseIds: string[] = [];
-
-        // Replace any old item owners with the new user
-        for (const { expenseId } of ues) {
-            const items = await this._expenseItemDao.getForExpense(expenseId);
-
-            const payer = await this._expensePayerDao.read({ expenseId, userId: guestUserId });
-            if (payer) {
-                await this._expensePayerDao.delete({ expenseId, userId: guestUserId });
-                await this._expensePayerDao.create(new ExpensePayer(expenseId, registeredUser.id, payer.share));
-            }
-
-            const payerStatus = await this._expensePayerStatusDao.read({ expenseId, userId: guestUserId });
-            if (payerStatus) {
-                await this._expensePayerStatusDao.delete({ expenseId, userId: guestUserId });
-                await this._expensePayerStatusDao.create(
-                    new ExpensePayerStatus(expenseId, registeredUser.id, payerStatus.settled),
-                );
-            }
-
-            let updated = false;
-            for (const item of items) {
-                const idx = item.owners.findIndex((e) => e.id === guestUserId);
-                if (idx === -1) continue;
-
-                updated = true;
-                item.owners.splice(idx, 1);
-                item.owners.push(registeredUser);
-                updates.push(this._expenseItemDao.update(item));
-            }
-
-            if (updated) updatedExpenseIds.push(expenseId);
-        }
-
-        await Promise.all(updates);
+        const updatedExpenseIds = await this._userDataStrategy.replaceGuestUserInfo(guestUserId, registeredUser);
         return Promise.all(updatedExpenseIds.map(async (id) => await this.getExpense(id)));
     }
 
@@ -288,55 +241,7 @@ export class ExpenseManager implements IExpenseManager {
     }
 
     async deleteUserData(userId: string): Promise<string[]> {
-        const expenseIds = [];
-        const limit = 500;
-
-        const updatedItems = [];
-        let offset = undefined;
-        let nextOffset: Record<string, object> | undefined = undefined;
-
-        this._logger.log(`Deleting user data for ${userId}`);
-
-        do {
-            const scanResult = await this._leadingExpenseDao.getForUser(
-                userId,
-                limit,
-                nextOffset as Record<string, AttributeValue> | undefined,
-            );
-            expenseIds.push(...scanResult.result.map((e) => e.expenseId));
-
-            for (const expenseId of scanResult.result.map((e) => e.expenseId)) {
-                const items = await this._expenseItemDao.getForExpense(expenseId);
-
-                const payer = await this._expensePayerDao.read({ expenseId, userId });
-                if (payer) {
-                    await this._expensePayerDao.delete({ expenseId, userId });
-                    await this._expensePayerDao.create(new ExpensePayer(expenseId, userId, payer.share));
-                }
-
-                const payerStatus = await this._expensePayerStatusDao.read({ expenseId, userId });
-                if (payerStatus) {
-                    await this._expensePayerStatusDao.delete({ expenseId, userId });
-                    await this._expensePayerStatusDao.create(
-                        new ExpensePayerStatus(expenseId, userId, payerStatus.settled),
-                    );
-                }
-
-                for (const item of items) {
-                    const index = item.owners.findIndex((o) => o.id === userId);
-                    if (index === -1) continue;
-
-                    item.owners.splice(index, 1);
-                    updatedItems.push(item);
-                }
-            }
-
-            offset = nextOffset;
-            nextOffset = scanResult.lastEvaluatedKey;
-        } while (offset !== nextOffset);
-
-        await Promise.all([this.saveUpdatedItems(updatedItems), this._userExpenseDao.deleteForUser(userId)]);
-        return expenseIds;
+        return await this._userDataStrategy.deleteUserData(userId);
     }
 
     async setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto> {
