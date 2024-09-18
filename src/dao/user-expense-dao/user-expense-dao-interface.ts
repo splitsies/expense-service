@@ -14,6 +14,5 @@ export interface IUserExpenseDao extends IDynamoDbDao<UserExpenseDa, Key, UserEx
     ): Promise<IScanResult<IUserExpense>>;
     getJoinRequestCountForUser(userId: string): Promise<number>;
     getJoinRequestsForExpense(expenseId: string): Promise<IUserExpense[]>;
-    deleteForUser(userId: string): Promise<void>;
 }
 export const IUserExpenseDao = Symbol.for("IUserExpenseDao");

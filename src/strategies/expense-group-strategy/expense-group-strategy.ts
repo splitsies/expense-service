@@ -51,7 +51,7 @@ export class ExpenseGroupStrategy implements IExpenseGroupStrategy {
             writes.push(
                 ...childExpenseUserIds.map((userId) =>
                     this._leadingExpenseDao.create(
-                        new LeadingExpense(userId, childExpense.transactionDate, childExpense.name),
+                        new LeadingExpense(userId, childExpense.transactionDate, childExpense.id),
                         transaction,
                     ),
                 ),
