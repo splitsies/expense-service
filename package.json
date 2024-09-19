@@ -25,10 +25,9 @@
     "@middy/http-json-body-parser": "^3.4.0",
     "@middy/ws-json-body-parser": "^4.4.0",
     "@splitsies/shared-models": "^0.0.36",
-    "@splitsies/utils": "/Users/kevin/source/splitsies/utils/splitsies-utils-0.0.32.tgz",
+    "@splitsies/utils": "./splitsies-utils-0.0.32.tgz",
     "inversify": "6.0.1",
     "mathjs": "^11.8.0",
-    "postgres": "^3.4.4",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {

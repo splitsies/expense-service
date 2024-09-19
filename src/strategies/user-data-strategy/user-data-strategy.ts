@@ -27,43 +27,47 @@ export class UserDataStrategy implements IUserDataStrategy {
         @inject(IDynamoDbTransactionStrategy) private readonly _transactionStrategy: IDynamoDbTransactionStrategy,
         @inject(IUserExpenseStrategy) private readonly _userExpenseStrategy: IUserExpenseStrategy,
         @inject(IExpenseWriteStrategy) private readonly _expenseWriteStrategy: IExpenseWriteStrategy,
-    ) { }
-    
+    ) {}
+
     async deleteUserData(userId: string): Promise<string[]> {
         this._logger.log(`Deleting user data for ${userId}`);
 
         const userExpenses = await this._userExpenseDao.getForUser(userId);
-        await this._transactionStrategy.runWithSimpleTransaction(async transaction => { 
+        await this._transactionStrategy.runWithSimpleTransaction(async (transaction) => {
             const ops: Promise<any>[] = [];
-            await Promise.all(userExpenses.map(async ({ expenseId, userId }) => {
-                const users = await this._userExpenseDao.getUsersForExpense(expenseId);
-                if (users.length > 1) {
-                    ops.push(this._userExpenseStrategy.removeUserFromExpense(expenseId, userId, transaction));
-                } else {
-                    ops.push(this._expenseWriteStrategy.delete(expenseId, transaction));
-                }
-            }));
+            await Promise.all(
+                userExpenses.map(async ({ expenseId, userId }) => {
+                    const users = await this._userExpenseDao.getUsersForExpense(expenseId);
+                    if (users.length > 1) {
+                        ops.push(this._userExpenseStrategy.removeUserFromExpense(expenseId, userId, transaction));
+                    } else {
+                        ops.push(this._expenseWriteStrategy.delete(expenseId, transaction));
+                    }
+                }),
+            );
             await Promise.all(ops);
         });
 
-        return userExpenses.map(ue => ue.expenseId);
+        return userExpenses.map((ue) => ue.expenseId);
     }
 
     async replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<string[]> {
         const updates: Promise<any>[] = [];
         const updatedExpenseIds: string[] = [];
 
-        this._transactionStrategy.runWithSimpleTransaction(async transaction => {
+        this._transactionStrategy.runWithSimpleTransaction(async (transaction) => {
             // Get user expense records
             const ues = await this._userExpenseDao.getForUser(guestUserId);
 
             // Replace the existing guest id with registered id
-            updates.push(...ues.map((ue) => this._userExpenseDao.delete(this._userExpenseDao.keyFrom(ue), transaction)));
+            updates.push(
+                ...ues.map((ue) => this._userExpenseDao.delete(this._userExpenseDao.keyFrom(ue), transaction)),
+            );
             updates.push(
                 ...ues.map((ue) =>
                     this._userExpenseDao.create(
                         new UserExpense(ue.expenseId, registeredUser.id, false, ue.requestingUserId),
-                        transaction
+                        transaction,
                     ),
                 ),
             );
@@ -77,10 +81,14 @@ export class UserDataStrategy implements IUserDataStrategy {
 
                 const leadingExpense = await this._leadingExpenseDao.readByValues(guestUserId, expense);
                 if (leadingExpense) {
+                    updated = true;
                     updates.push(this._leadingExpenseDao.deleteByValues(guestUserId, expense, transaction));
-                    updates.push(this._leadingExpenseDao.create(
-                        new LeadingExpense(registeredUser.id, expense.transactionDate, expense.id), transaction
-                    ));
+                    updates.push(
+                        this._leadingExpenseDao.create(
+                            new LeadingExpense(registeredUser.id, expense.transactionDate, expense.id),
+                            transaction,
+                        ),
+                    );
                 }
 
                 const items = await this._expenseItemDao.getForExpense(expenseId);
@@ -88,7 +96,10 @@ export class UserDataStrategy implements IUserDataStrategy {
                 if (payer) {
                     updated = true;
                     await this._expensePayerDao.delete({ expenseId, userId: guestUserId }, transaction);
-                    await this._expensePayerDao.create(new ExpensePayer(expenseId, registeredUser.id, payer.share), transaction);
+                    await this._expensePayerDao.create(
+                        new ExpensePayer(expenseId, registeredUser.id, payer.share),
+                        transaction,
+                    );
                 }
 
                 const payerStatus = await this._expensePayerStatusDao.read({ expenseId, userId: guestUserId });
@@ -97,7 +108,7 @@ export class UserDataStrategy implements IUserDataStrategy {
                     await this._expensePayerStatusDao.delete({ expenseId, userId: guestUserId }, transaction);
                     await this._expensePayerStatusDao.create(
                         new ExpensePayerStatus(expenseId, registeredUser.id, payerStatus.settled),
-                        transaction
+                        transaction,
                     );
                 }
                 for (const item of items) {

@@ -67,8 +67,6 @@ import { IUserExpenseStrategy } from "src/strategies/user-expense-strategy/user-
 import { UserExpenseStrategy } from "src/strategies/user-expense-strategy/user-expense-strategy";
 import { ILeadingExpenseValidator } from "src/validators/leading-expense-validator/leading-expense-validator.i";
 import { LeadingExpenseValidator } from "src/validators/leading-expense-validator/leading-expense-validator";
-import { IPgProvider } from "src/providers/pg-provider.i";
-import { PgProvider } from "src/providers/pg-provider";
 import { IExpenseWriteStrategy } from "src/strategies/expense-write-strategy/expense-write-strategy.i";
 import { ExpenseWriteStrategy } from "src/strategies/expense-write-strategy/expense-write-strategy";
 import { ILeadingExpenseDao } from "src/dao/leading-expense-dao/leading-expense-dao.i";
@@ -124,7 +122,6 @@ container.bind<IExpenseOwnershipValidator>(IExpenseOwnershipValidator).to(Expens
 container.bind<IParentChildUserSyncStrategy>(IParentChildUserSyncStrategy).to(ParentChildUserSyncStrategy);
 container.bind<IUserExpenseStrategy>(IUserExpenseStrategy).to(UserExpenseStrategy);
 container.bind<ILeadingExpenseValidator>(ILeadingExpenseValidator).to(LeadingExpenseValidator);
-container.bind<IPgProvider>(IPgProvider).to(PgProvider);
 container.bind<IExpenseWriteStrategy>(IExpenseWriteStrategy).to(ExpenseWriteStrategy);
 container.bind<ILeadingExpenseDao>(ILeadingExpenseDao).to(LeadingExpenseDao);
 container.bind<ILeadingExpenseMapper>(ILeadingExpenseMapper).to(LeadingExpenseMapper);
