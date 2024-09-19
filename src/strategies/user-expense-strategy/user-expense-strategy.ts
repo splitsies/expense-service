@@ -69,12 +69,15 @@ export class UserExpenseStrategy implements IUserExpenseStrategy {
         const expense = await this._expenseDao.read({ id: expenseId });
         if (!expense) return;
 
-        this._transactionStrategy.runWithSimpleTransaction(async transaction => {
+        this._transactionStrategy.runWithSimpleTransaction(async (transaction) => {
             const writes = [];
 
             if (!(await this._expenseGroupDao.getParentExpenseId(expenseId))) {
                 writes.push(
-                    this._leadingExpenseDao.create(new LeadingExpense(userId, expense.transactionDate, expense.id), transaction),
+                    this._leadingExpenseDao.create(
+                        new LeadingExpense(userId, expense.transactionDate, expense.id),
+                        transaction,
+                    ),
                 );
             }
 
