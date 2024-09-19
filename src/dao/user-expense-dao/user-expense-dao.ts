@@ -5,19 +5,21 @@ import { IUserExpenseDao } from "./user-expense-dao-interface";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
 import postgres, { Sql } from "postgres";
 import { IScanResult, ScanResult } from "@splitsies/shared-models";
+import { IPgProvider } from "src/providers/pg-provider.i";
 
 @injectable()
 export class UserExpenseDao implements IUserExpenseDao {
     private readonly _client: Sql;
 
-    constructor(@inject(ILogger) logger: ILogger, @inject(IDbConfiguration) dbConfiguration: IDbConfiguration) {
+    constructor(
+        @inject(ILogger) logger: ILogger,
+        @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
+        @inject(IPgProvider) private readonly _pgProvider: IPgProvider,
+    ) {
+        this._client = this._pgProvider.provide();
+
         const keySelector = (e: IUserExpense) => ({ expenseId: e.expenseId, userId: e.userId });
         this.key = keySelector;
-        this._client = postgres({
-            hostname: dbConfiguration.pgHost,
-            port: dbConfiguration.pgPort,
-            database: dbConfiguration.pgDatabaseName,
-        });
     }
     key: (model: IUserExpense) => Record<string, string | number>;
 

@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { IExpenseBroadcaster } from "./expense-broadcaster-interface";
-import { IExpenseDto } from "@splitsies/shared-models";
-import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
+import { ExpenseMessage, IExpenseDto } from "@splitsies/shared-models";
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 import { sendMessage } from "@libs/broadcast";
 import { ILogger } from "@splitsies/utils";
@@ -12,19 +11,23 @@ import { IConnection } from "src/models/connection/connection-interface";
 export class ExpenseBroadcaster implements IExpenseBroadcaster {
     constructor(
         @inject(ILogger) private readonly _logger: ILogger,
-        @inject(IConnectionConfiguration) private readonly _connectionConfiguration: IConnectionConfiguration,
         @inject(IConnectionService) private readonly _connectionService: IConnectionService,
         @inject(IExpenseService) private readonly _expenseService: IExpenseService,
     ) {}
 
-    async broadcast(expense: IExpenseDto): Promise<void> {
-        const connections = await this._connectionService.getConnectionsForExpenseId(expense.id);
+    async broadcast(expense: ExpenseMessage, ignoredConnectionIds: string[] = []): Promise<void> {
+        const connections = await this._connectionService.getConnectionsForExpenseId(expense.connectedExpenseId);
+
+        const ignored = new Set(ignoredConnectionIds);
 
         // See local-emulation/queue-runner for setting up local listening to DynamoDB Stream
-        return this._expenseService.queueExpenseUpdate(expense, connections);
+        return this._expenseService.queueExpenseUpdate(
+            expense,
+            connections.filter((c) => !ignored.has(c.connectionId)),
+        );
     }
 
-    async notify(expense: IExpenseDto, connection: IConnection): Promise<void> {
+    async notify(expense: ExpenseMessage, connection: IConnection): Promise<void> {
         try {
             await sendMessage(connection.gatewayUrl, connection.connectionId, expense);
         } catch (e) {

@@ -8,7 +8,7 @@ const expenseUserDetailsSchema = {
         phoneNumber: { type: "string" },
         username: { type: "string" },
     },
-    required: ["isRegistered", "id", "givenName"],
+    required: ["isRegistered", "id", "givenName", "username", "familyName"],
 } as const;
 
 const expenseItemSchema = {
@@ -22,24 +22,47 @@ const expenseItemSchema = {
         isProportional: { type: "boolean" },
         createdAt: { type: "number" },
     },
-    required: ["id", "expenseId", "name", "price", "owners"],
+    required: ["id", "expenseId", "name", "price", "owners", "createdAt", "isProportional"],
+} as const;
+
+const payerStatusSchema = {
+    type: "object",
+    properties: {
+        expenseId: { type: "string" },
+        userId: { type: "string" },
+        settled: { type: "boolean" },
+    },
+    required: ["expenseId", "userId", "settled"],
+} as const;
+
+const payerSchema = {
+    type: "object",
+    properties: {
+        userId: { type: "string" },
+        share: { type: "number" },
+    },
+    required: ["userId", "share"],
+} as const;
+
+const expenseSchema = {
+    type: "object",
+    properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        transactionDate: { type: "string", format: "date-time" },
+        items: { type: "array", items: expenseItemSchema },
+        userIds: { type: "array", items: { type: "string" } },
+        payers: { type: "array", items: payerSchema },
+        payerStatuses: { type: "array", items: payerStatusSchema },
+    },
+    required: ["id", "name", "transactionDate", "items", "userIds", "payers", "payerStatuses"],
 } as const;
 
 export default {
     type: "object",
     properties: {
         userId: { type: "string" },
-        expense: {
-            type: "object",
-            properties: {
-                id: { type: "string" },
-                name: { type: "string" },
-                transactionDate: { type: "string", format: "date-time" },
-                items: { type: "array", items: expenseItemSchema },
-                userIds: { type: "array", items: { type: "string" } },
-            },
-            required: ["id", "name", "transactionDate", "items", "userIds"],
-        },
+        expense: expenseSchema,
     },
     required: ["userId"],
 } as const;

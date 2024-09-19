@@ -6,14 +6,12 @@ import { DataResponse, HttpStatusCode, IExpenseDto, InvalidArgumentsError } from
 import { IConnectionService } from "src/services/connection-service/connection-service-interface";
 import { IExpenseService } from "src/services/expense-service/expense-service-interface";
 import { UnauthorizedUserError } from "src/models/error/unauthorized-user-error";
-import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
 import { deleteConnection } from "@libs/broadcast";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
 
 const logger = container.get<ILogger>(ILogger);
 const connectionService = container.get<IConnectionService>(IConnectionService);
 const expenseService = container.get<IExpenseService>(IExpenseService);
-const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
 const connectionConfiguration = container.get<IConnectionConfiguration>(IConnectionConfiguration);
 
 const expectedErrors = [
@@ -44,9 +42,9 @@ export const main = SplitsiesFunctionHandlerFactory.create<typeof schema, IExpen
             throw new UnauthorizedUserError();
         }
 
-        const expense = await expenseService.getExpense(userExpense.expenseId);
-        await connectionService.create(connectionId, expenseId);
-        await expenseBroadcaster.broadcast(expense);
+        const expense = await expenseService.getLeadingExpense(userExpense.expenseId);
+        await connectionService.create(connectionId, expense.id);
+
         return new DataResponse(HttpStatusCode.OK, expense).toJson();
     },
     expectedErrors,

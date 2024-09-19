@@ -1,8 +1,8 @@
 import {
+    ExpenseMessage,
     IExpenseDto,
     IExpenseItem,
     IExpenseJoinRequest,
-    IExpensePayerDto,
     IExpenseUserDetails,
     IPayerShare,
     IScanResult,
@@ -16,14 +16,17 @@ export interface IExpenseService {
     getUserExpense(userId: string, expenseId: string): Promise<IUserExpense>;
     createExpense(userId: string): Promise<IExpenseDto>;
     createExpenseFromScan(expense: IExpenseDto, userId: string): Promise<IExpenseDto>;
+    deleteExpense(id: string, requestingUserId: string): Promise<void>;
+    addNewExpenseToGroup(
+        parentExpenseId: string,
+        userId: string,
+        childExpense?: IExpenseDto | undefined,
+    ): Promise<IExpenseDto>;
+    addExistingExpenseToGroup(groupExpenseId: string, childExpenseId: string, requestingUserId: string): Promise<void>;
+    removeExpenseFromGroup(groupExpenseId: string, childExpenseId: string, requestingUserId: string): Promise<void>;
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
     getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDto>>;
-    addUserToExpense(
-        userId: string,
-        expenseId: string,
-        requestingUserId: string,
-        authorizedUserId: string,
-    ): Promise<void>;
+    addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;
     getExpenseJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpenseDto>>;
     getJoinRequestCountForUser(userId: string): Promise<number>;
@@ -41,10 +44,12 @@ export interface IExpenseService {
     getExpenseItems(expenseId: string): Promise<IExpenseItem[]>;
     saveUpdatedItems(updatedItems: IExpenseItem[]): Promise<IExpenseItem[]>;
     replaceGuestUserInfo(guestUserId: string, registeredUser: IExpenseUserDetails): Promise<IExpenseDto[]>;
-    queueExpenseUpdate(expenseUpdate: IExpenseDto, connections: IConnection[]): Promise<void>;
+    queueExpenseUpdate(expenseUpdate: ExpenseMessage, connections: IConnection[]): Promise<void>;
     deleteUserData(userId: string): Promise<string[]>;
     setExpensePayers(expenseId: string, payerShares: IPayerShare[]): Promise<IExpenseDto>;
     setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto>;
+    getLeadingExpenseId(expenseId: string): Promise<string>;
+    getLeadingExpense(expenseId: string): Promise<IExpenseDto>;
 }
 
 export const IExpenseService: symbol = Symbol.for("IExpenseService");

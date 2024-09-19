@@ -1,9 +1,13 @@
 import {
+    ExpenseMessage,
     ExpenseOperation,
     IExpenseDto,
     IExpenseItem,
     IExpenseMessageParameters,
     IExpenseUserDetails,
+    ExpenseMessageType,
+    ExpenseItemSelectionUpdate,
+    ExpenseItemDetailsUpdate,
 } from "@splitsies/shared-models";
 import { IExpenseMessageStrategy } from "./expense-message-strategy-interface";
 import { inject, injectable } from "inversify";
@@ -13,7 +17,7 @@ import { IExpenseService } from "src/services/expense-service/expense-service-in
 export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
     constructor(@inject(IExpenseService) private readonly _expenseService: IExpenseService) {}
 
-    async execute(operationName: ExpenseOperation, params: IExpenseMessageParameters): Promise<IExpenseDto> {
+    async execute(operationName: ExpenseOperation, params: IExpenseMessageParameters): Promise<ExpenseMessage> {
         switch (operationName) {
             case "addItem":
                 return this.addItem(
@@ -55,19 +59,33 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         price: number,
         owners: IExpenseUserDetails[],
         isProportional: boolean,
-    ): Promise<IExpenseDto> {
-        return this._expenseService.addExpenseItem(name, price, owners, isProportional, expenseId);
+    ): Promise<ExpenseMessage> {
+        await this._expenseService.addExpenseItem(name, price, owners, isProportional, expenseId);
+
+        const expense = await this._expenseService.getLeadingExpense(expenseId);
+        return new ExpenseMessage({
+            type: ExpenseMessageType.ExpenseDto,
+            connectedExpenseId: expense.id,
+            expenseDto: expense,
+        });
     }
 
-    private async removeItem(expenseId: string, item: IExpenseItem): Promise<IExpenseDto> {
-        return await this._expenseService.removeExpenseItem(item.id, expenseId);
+    private async removeItem(expenseId: string, item: IExpenseItem): Promise<ExpenseMessage> {
+        await this._expenseService.removeExpenseItem(item.id, expenseId);
+
+        const expense = await this._expenseService.getLeadingExpense(expenseId);
+        return new ExpenseMessage({
+            type: ExpenseMessageType.ExpenseDto,
+            connectedExpenseId: expense.id,
+            expenseDto: expense,
+        });
     }
 
     private async updateItemSelections(
         expenseId: string,
         user: IExpenseUserDetails,
         selectedItemIds: string[],
-    ): Promise<IExpenseDto> {
+    ): Promise<ExpenseMessage> {
         const expenseItems = await this._expenseService.getExpenseItems(expenseId);
         const updated: IExpenseItem[] = [];
 
@@ -88,7 +106,13 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         }
 
         await this._expenseService.saveUpdatedItems(updated);
-        return this._expenseService.getExpense(expenseId);
+
+        const expense = await this._expenseService.getLeadingExpense(expenseId);
+        return new ExpenseMessage({
+            type: ExpenseMessageType.ExpenseDto,
+            connectedExpenseId: expense.id,
+            expenseDto: expense,
+        });
     }
 
     private async updateSingleItemSelected(
@@ -96,7 +120,7 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         user: IExpenseUserDetails,
         itemId: string,
         selected: boolean,
-    ): Promise<IExpenseDto> {
+    ): Promise<ExpenseMessage> {
         const expenseItems = await this._expenseService.getExpenseItems(expenseId);
         const targetItem = expenseItems.find((i) => i.id === itemId);
         if (selected && !targetItem.owners.find((o) => o.id === user.id)) {
@@ -109,7 +133,12 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         }
 
         await this._expenseService.saveUpdatedItems([targetItem]);
-        return this._expenseService.getExpense(expenseId);
+
+        return new ExpenseMessage({
+            type: ExpenseMessageType.ItemSelection,
+            connectedExpenseId: await this._expenseService.getLeadingExpenseId(expenseId),
+            itemSelectionUpdate: new ExpenseItemSelectionUpdate(expenseId, itemId, user.id, selected),
+        });
     }
 
     private async updateItemDetails(
@@ -118,21 +147,26 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
         name: string,
         price: number,
         isProportional: boolean,
-    ): Promise<IExpenseDto> {
+    ): Promise<ExpenseMessage> {
         const expenseItems = await this._expenseService.getExpenseItems(expenseId);
         const itemIndex = expenseItems.findIndex((i) => i.id === itemId);
         if (itemIndex === -1) throw new Error("Item not found for expense");
 
         const updatedItem = { ...expenseItems[itemIndex], name, price, isProportional };
         await this._expenseService.saveUpdatedItems([updatedItem]);
-        return this._expenseService.getExpense(expenseId);
+
+        return new ExpenseMessage({
+            type: ExpenseMessageType.ItemDetails,
+            connectedExpenseId: await this._expenseService.getLeadingExpenseId(expenseId),
+            itemDetailsUpdate: new ExpenseItemDetailsUpdate(expenseId, updatedItem),
+        });
     }
 
-    private async updateExpenseName(expenseId: string, expenseName: string): Promise<IExpenseDto> {
+    private async updateExpenseName(expenseId: string, expenseName: string): Promise<ExpenseMessage> {
         return this.updateExpense(expenseId, (e) => ({ ...e, name: expenseName } as IExpenseDto));
     }
 
-    private async updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<IExpenseDto> {
+    private async updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<ExpenseMessage> {
         return this.updateExpense(
             expenseId,
             (e) => ({ ...e, transactionDate: transactionDate.toISOString() } as IExpenseDto),
@@ -142,9 +176,16 @@ export class ExpenseMessageStrategy implements IExpenseMessageStrategy {
     private async updateExpense(
         expenseId: string,
         update: (expense: IExpenseDto) => IExpenseDto,
-    ): Promise<IExpenseDto> {
+    ): Promise<ExpenseMessage> {
         const expense = await this._expenseService.getExpense(expenseId);
         const updated = update(expense);
-        return this._expenseService.updateExpense(expense.id, updated);
+        await this._expenseService.updateExpense(expense.id, updated);
+
+        const updatedExpense = await this._expenseService.getLeadingExpense(expenseId);
+        return new ExpenseMessage({
+            type: ExpenseMessageType.ExpenseDto,
+            connectedExpenseId: expense.id,
+            expenseDto: updatedExpense,
+        });
     }
 }

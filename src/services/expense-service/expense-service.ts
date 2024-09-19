@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import {
+    ExpenseMessage,
     IExpenseDto,
     IExpenseItem,
     IExpenseJoinRequest,
@@ -18,6 +19,8 @@ import { randomUUID } from "crypto";
 import { IExpensePublishRequest } from "src/models/expense-publish-request/expense-publish-request-interface";
 import { ExpensePublishRequest } from "src/models/expense-publish-request/expense-publish-request";
 import { IConnection } from "src/models/connection/connection-interface";
+import { IExpenseOwnershipValidator } from "src/validators/expense-ownership-validator/expense-ownership-validator.i";
+import { ILeadingExpenseValidator } from "src/validators/leading-expense-validator/leading-expense-validator.i";
 
 @injectable()
 export class ExpenseService implements IExpenseService {
@@ -25,9 +28,11 @@ export class ExpenseService implements IExpenseService {
         @inject(ILogger) private readonly _logger: ILogger,
         @inject(IExpenseManager) private readonly _expenseManager: IExpenseManager,
         @inject(IMessageQueueClient) private readonly _messageQueueClient: IMessageQueueClient,
+        @inject(IExpenseOwnershipValidator) private readonly _expenseOwnershipValidator: IExpenseOwnershipValidator,
+        @inject(ILeadingExpenseValidator) private readonly _leadingExpenseValidator: ILeadingExpenseValidator,
     ) {}
 
-    async queueExpenseUpdate(expenseUpdate: IExpenseDto, connections: IConnection[]): Promise<void> {
+    async queueExpenseUpdate(expenseUpdate: ExpenseMessage, connections: IConnection[]): Promise<void> {
         const messages = connections.map((connection) =>
             this._messageQueueClient.send(
                 new QueueMessage<IExpensePublishRequest>(
@@ -57,6 +62,41 @@ export class ExpenseService implements IExpenseService {
         return this._expenseManager.createExpenseFromScan(expense, userId);
     }
 
+    async deleteExpense(id: string, requestingUserId: string): Promise<void> {
+        await this._expenseOwnershipValidator.validate(id, requestingUserId);
+        return this._expenseManager.deleteExpense(id);
+    }
+
+    async addNewExpenseToGroup(
+        parentExpenseId: string,
+        userId: string,
+        childExpense: IExpenseDto | undefined = undefined,
+    ): Promise<IExpenseDto> {
+        return this._expenseManager.addNewExpenseToGroup(parentExpenseId, userId, childExpense);
+    }
+
+    async addExistingExpenseToGroup(
+        groupExpenseId: string,
+        childExpenseId: string,
+        requestingUserId: string,
+    ): Promise<void> {
+        await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId);
+        await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId);
+
+        return this._expenseManager.addExistingExpenseToGroup(groupExpenseId, childExpenseId);
+    }
+
+    async removeExpenseFromGroup(
+        groupExpenseId: string,
+        childExpenseId: string,
+        requestingUserId: string,
+    ): Promise<void> {
+        await this._expenseOwnershipValidator.validate(groupExpenseId, requestingUserId);
+        await this._expenseOwnershipValidator.validate(childExpenseId, requestingUserId);
+
+        return this._expenseManager.removeExpenseFromGroup(groupExpenseId, childExpenseId);
+    }
+
     async updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto> {
         return await this._expenseManager.updateExpense(id, updated);
     }
@@ -69,13 +109,9 @@ export class ExpenseService implements IExpenseService {
         return await this._expenseManager.getUsersForExpense(expenseId);
     }
 
-    async addUserToExpense(
-        userId: string,
-        expenseId: string,
-        requestingUserId: string,
-        authorizedUserId: string,
-    ): Promise<void> {
-        await this._expenseManager.addUserToExpense(userId, expenseId, requestingUserId, authorizedUserId);
+    async addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
+        await this._expenseOwnershipValidator.validateForUserAdd(expenseId, userId, requestingUserId);
+        await this._expenseManager.addUserToExpense(userId, expenseId);
     }
 
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto> {
@@ -121,6 +157,7 @@ export class ExpenseService implements IExpenseService {
     }
 
     async addExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void> {
+        await this._leadingExpenseValidator.validate(expenseId);
         await this._expenseManager.addExpenseJoinRequest(userId, expenseId, requestingUserId);
         if (userId.startsWith("@splitsies-guest")) return;
 
@@ -148,5 +185,14 @@ export class ExpenseService implements IExpenseService {
 
     async setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto> {
         return await this._expenseManager.setExpensePayerStatus(expenseId, userId, settled);
+    }
+
+    async getLeadingExpenseId(expenseId: string): Promise<string> {
+        return this._expenseManager.getLeadingExpenseId(expenseId);
+    }
+
+    async getLeadingExpense(expenseId: string): Promise<IExpenseDto> {
+        const leadingExpenseId = await this.getLeadingExpenseId(expenseId);
+        return this.getExpense(leadingExpenseId);
     }
 }

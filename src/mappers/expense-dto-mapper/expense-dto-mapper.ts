@@ -11,6 +11,7 @@ export class ExpenseDtoMapper implements IExpenseDtoMapper {
         items: IExpenseItem[],
         payers: IPayerShare[],
         payerStatuses: ExpensePayerStatus[],
+        children: IExpenseDto[],
     ): IExpenseDto {
         return new ExpenseDto(
             expense.id,
@@ -20,6 +21,7 @@ export class ExpenseDtoMapper implements IExpenseDtoMapper {
             userIds,
             payers,
             payerStatuses,
+            children,
         );
     }
 }

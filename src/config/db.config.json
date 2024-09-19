@@ -14,5 +14,8 @@
     "connectionTokenTableName": "${param:CONNECTION_TOKEN_TABLE_NAME}",
     "messageQueueResourceName": "${param:MESSAGE_QUEUE_RESOURCE_NAME}",
     "expensePayerTableName": "Splitsies-ExpensePayer-${param:RTENV}",
-    "expensePayerStatusTableName": "Splitsies-ExpensePayerStatus-${param:RTENV}"
+    "expensePayerStatusTableName": "Splitsies-ExpensePayerStatus-${param:RTENV}",
+    "pgIdleTimeoutSec": "10",
+    "pgMaxLifetimeSec": "30",
+    "pgMaxConnections": "100"
 }
