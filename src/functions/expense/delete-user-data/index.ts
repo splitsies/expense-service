@@ -1,4 +1,3 @@
-import { VpcConfig } from "src/config/vpc.config";
 import { handlerPath } from "../../../libs/handler-resolver";
 import { QueueConfig } from "src/config/queue.config";
 
@@ -24,5 +23,4 @@ export default {
             },
         },
     ],
-    vpc: VpcConfig.vpc,
 };
