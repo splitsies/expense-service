@@ -1,44 +1,28 @@
 import { IExpenseItem } from "@splitsies/shared-models";
 import { DaoBase, ILogger } from "@splitsies/utils";
 import { inject, injectable } from "inversify";
-import { IExpenseItemDao } from "./expense-item-dao-interface";
+import { IExpenseItemDao, Key } from "./expense-item-dao-interface";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
-import { QueryCommand } from "@aws-sdk/client-dynamodb";
-import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 @injectable()
-export class ExpenseItemDao extends DaoBase<IExpenseItem> implements IExpenseItemDao {
+export class ExpenseItemDao extends DaoBase<IExpenseItem, Key> implements IExpenseItemDao {
     constructor(
         @inject(ILogger) logger: ILogger,
         @inject(IDbConfiguration) private readonly dbConfiguration: IDbConfiguration,
     ) {
-        const keySelector = (c: IExpenseItem) => ({ expenseId: c.expenseId, id: c.id });
-        super(logger, dbConfiguration, dbConfiguration.expenseItemTableName, keySelector);
+        super(logger, dbConfiguration, dbConfiguration.expenseItemTableName, (m) => ({
+            id: m.id,
+            expenseId: m.expenseId,
+        }));
     }
 
     async getForExpense(expenseId: string): Promise<IExpenseItem[]> {
-        const timeout = Date.now() + 10000;
-        const items: IExpenseItem[] = [];
-        let next = undefined;
-
-        do {
-            const response = await this._client.send(
-                new QueryCommand({
-                    TableName: this.dbConfiguration.expenseItemTableName,
-                    ExclusiveStartKey: next,
-                    KeyConditionExpression: "#expenseId = :expenseId",
-                    ExpressionAttributeNames: {
-                        "#expenseId": "expenseId",
-                    },
-                    ExpressionAttributeValues: {
-                        ":expenseId": { S: expenseId },
-                    },
-                }),
-            );
-
-            items.push(...(response.Items?.map((i) => unmarshall(i) as IExpenseItem) ?? []));
-            next = response?.LastEvaluatedKey;
-        } while (next && Date.now() < timeout);
+        const items = await this.queryAll({
+            TableName: this.dbConfiguration.expenseItemTableName,
+            KeyConditionExpression: "#expenseId = :expenseId",
+            ExpressionAttributeNames: { "#expenseId": "expenseId" },
+            ExpressionAttributeValues: { ":expenseId": { S: expenseId } },
+        });
 
         return items.sort((a, b) => a.createdAt - b.createdAt);
     }

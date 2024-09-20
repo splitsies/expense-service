@@ -1,7 +1,7 @@
-import { IDao } from "@splitsies/utils";
-import { IExpensePayer } from "src/models/expense-payer/expense-payer-interface";
+import { IDynamoDbDao } from "@splitsies/utils";
+import { IExpensePayer, Key } from "src/models/expense-payer/expense-payer-interface";
 
-export interface IExpensePayerDao extends IDao<IExpensePayer> {
+export interface IExpensePayerDao extends IDynamoDbDao<IExpensePayer, Key> {
     getForExpense(expenseId: string): Promise<IExpensePayer[]>;
 }
 export const IExpensePayerDao = Symbol.for("IExpensePayerDao");

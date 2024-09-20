@@ -11,15 +11,15 @@ export class DbConfiguration implements IDbConfiguration {
     private readonly _connectionTableName: string;
     private readonly _endpoint: string;
     readonly expenseItemTableName: string;
-    readonly pgPort: number;
-    readonly pgHost: string;
-    readonly pgDatabaseName: string;
     readonly connectionTokenTableName: string;
     readonly expensePayerTableName: string;
     readonly expensePayerStatusTableName: string;
-    readonly pgIdleTimeoutSec: number;
-    readonly pgMaxLifetimeSec: number;
-    readonly pgMaxConnections: number;
+    readonly expenseTableName: string;
+    readonly expenseGroupTableName: string;
+    readonly expenseGroupChildIndexName: string;
+    readonly userExpenseTableName: string;
+    readonly userExpenseUserIndexName: string;
+    readonly leadingExpenseTableName: string;
 
     constructor() {
         assert(!!process.env.dbAccessKeyId, "db access key was undefined");
@@ -30,14 +30,14 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.connectionTokenTableName, "CONNECTION_TOKEN_TABLE_NAME name was undefined");
         assert(!!process.env.dbEndpoint, "db endpoint was undefined");
         assert(!!process.env.expenseItemTableName, "EXPENSE_ITEM_TABLE_NAME was undefined");
-        assert(!!process.env.pgPort, "PG_PORT was undefined");
-        assert(!!process.env.pgHost, "PG_HOST was undefined");
-        assert(!!process.env.pgDatabaseName, "PG_DATABASE_NAME was undefined");
         assert(!!process.env.expensePayerTableName, "Expense Payer table name was undefined");
         assert(!!process.env.expensePayerStatusTableName, "ExpensePayerStatus table name was undefined");
-        assert(!!process.env.pgIdleTimeoutSec, "pgIdleTimeoutSec was undefined");
-        assert(!!process.env.pgMaxLifetimeSec, "pgMaxLifetimeSec was undefined");
-        assert(!!process.env.pgMaxConnections, "pgMaxConnections was undefined");
+        assert(!!process.env.expenseTableName, "expenseTableName was undefined");
+        assert(!!process.env.expenseGroupTableName, "expenseGroupTableName was undefined");
+        assert(!!process.env.expenseGroupChildIndexName, "expenseGroupChildIndexName was undefined");
+        assert(!!process.env.userExpenseTableName, "userExpenseTableName was undefined");
+        assert(!!process.env.userExpenseUserIndexName, "userExpenseUserIndexName was undefined");
+        assert(!!process.env.leadingExpenseTableName, "leadingExpenseTableName was undefined");
         this._dbAccessKeyId = process.env.dbAccessKeyId;
         this._dbSecretAccessKey = process.env.dbSecretAccessKey;
         this._dbRegion = process.env.dbRegion;
@@ -45,15 +45,15 @@ export class DbConfiguration implements IDbConfiguration {
         this._connectionTableName = process.env.connectionTableName;
         this._endpoint = process.env.dbEndpoint;
         this.expenseItemTableName = process.env.expenseItemTableName;
-        this.pgPort = parseInt(process.env.pgPort);
-        this.pgHost = process.env.pgHost;
-        this.pgDatabaseName = process.env.pgDatabaseName;
         this.connectionTokenTableName = process.env.connectionTokenTableName;
         this.expensePayerTableName = process.env.expensePayerTableName;
         this.expensePayerStatusTableName = process.env.expensePayerStatusTableName;
-        this.pgIdleTimeoutSec = parseInt(process.env.pgIdleTimeoutSec);
-        this.pgMaxLifetimeSec = parseInt(process.env.pgMaxLifetimeSec);
-        this.pgMaxConnections = parseInt(process.env.pgMaxConnections);
+        this.expenseTableName = process.env.expenseTableName;
+        this.expenseGroupTableName = process.env.expenseGroupTableName;
+        this.expenseGroupChildIndexName = process.env.expenseGroupChildIndexName;
+        this.userExpenseTableName = process.env.userExpenseTableName;
+        this.userExpenseUserIndexName = process.env.userExpenseUserIndexName;
+        this.leadingExpenseTableName = process.env.leadingExpenseTableName;
     }
 
     get dbAccessKeyId(): string {
