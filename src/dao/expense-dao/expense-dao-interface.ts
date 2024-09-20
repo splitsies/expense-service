@@ -1,10 +1,6 @@
-import { IScanResult } from "@splitsies/shared-models";
-import { IDao } from "@splitsies/utils";
-import { IExpenseDa } from "src/models/expense/expense-da-interface";
+import { IDynamoDbDao } from "@splitsies/utils";
+import { Expense } from "src/models/expense";
+import { ExpenseDa, Key } from "src/models/expense-da";
 
-export interface IExpenseDao extends IDao<IExpenseDa> {
-    getExpenses(expenseIds: string[]): Promise<IExpenseDa[]>;
-    getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDa>>;
-    getChildExpenseIds(parentExpenseId: string): Promise<string[]>;
-}
+export interface IExpenseDao extends IDynamoDbDao<ExpenseDa, Key, Expense> {}
 export const IExpenseDao = Symbol.for("IExpenseDao");

@@ -6,16 +6,14 @@
     "connectionTableName": "${param:CONNECTION_TABLE_NAME}",
     "expenseItemTableName": "${param:EXPENSE_ITEM_TABLE_NAME}",
     "dbEndpoint": "${param:DB_ENDPOINT}",
-    "PGUSERNAME": "${param:PGUSERNAME}",
-    "PGPASSWORD": "${param:PGPASSWORD}",
-    "pgHost": "${param:PG_HOST}",
-    "pgPort": "${param:PG_PORT}",
-    "pgDatabaseName": "${param:PG_DATABASE_NAME}",
     "connectionTokenTableName": "${param:CONNECTION_TOKEN_TABLE_NAME}",
     "messageQueueResourceName": "${param:MESSAGE_QUEUE_RESOURCE_NAME}",
     "expensePayerTableName": "Splitsies-ExpensePayer-${param:RTENV}",
     "expensePayerStatusTableName": "Splitsies-ExpensePayerStatus-${param:RTENV}",
-    "pgIdleTimeoutSec": "10",
-    "pgMaxLifetimeSec": "30",
-    "pgMaxConnections": "100"
+    "expenseTableName": "Splitsies-Expense-${param:RTENV}",
+    "expenseGroupTableName": "Splitsies-ExpenseGroup-${param:RTENV}",
+    "expenseGroupChildIndexName": "ChildExpenseIdIndex",
+    "userExpenseTableName": "Splitsies-UserExpense-${param:RTENV}",
+    "userExpenseUserIndexName": "UserIdIndex",
+    "leadingExpenseTableName": "Splitsies-LeadingExpense-${param:RTENV}"
 }

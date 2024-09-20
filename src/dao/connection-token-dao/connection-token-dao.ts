@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { IConnectionTokenDao } from "./connection-token-dao-interface";
-import { IConnection } from "src/models/connection/connection-interface";
+import { IConnection, Key } from "src/models/connection/connection-interface";
 import { DaoBase, ILogger } from "@splitsies/utils";
 import { ExecuteStatementCommand, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
@@ -8,17 +8,16 @@ import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { IConnectionTokenDaoStatements } from "./connection-token-dao-statements-interface";
 
 @injectable()
-export class ConnectionTokenDao extends DaoBase<IConnection> implements IConnectionTokenDao {
-    readonly key: (c: IConnection) => Record<string, string>;
-
+export class ConnectionTokenDao extends DaoBase<IConnection, Key> implements IConnectionTokenDao {
     constructor(
         @inject(ILogger) logger: ILogger,
         @inject(IDbConfiguration) private readonly dbConfiguration: IDbConfiguration,
         @inject(IConnectionTokenDaoStatements) private readonly _statements: IConnectionTokenDaoStatements,
     ) {
-        const keySelector = (c: IConnection) => ({ connectionId: c.connectionId, expenseId: c.expenseId });
-        super(logger, dbConfiguration, dbConfiguration.connectionTokenTableName, keySelector);
-        this.key = keySelector;
+        super(logger, dbConfiguration, dbConfiguration.connectionTokenTableName, (m) => ({
+            expenseId: m.expenseId,
+            connectionId: m.connectionId,
+        }));
     }
 
     async verify(token: string, expenseId: string): Promise<boolean> {
@@ -58,7 +57,7 @@ export class ConnectionTokenDao extends DaoBase<IConnection> implements IConnect
             return [];
         }
 
-        await Promise.all(expired.map((connection) => this.delete(this._keySelector(connection))));
+        await Promise.all(expired.map((connection) => this.delete(this.keyFrom(connection))));
         this._logger.log(
             `Successfully deleted expired connection tokens: ${expired
                 .map((c) => `${c.connectionId}::${c.ttl}`)

@@ -1,146 +1,104 @@
-import { ILogger } from "@splitsies/utils";
+import { DaoBase, ILogger, IPageInfoMapper } from "@splitsies/utils";
 import { inject, injectable } from "inversify";
 import { IUserExpense } from "src/models/user-expense/user-expense-interface";
 import { IUserExpenseDao } from "./user-expense-dao-interface";
 import { IDbConfiguration } from "src/models/configuration/db/db-configuration-interface";
-import postgres, { Sql } from "postgres";
 import { IScanResult, ScanResult } from "@splitsies/shared-models";
-import { IPgProvider } from "src/providers/pg-provider.i";
+import { AttributeValue, QueryCommand, ScanCommand } from "@aws-sdk/client-dynamodb";
+import { Key, UserExpenseDa } from "src/models/user-expense-da";
+import { IUserExpenseDaMapper } from "src/mappers/user-expense-mapper/user-expense-mapper.i";
+import { UserExpense } from "src/models/user-expense/user-expense";
 
 @injectable()
-export class UserExpenseDao implements IUserExpenseDao {
-    private readonly _client: Sql;
-
+export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> implements IUserExpenseDao {
     constructor(
         @inject(ILogger) logger: ILogger,
-        @inject(IDbConfiguration) dbConfiguration: IDbConfiguration,
-        @inject(IPgProvider) private readonly _pgProvider: IPgProvider,
+        @inject(IDbConfiguration) protected readonly _dbConfiguration: IDbConfiguration,
+        @inject(IUserExpenseDaMapper) protected readonly _mapper: IUserExpenseDaMapper,
+        @inject(IPageInfoMapper) private readonly _pageInfoMapper: IPageInfoMapper,
     ) {
-        this._client = this._pgProvider.provide();
-
-        const keySelector = (e: IUserExpense) => ({ expenseId: e.expenseId, userId: e.userId });
-        this.key = keySelector;
-    }
-    key: (model: IUserExpense) => Record<string, string | number>;
-
-    async create(model: IUserExpense): Promise<IUserExpense> {
-        const res = await this._client<IUserExpense[]>`
-            INSERT INTO "UserExpense"
-                ("expenseId", "userId", "pendingJoin", "requestingUserId", "createdAt")
-            VALUES
-                (${model.expenseId}, ${model.userId}, ${!!model.pendingJoin}, ${model.requestingUserId ?? null}, ${
-            model.createdAt ?? null
-        }) 
-            RETURNING *;
-        `;
-
-        return res.length ? res[0] : undefined;
-    }
-
-    async read(key: Record<string, string | number>): Promise<IUserExpense> {
-        const id = key.expenseId;
-        const userId = key.userId;
-
-        const res = await this._client<IUserExpense[]>`
-            SELECT *
-              FROM "UserExpense"
-             WHERE "expenseId" = ${id} 
-               AND "userId" = ${userId};
-        `;
-
-        return res.length ? res[0] : undefined;
-    }
-
-    async update(updated: IUserExpense): Promise<IUserExpense> {
-        const res = await this._client<IUserExpense[]>`
-            UPDATE "UserExpense"
-               SET "pendingJoin" = ${updated.pendingJoin}
-             WHERE "expenseId" = ${updated.expenseId}
-               AND "userId" = ${updated.userId}
-            RETURNING *;
-        `;
-
-        return res.length ? res[0] : undefined;
-    }
-
-    async delete(key: Record<string, string | number>): Promise<void> {
-        await this._client<IUserExpense[]>`
-            DELETE FROM "UserExpense"
-             WHERE "expenseId" = ${key.expenseId}
-               AND "userId" = ${key.userId};
-        `;
+        super(
+            logger,
+            _dbConfiguration,
+            _dbConfiguration.userExpenseTableName,
+            (m) => ({ userId: m.userId, expenseId: m.expenseId }),
+            _mapper,
+        );
     }
 
     async getForUser(userId: string): Promise<IUserExpense[]> {
-        const res = await this._client<IUserExpense[]>`
-            SELECT *
-              FROM "UserExpense"
-             WHERE "userId" = ${userId};
-        `;
+        const userExpenses = await this.queryAll({
+            TableName: this._tableName,
+            IndexName: this._dbConfiguration.userExpenseUserIndexName,
+            KeyConditionExpression: "#userId = :userId",
+            ExpressionAttributeNames: { "#userId": "userId" },
+            ExpressionAttributeValues: { ":userId": { S: userId } },
+        });
 
-        return res.length ? res : [];
-    }
-
-    async getExpenseIdsForUser(userId: string): Promise<string[]> {
-        const res = await this._client<{ expenseId: string }[]>`        
-            SELECT "expenseId" FROM "UserExpense"
-             WHERE "userId" = ${userId}
-             AND "pendingJoin" = FALSE;
-        `;
-
-        return res.length ? res.map((u) => u.expenseId) : [];
+        return userExpenses;
     }
 
     async getUsersForExpense(expenseId: string): Promise<string[]> {
-        const res = await this._client<{ userId: string }[]>`
-            SELECT "userId" FROM "UserExpense"
-             WHERE "expenseId" = ${expenseId};
-        `;
+        const userExpenses = await this.queryAll({
+            TableName: this._tableName,
+            KeyConditionExpression: "#expenseId = :expenseId",
+            ExpressionAttributeNames: { "#expenseId": "expenseId" },
+            ExpressionAttributeValues: { ":expenseId": { S: expenseId } },
+        });
 
-        return res.length ? res.map((u) => u.userId) : [];
+        return userExpenses.map((ue) => ue.userId);
     }
 
-    async getJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpense>> {
-        const res = await this._client<IUserExpense[]>`
-            SELECT *
-              FROM "UserExpense"
-             WHERE "userId" = ${userId}
-               AND "pendingJoin" = TRUE
-          ORDER BY "createdAt" DESC
-             LIMIT ${limit}
-            OFFSET ${offset}
-        `;
+    async getJoinRequestsForUser(
+        userId: string,
+        limit: number,
+        offset: Record<string, object> = undefined,
+    ): Promise<IScanResult<IUserExpense>> {
+        const res = await this._client.send(
+            new QueryCommand({
+                TableName: this._tableName,
+                IndexName: this._dbConfiguration.userExpenseUserIndexName,
+                KeyConditionExpression: "#userId = :userId",
+                FilterExpression: "#pendingJoin = :pendingJoin",
+                ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
+                ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
+                ExclusiveStartKey: offset as Record<string, AttributeValue>,
+            }),
+        );
 
-        const scan = new ScanResult<IUserExpense>(res, { nextPage: { limit, offset: offset + (res?.length ?? 0) } });
+        const userExpenses = this.unmarshallResults(res)
+            .sort((a, b) => b.createdAt?.getTime() ?? 0 - a.createdAt?.getTime() ?? 0)
+            .slice(0, limit);
+
+        const pageInfo = this._pageInfoMapper.fromFiltered(userExpenses, this.keyFrom.bind(this), limit, offset);
+        const scan = new ScanResult<IUserExpense>(userExpenses, pageInfo);
         return scan;
     }
 
     async getJoinRequestCountForUser(userId: string): Promise<number> {
-        const res = await this._client<{ count: number }[]>`
-            SELECT COUNT(*) as "count"
-              FROM "UserExpense"
-             WHERE "userId" = ${userId}
-               AND "pendingJoin" = TRUE
-        `;
+        const res = await this._client.send(
+            new ScanCommand({
+                TableName: this._tableName,
+                IndexName: this._dbConfiguration.userExpenseUserIndexName,
+                FilterExpression: "#userId = :userId AND #pendingJoin = :pendingJoin",
+                ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
+                ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
+                Select: "COUNT",
+            }),
+        );
 
-        return res ? res[0].count : 0;
+        return res.Count ?? 0;
     }
 
     async getJoinRequestsForExpense(expenseId: string): Promise<IUserExpense[]> {
-        const res = await this._client<IUserExpense[]>`
-            SELECT *
-              FROM "UserExpense"
-             WHERE "expenseId" = ${expenseId}
-               AND "pendingJoin" = TRUE;
-        `;
+        const userExpenses = this.queryAll({
+            TableName: this._tableName,
+            KeyConditionExpression: "#expenseId = :expenseId",
+            FilterExpression: "#pendingJoin = :pendoingJoin",
+            ExpressionAttributeNames: { "#expenseId": "expenseId" },
+            ExpressionAttributeValues: { ":expenseId": { S: expenseId }, ":pendingJoin": { BOOL: true } },
+        });
 
-        return res.length ? res : [];
-    }
-
-    async deleteForUser(userId: string): Promise<void> {
-        await this._client`
-            DELETE FROM "UserExpense"
-                  WHERE "userId" = ${userId};
-        `;
+        return userExpenses;
     }
 }

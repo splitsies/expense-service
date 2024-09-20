@@ -25,10 +25,18 @@ export interface IExpenseService {
     addExistingExpenseToGroup(groupExpenseId: string, childExpenseId: string, requestingUserId: string): Promise<void>;
     removeExpenseFromGroup(groupExpenseId: string, childExpenseId: string, requestingUserId: string): Promise<void>;
     updateExpense(id: string, updated: IExpenseDto): Promise<IExpenseDto>;
-    getExpensesForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IExpenseDto>>;
+    getExpensesForUser(
+        userId: string,
+        limit: number,
+        offset: Record<string, object>,
+    ): Promise<IScanResult<IExpenseDto>>;
     addUserToExpense(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
     removeUserFromExpense(expenseId: string, userId: string): Promise<IExpenseDto>;
-    getExpenseJoinRequestsForUser(userId: string, limit: number, offset: number): Promise<IScanResult<IUserExpenseDto>>;
+    getExpenseJoinRequestsForUser(
+        userId: string,
+        limit: number,
+        offset: Record<string, object>,
+    ): Promise<IScanResult<IUserExpenseDto>>;
     getJoinRequestCountForUser(userId: string): Promise<number>;
     addExpenseJoinRequest(userId: string, expenseId: string, requestUserId: string): Promise<void>;
     removeExpenseJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
@@ -50,6 +58,7 @@ export interface IExpenseService {
     setExpensePayerStatus(expenseId: string, userId: string, settled: boolean): Promise<IExpenseDto>;
     getLeadingExpenseId(expenseId: string): Promise<string>;
     getLeadingExpense(expenseId: string): Promise<IExpenseDto>;
+    updateExpenseTransactionDate(expenseId: string, transactionDate: Date): Promise<IExpenseDto>;
 }
 
 export const IExpenseService: symbol = Symbol.for("IExpenseService");

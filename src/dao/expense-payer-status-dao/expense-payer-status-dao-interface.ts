@@ -1,7 +1,8 @@
 import { ExpensePayerStatus } from "@splitsies/shared-models";
-import { IDao } from "@splitsies/utils";
+import { IDynamoDbDao } from "@splitsies/utils";
 
-export interface IExpensePayerStatusDao extends IDao<ExpensePayerStatus> {
+export type Key = Pick<ExpensePayerStatus, "expenseId" | "userId">;
+export interface IExpensePayerStatusDao extends IDynamoDbDao<ExpensePayerStatus, Key> {
     getForExpense(expenseId: string): Promise<ExpensePayerStatus[]>;
 }
 export const IExpensePayerStatusDao = Symbol.for("IExpensePayerStatusDao");

@@ -5,7 +5,12 @@ export interface IUserExpenseStrategy {
      * @param expenseId The expense to add to
      * @param addToChildren [default=true] Extends the user add to the children (if exists)
      */
-    addUserToExpense(userId: string, expenseId: string, addToChildren?: boolean): Promise<void>;
+    addUserToExpense(
+        userId: string,
+        expenseId: string,
+        addToChildren?: boolean,
+        transactionSuccess?: Promise<boolean>,
+    ): Promise<void>;
 
     addUserToChildren(userId: string, expenseId: string): Promise<void>;
 
@@ -16,6 +21,8 @@ export interface IUserExpenseStrategy {
      * @param requestingUserId The id of the user sending the request
      */
     addUserToExpenseAsJoinRequest(userId: string, expenseId: string, requestingUserId: string): Promise<void>;
+    removeUserFromExpense(expenseId: string, userId: string, transaction?: Promise<boolean>): Promise<void>;
+    acceptExpenseJoinRequest(userId: string, expenseId: string): Promise<void>;
 }
 
 export const IUserExpenseStrategy = Symbol.for("IUserExpenseStrategy");

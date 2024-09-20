@@ -1,9 +1,10 @@
 import { IExpenseDto } from "@splitsies/shared-models";
-import { IExpenseDa } from "src/models/expense/expense-da-interface";
+import { Expense } from "src/models/expense";
 
 export interface IExpenseWriteStrategy {
-    delete(id: string): Promise<void>;
-    create(userId: string, dto?: IExpenseDto): Promise<IExpenseDa>;
+    delete(id: string, transaction?: Promise<boolean>): Promise<void>;
+    create(userId: string, dto?: IExpenseDto): Promise<Expense>;
+    updateTransactionDate(id: string, newTransactionDate: Date): Promise<void>;
 }
 
 export const IExpenseWriteStrategy = Symbol.for("IExpenseWriteStrategy");
