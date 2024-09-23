@@ -63,7 +63,7 @@ const serverlessConfiguration: AWS = {
             STAGE: "${param:QUEUE_STAGE_NAME}",
             AwsAccountId: "${aws:AccountId}",
             RtRegion: "${aws:Region}",
-            Stage: "${sls:Stage}",
+            Stage: "${sls:stage}",
             ...dbConfig,
             ...connectionConfig,
             ...firebaseConfig,
