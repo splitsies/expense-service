@@ -1,5 +1,6 @@
-import { QueueConfig } from "src/config/queue.config";
+
 import { handlerPath } from "../../../libs/handler-resolver";
+// import { QueueConfig } from "src/config/queue.config";
 
 export default {
     handler: `${handlerPath(__dirname)}/handler.main`,
