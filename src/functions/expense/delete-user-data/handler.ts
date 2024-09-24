@@ -3,12 +3,12 @@ import { IExpenseService } from "../../../services/expense-service/expense-servi
 import { ExpenseMessage, ExpenseMessageType, IQueueMessage } from "@splitsies/shared-models";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
 import { IMessageQueueClient } from "@splitsies/utils";
-import { SQSHandler } from "aws-lambda";
+import { SQSEvent, SQSHandler, SQSRecord } from "aws-lambda";
 
 const expenseService = container.get<IExpenseService>(IExpenseService);
 const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
 const messageQueueClient = container.get<IMessageQueueClient>(IMessageQueueClient);
-const queueUrl = `https://sqs.${process.env.RtRegion}.amazonaws.com/${process.env.AwsAccountId}/Splitsies-GlobalMessageQueue-${process.env.Stage}`;
+const queueUrl = `https://sqs.${process.env.RtRegion}.amazonaws.com/${process.env.AwsAccountId}/Splitsies-UserAccountModifiedQueue-${process.env.Stage}`;
 
 export const main: SQSHandler = async (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
@@ -22,8 +22,9 @@ export const main: SQSHandler = async (event, context, callback) => {
         console.log({ record, body: record.body });
         
         try {
-            const message = JSON.parse(record.body) as IQueueMessage<string>;
-            console.log({ message });
+            const message = JSON.parse(record.body) as { Message: string };
+            const queueMessage = JSON.parse(message.Message) as IQueueMessage<string>;
+            console.log({ message, queueMessage });
         } catch (e) {
             console.error(e);
         }
