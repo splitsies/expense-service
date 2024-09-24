@@ -19,14 +19,18 @@ export const main: SQSHandler = async (event, context, callback) => {
     for (const record of event.Records) {
         if (!record.body) continue;
 
-        console.log({ record });
+        console.log({ record, body: record.body });
         
-        const message = JSON.parse(record.body) as IQueueMessage<string>;
+        try {
+            const message = JSON.parse(record.body) as IQueueMessage<string>;
+            console.log({ message });
+        } catch (e) {
+            console.error(e);
+        }
+
         const deleteRecord: IQueueMessage<string> = messageQueueClient.createDeleteRecord(queueUrl, record.messageId, record.receiptHandle);
         // expenseIds.push(...(await expenseService.deleteUserData(message.data.userId)));
-        messages.push(
-            messageQueueClient.createDeleteRecord(queueUrl, record.messageId, record.receiptHandle)
-        );
+        messages.push(deleteRecord);
     }
 
     await messageQueueClient.deleteBatch(messages);
