@@ -33,23 +33,13 @@ jobs:
       uses: serverless/github-action@v3.1
       with:
         args: deploy --stage dev \
-                --param="DB_EXPENSE_JOIN_REQUEST_TABLE_NAME=ExpenseJoinRequest" \
                 --param="CONNECTION_TTL_SEC=1800" \
                 --param="DB_REGION=us-east-1" \
-                --param="CONNECTION_TOKEN_TABLE_NAME=ConnectionToken" \
-                --param="CONNECTION_TABLE_NAME=ExpenseConnection" \
-                --param="TRANSACTION_DATE_INDEX_NAME=TransactionDateIndex" \
                 --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
                 --param="MESSAGE_QUEUE_RESOURCE_NAME=MessageQueue" \
                 --param="EXPENSE_UPDATE_TABLE_NAME=ExpenseUpdate" \
-                --param="DB_TABLE_NAME=Expense" \
                 --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
-                --param="EXPENSE_ITEM_TABLE_NAME=ExpenseItem" \
-                --param="DB_USER_EXPENSE_TABLE_NAME=UserExpense" \
-                --param="APIG_URL=https://srzam2rrj5.execute-api.us-east-1.amazonaws.com/dev-pr/" \
-                --param="INTERNAL_API_KEY=${{ secrets.INTERNAL_API_KEY }}" \
-                --param="DB_ACCESS_KEY_ID=${{ secrets.DB_ACCESS_KEY_ID }}" \
-                --param="DB_SECRET_ACCESS_KEY=${{ secrets.DB_SECRET_ACCESS_KEY }}" \
+                --param="APIG_URL=https://i1nnpdkz89.execute-api.us-east-1.amazonaws.com/dev/" \
                 --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_DEV_PR }}" \
                 --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_DEV_PR }}" \
                 --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_DEV_PR }}" \
