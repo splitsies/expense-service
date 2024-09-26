@@ -7,7 +7,6 @@ export class DbConfiguration implements IDbConfiguration {
     private readonly _dbAccessKeyId: string;
     private readonly _dbSecretAccessKey: string;
     private readonly _dbRegion: string;
-    private readonly _tableName: string;
     private readonly _connectionTableName: string;
     private readonly _endpoint: string;
     readonly expenseItemTableName: string;
@@ -41,7 +40,6 @@ export class DbConfiguration implements IDbConfiguration {
         this._dbAccessKeyId = process.env.dbAccessKeyId;
         this._dbSecretAccessKey = process.env.dbSecretAccessKey;
         this._dbRegion = process.env.dbRegion;
-        this._tableName = process.env.dbTableName;
         this._connectionTableName = process.env.connectionTableName;
         this._endpoint = process.env.dbEndpoint;
         this.expenseItemTableName = process.env.expenseItemTableName;
@@ -66,10 +64,6 @@ export class DbConfiguration implements IDbConfiguration {
 
     get dbRegion(): string {
         return this._dbRegion;
-    }
-
-    get tableName(): string {
-        return this._tableName;
     }
 
     get connectionTableName(): string {
