@@ -135,6 +135,7 @@ const serverlessConfiguration: AWS = {
                                         Resource: [
                                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
                                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/stream/*",
+                                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",     
                                         ]
                                     }
                                 ]
