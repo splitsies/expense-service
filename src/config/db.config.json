@@ -8,12 +8,12 @@
     "dbEndpoint": "${param:DB_ENDPOINT}",
     "connectionTokenTableName": "${param:CONNECTION_TOKEN_TABLE_NAME}",
     "messageQueueResourceName": "${param:MESSAGE_QUEUE_RESOURCE_NAME}",
-    "expensePayerTableName": "Splitsies-ExpensePayer-${param:RTENV}",
-    "expensePayerStatusTableName": "Splitsies-ExpensePayerStatus-${param:RTENV}",
-    "expenseTableName": "Splitsies-Expense-${param:RTENV}",
-    "expenseGroupTableName": "Splitsies-ExpenseGroup-${param:RTENV}",
+    "expensePayerTableName": "ExpensePayer",
+    "expensePayerStatusTableName": "ExpensePayerStatus",
+    "expenseTableName": "Expense",
+    "expenseGroupTableName": "ExpenseGroup",
     "expenseGroupChildIndexName": "ChildExpenseIdIndex",
-    "userExpenseTableName": "Splitsies-UserExpense-${param:RTENV}",
+    "userExpenseTableName": "UserExpense",
     "userExpenseUserIndexName": "UserIdIndex",
-    "leadingExpenseTableName": "Splitsies-LeadingExpense-${param:RTENV}"
+    "leadingExpenseTableName": "LeadingExpense"
 }
