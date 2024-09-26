@@ -18,6 +18,8 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
 
         const ignored = new Set(ignoredConnectionIds);
 
+        console.log(expense, connections);
+
         // See local-emulation/queue-runner for setting up local listening to DynamoDB Stream
         await Promise.all(
             connections
@@ -28,7 +30,9 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
 
     async notify(expense: ExpenseMessage, connection: IConnection): Promise<void> {
         try {
+            console.log(`notifying ${connection.connectionId} on ${connection.gatewayUrl}`);
             await sendMessage(connection.gatewayUrl, connection.connectionId, expense);
+            console.log(`${connection.connectionId} notified successfully`);
         } catch (e) {
             this._logger.error(`uncaught exception broadcasting for connection ${connection}`, e);
         }
