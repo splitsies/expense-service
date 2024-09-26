@@ -5,15 +5,11 @@ Description: >
 
   SAM Template for expense-service database
 
-Parameters:
-  RtEnv:
-    Type: String
-
 Resources:  
   ExpensePayer:
     Type: AWS::DynamoDB::Table
     Properties: 
-      TableName: !Sub Splitsies-ExpensePayer-${RtEnv}
+      TableName: ExpensePayer
       AttributeDefinitions: 
         - AttributeName: expenseId
           AttributeType: S
@@ -28,7 +24,7 @@ Resources:
   ExpensePayerStatus:
     Type: AWS::DynamoDB::Table
     Properties: 
-      TableName: !Sub Splitsies-ExpensePayerStatus-${RtEnv}
+      TableName: ExpensePayerStatus
       AttributeDefinitions: 
         - AttributeName: expenseId
           AttributeType: S
@@ -41,10 +37,10 @@ Resources:
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
 
-  SplitsiesLeadingExpenseTable:
+  LeadingExpenseTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub Splitsies-LeadingExpense-${RtEnv}
+      TableName: LeadingExpense
       AttributeDefinitions:
         - AttributeName: userId
           AttributeType: S
@@ -58,10 +54,10 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       TableClass: STANDARD
 
-  SplitsiesExpenseTable:
+  ExpenseTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub Splitsies-Expense-${RtEnv}
+      TableName: Expense
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
@@ -71,10 +67,10 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       TableClass: STANDARD
 
-  SplitsiesExpenseGroupTable:
+  ExpenseGroupTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub Splitsies-ExpenseGroup-${RtEnv}
+      TableName: ExpenseGroup
       AttributeDefinitions:
         - AttributeName: parentExpenseId
           AttributeType: S
@@ -95,10 +91,10 @@ Resources:
           Projection:
             ProjectionType: ALL
 
-  SplitsiesUserExpenseTable:
+  UserExpenseTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub Splitsies-UserExpense-${RtEnv}
+      TableName: UserExpense
       AttributeDefinitions:
         - AttributeName: expenseId
           AttributeType: S
@@ -120,3 +116,63 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
+
+  ExpenseConnectionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ExpenseConnection
+      AttributeDefinitions:
+        - AttributeName: connectionId
+          AttributeType: S
+        - AttributeName: expenseId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: connectionId
+          KeyType: HASH
+        - AttributeName: expenseId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD
+      GlobalSecondaryIndexes:
+        - IndexName: ExpenseIndex
+          KeySchema:
+            - AttributeName: expenseId
+              KeyType: HASH
+            - AttributeName: connectionId
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  ConnectionTokenTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ConnectionToken
+      AttributeDefinitions:
+        - AttributeName: connectionId
+          AttributeType: S
+        - AttributeName: expenseId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: expenseId
+          KeyType: HASH
+        - AttributeName: connectionId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD
+
+  ExpenseItemTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ExpenseItem
+      AttributeDefinitions:
+        - AttributeName: expenseId
+          AttributeType: S
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: expenseId
+          KeyType: HASH
+        - AttributeName: id
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD

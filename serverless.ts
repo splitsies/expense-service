@@ -33,15 +33,16 @@ import removeExpenseFromGroup from "@functions/expense/remove-expense-from-group
 import deleteExpense from "@functions/expense/delete";
 
 const serverlessConfiguration: AWS = {
-    org: "splitsies",
-    app: "expense-service",
     service: "expense-service",
     frameworkVersion: "3",
     plugins: ["serverless-esbuild", "serverless-offline"],
     provider: {
         name: "aws",
-        stage: "dev-pr",
+        stage: "dev",
         runtime: "nodejs18.x",
+        iam: {
+            role: { "Fn::GetAtt": ["LambdaExecutionRole", "Arn"] }
+        },
         httpApi: {
             authorizers: {
                 verifyToken: {
@@ -57,7 +58,7 @@ const serverlessConfiguration: AWS = {
         },
         environment: {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
-            NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
+            NODE_OPTIONS: "--stack-trace-limit=1000",
             APIG_URL: "${param:APIG_URL}",
             FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST,
             STAGE: "${param:QUEUE_STAGE_NAME}",
@@ -96,6 +97,55 @@ const serverlessConfiguration: AWS = {
         removeExpenseFromGroup,
         deleteExpense,
     },
+    resources: {
+        Resources: {
+            LambdaExecutionRole: {
+                Type: "AWS::IAM::Role",
+                Properties: {
+                    AssumeRolePolicyDocument: {
+                        Version: "2012-10-17",
+                        Statement: [
+                            {
+                                "Effect": "Allow",
+                                "Principal": {
+                                    "Service": "lambda.amazonaws.com"
+                                },
+                                "Action": "sts:AssumeRole"
+                            }
+                        ]
+                    },
+                    Policies: [
+                        {
+                            PolicyName: "ExpenseServiceLambdaExecutionPolicy",
+                            PolicyDocument: {
+                                Version: "2012-10-17",
+                                Statement: [
+                                    {
+                                        Effect: "Allow",
+                                        Action: [
+                                            "logs:CreateLogGroup",
+                                            "logs:CreateLogStream",
+                                            "logs:PutLogEvents"
+                                        ],
+                                        Resource: "arn:aws:logs:*:*:*"
+                                    },
+                                    {
+                                        Effect: "Allow",
+                                        Action: "dynamodb:*",
+                                        Resource: [
+                                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
+                                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/stream/*",
+                                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",     
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    },
     package: { individually: true },
     custom: {
         apigUri: { "Fn::GetAtt": ["HttpApi", "ApiEndpoint"] },
@@ -103,7 +153,7 @@ const serverlessConfiguration: AWS = {
             format: "esm",
             bundle: true,
             minify: true,
-            sourcemap: true,
+            sourcemap: false,
             sourcesContent: false,
             keepNames: false,
             outputFileExtension: ".mjs",
