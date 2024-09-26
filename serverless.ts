@@ -33,8 +33,6 @@ import removeExpenseFromGroup from "@functions/expense/remove-expense-from-group
 import deleteExpense from "@functions/expense/delete";
 
 const serverlessConfiguration: AWS = {
-    org: "splitsies",
-    app: "expense-service",
     service: "expense-service",
     frameworkVersion: "3",
     plugins: ["serverless-esbuild", "serverless-offline"],
