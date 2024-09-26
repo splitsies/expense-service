@@ -55,7 +55,7 @@ const serverlessConfiguration: AWS = {
         },
         environment: {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
-            NODE_OPTIONS: "---stack-trace-limit=1000",
+            NODE_OPTIONS: "--stack-trace-limit=1000",
             APIG_URL: "${param:APIG_URL}",
             FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST,
             STAGE: "${param:QUEUE_STAGE_NAME}",
@@ -93,6 +93,51 @@ const serverlessConfiguration: AWS = {
         addExistingExpenseToGroup,
         removeExpenseFromGroup,
         deleteExpense,
+    },
+    resources: {
+        Resources: {
+            LambdaExecutionRole: {
+                Type: "AWS::IAM::Role",
+                Properties: {
+                    AssumeRolePolicyDocument: {
+                        Version: "2012-10-17",
+                        Statement: [
+                            {
+                                "Effect": "Allow",
+                                "Principal": {
+                                    "Service": "lambda.amazonaws.com"
+                                },
+                                "Action": "sts:AssumeRole"
+                            }
+                        ]
+                    },
+                    Policies: [
+                        {
+                            PolicyName: "ExpenseServiceLambdaExecutionPolicy",
+                            PolicyDocument: {
+                                Version: "2012-10-17",
+                                Statement: [
+                                    {
+                                        Effect: "Allow",
+                                        Action: [
+                                            "logs:CreateLogGroup",
+                                            "logs:CreateLogStream",
+                                            "logs:PutLogEvents"
+                                        ],
+                                        Resource: "arn:aws:logs:*:*:*"
+                                    },
+                                    {
+                                        Effect: "Allow",
+                                        Action: "dynamodb:*",
+                                        Resource: "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
     },
     package: { individually: true },
     custom: {

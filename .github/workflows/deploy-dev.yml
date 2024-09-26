@@ -60,7 +60,8 @@ jobs:
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_DEV_PR }}" \
                 --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \
                 --param="RTENV=dev" \
-                --param="QUEUE_STAGE_NAME=dev"
+                --param="QUEUE_STAGE_NAME=dev" \
+                --param="RESOURCE_ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }}"
 
     - run: npm ci
       working-directory: ./resources
