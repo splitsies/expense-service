@@ -40,6 +40,9 @@ const serverlessConfiguration: AWS = {
         name: "aws",
         stage: "dev",
         runtime: "nodejs18.x",
+        iam: {
+            role: { "Fn::GetAtt": ["LambdaExecutionRole", "Arn"] }
+        },
         httpApi: {
             authorizers: {
                 verifyToken: {
@@ -129,7 +132,10 @@ const serverlessConfiguration: AWS = {
                                     {
                                         Effect: "Allow",
                                         Action: "dynamodb:*",
-                                        Resource: "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*"
+                                        Resource: [
+                                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
+                                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/stream/*",
+                                        ]
                                     }
                                 ]
                             }

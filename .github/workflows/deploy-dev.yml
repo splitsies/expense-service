@@ -36,7 +36,6 @@ jobs:
                 --param="CONNECTION_TTL_SEC=1800" \
                 --param="DB_REGION=us-east-1" \
                 --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
-                --param="MESSAGE_QUEUE_RESOURCE_NAME=MessageQueue" \
                 --param="EXPENSE_UPDATE_TABLE_NAME=ExpenseUpdate" \
                 --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
                 --param="APIG_URL=https://i1nnpdkz89.execute-api.us-east-1.amazonaws.com/dev/" \

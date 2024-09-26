@@ -1,8 +1,7 @@
 {
     "dbRegion": "${param:DB_REGION}",
-    "dbTableName": "${param:DB_TABLE_NAME}",
     "dbEndpoint": "${param:DB_ENDPOINT}",
-    "messageQueueResourceName": "${param:MESSAGE_QUEUE_RESOURCE_NAME}",
+    "messageQueueResourceName": "MessageQueue",
     "connectionTokenTableName": "ConnectionToken",
     "connectionTableName": "ExpenseConnection",
     "expenseItemTableName": "ExpenseItem",
