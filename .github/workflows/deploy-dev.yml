@@ -33,10 +33,11 @@ jobs:
       uses: serverless/github-action@v3.1
       with:
         args: deploy --stage dev \
+                --param="RTENV=dev" \
+                --param="QUEUE_STAGE_NAME=dev" \
                 --param="CONNECTION_TTL_SEC=1800" \
                 --param="DB_REGION=us-east-1" \
                 --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
-                --param="EXPENSE_UPDATE_TABLE_NAME=ExpenseUpdate" \
                 --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
                 --param="APIG_URL=https://i1nnpdkz89.execute-api.us-east-1.amazonaws.com/dev/" \
                 --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_DEV_PR }}" \
@@ -48,8 +49,6 @@ jobs:
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_DEV_PR }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_DEV_PR }}" \
                 --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \
-                --param="RTENV=dev" \
-                --param="QUEUE_STAGE_NAME=dev" \
                 --param="RESOURCE_ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }}"
 
     - run: npm ci

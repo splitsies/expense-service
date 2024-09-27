@@ -41,7 +41,7 @@ const serverlessConfiguration: AWS = {
         stage: "dev",
         runtime: "nodejs18.x",
         iam: {
-            role: { 
+            role: {
                 statements: [
                     {
                         Effect: "Allow",
@@ -49,10 +49,10 @@ const serverlessConfiguration: AWS = {
                         Resource: [
                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/stream/*",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",     
-                        ]
-                    }
-                ]
+                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",
+                        ],
+                    },
+                ],
             },
         },
         httpApi: {
