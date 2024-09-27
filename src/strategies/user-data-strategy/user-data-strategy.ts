@@ -55,7 +55,7 @@ export class UserDataStrategy implements IUserDataStrategy {
         const updates: Promise<any>[] = [];
         const updatedExpenseIds: string[] = [];
 
-        this._transactionStrategy.runWithSimpleTransaction(async (transaction) => {
+        await this._transactionStrategy.runWithSimpleTransaction(async (transaction) => {
             // Get user expense records
             const ues = await this._userExpenseDao.getForUser(guestUserId);
 
