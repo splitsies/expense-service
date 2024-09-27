@@ -41,7 +41,19 @@ const serverlessConfiguration: AWS = {
         stage: "dev",
         runtime: "nodejs18.x",
         iam: {
-            role: { "Fn::GetAtt": ["LambdaExecutionRole", "Arn"] }
+            role: { 
+                statements: [
+                    {
+                        Effect: "Allow",
+                        Action: "dynamodb:*",
+                        Resource: [
+                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
+                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/stream/*",
+                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",     
+                        ]
+                    }
+                ]
+            },
         },
         httpApi: {
             authorizers: {
@@ -96,55 +108,6 @@ const serverlessConfiguration: AWS = {
         addExistingExpenseToGroup,
         removeExpenseFromGroup,
         deleteExpense,
-    },
-    resources: {
-        Resources: {
-            LambdaExecutionRole: {
-                Type: "AWS::IAM::Role",
-                Properties: {
-                    AssumeRolePolicyDocument: {
-                        Version: "2012-10-17",
-                        Statement: [
-                            {
-                                "Effect": "Allow",
-                                "Principal": {
-                                    "Service": "lambda.amazonaws.com"
-                                },
-                                "Action": "sts:AssumeRole"
-                            }
-                        ]
-                    },
-                    Policies: [
-                        {
-                            PolicyName: "ExpenseServiceLambdaExecutionPolicy",
-                            PolicyDocument: {
-                                Version: "2012-10-17",
-                                Statement: [
-                                    {
-                                        Effect: "Allow",
-                                        Action: [
-                                            "logs:CreateLogGroup",
-                                            "logs:CreateLogStream",
-                                            "logs:PutLogEvents"
-                                        ],
-                                        Resource: "arn:aws:logs:*:*:*"
-                                    },
-                                    {
-                                        Effect: "Allow",
-                                        Action: "dynamodb:*",
-                                        Resource: [
-                                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
-                                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/stream/*",
-                                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",     
-                                        ]
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }
     },
     package: { individually: true },
     custom: {
