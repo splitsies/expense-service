@@ -49,7 +49,19 @@ jobs:
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_DEV_PR }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_DEV_PR }}" \
                 --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \
-                --param="RESOURCE_ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }}"
+                --param="RESOURCE_ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }}" \
+                --param="messageQueueResourceName=MessageQueue" \
+                --param="connectionTokenTableName=ConnectionToken" \
+                --param="connectionTableName=ExpenseConnection" \
+                --param="expenseItemTableName=ExpenseItem" \
+                --param="expensePayerTableName=ExpensePayer" \
+                --param="expensePayerStatusTableName=ExpensePayerStatus" \
+                --param="expenseTableName=Expense" \
+                --param="expenseGroupTableName=ExpenseGroup" \
+                --param="expenseGroupChildIndexName=ChildExpenseIdIndex" \
+                --param="userExpenseTableName=UserExpense" \
+                --param="userExpenseUserIndexName=UserIdIndex" \
+                --param="leadingExpenseTableName=LeadingExpense"
 
     - run: npm ci
       working-directory: ./resources
@@ -59,7 +71,7 @@ jobs:
         sam deploy --stack-name expense-service-database \
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
-        --parameter-overrides "Stage=dev" "RtEnv=dev"
+        --parameter-overrides "StagingLambdaExecutionRoleArn=${{ secrets.STAGING_EXPENSE_SERVICE_LAMBDA_EXECUTION_ROLE_ARN }}"
       working-directory: ./resources
 
     env:

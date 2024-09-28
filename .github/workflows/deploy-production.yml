@@ -1,14 +1,15 @@
 name: Deploy Production
 
 on:
-  release:
-    types: [released]
+  pull_request:
+    branches:
+      - main
+      - "releases/**"
 
 jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
-    environment: production
     strategy:
       matrix:
         node-version: [18.x]
@@ -23,8 +24,8 @@ jobs:
     - uses: aws-actions/setup-sam@v2
     - uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY }}
+        aws-access-key-id: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID_PROD }}
+        aws-secret-access-key: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY_PROD }}
         aws-region: us-east-1
 
     - run: npm ci
@@ -32,23 +33,13 @@ jobs:
       uses: serverless/github-action@v3.1
       with:
         args: deploy --stage production \
-                --param="DB_EXPENSE_JOIN_REQUEST_TABLE_NAME=Splitsies-ExpenseJoinRequest-production" \
+                --param="RTENV=production" \
+                --param="QUEUE_STAGE_NAME=production" \
                 --param="CONNECTION_TTL_SEC=1800" \
                 --param="DB_REGION=us-east-1" \
-                --param="CONNECTION_TOKEN_TABLE_NAME=Splitsies-ConnectionToken-production" \
-                --param="CONNECTION_TABLE_NAME=Splitsies-ExpenseConnection-production" \
-                --param="TRANSACTION_DATE_INDEX_NAME=TransactionDateIndex" \
                 --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
-                --param="MESSAGE_QUEUE_RESOURCE_NAME=Splitsies-MessageQueue-production" \
-                --param="EXPENSE_UPDATE_TABLE_NAME=Splitsies-ExpenseUpdate-production" \
-                --param="DB_TABLE_NAME=Splitsies-Expense-production" \
                 --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
-                --param="EXPENSE_ITEM_TABLE_NAME=Splitsies-ExpenseItem-production" \
-                --param="DB_USER_EXPENSE_TABLE_NAME=Splitsies-UserExpense-production" \
-                --param="APIG_URL=https://o1bk5shwae.execute-api.us-east-1.amazonaws.com/production/" \
-                --param="INTERNAL_API_KEY=${{ secrets.INTERNAL_API_KEY }}" \
-                --param="DB_ACCESS_KEY_ID=${{ secrets.DB_ACCESS_KEY_ID }}" \
-                --param="DB_SECRET_ACCESS_KEY=${{ secrets.DB_SECRET_ACCESS_KEY }}" \
+                --param="APIG_URL=https://i1nnpdkz89.execute-api.us-east-1.amazonaws.com/production/" \
                 --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_PRODUCTION }}" \
                 --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_PRODUCTION }}" \
                 --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_PRODUCTION }}" \
@@ -58,21 +49,32 @@ jobs:
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PRODUCTION }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PRODUCTION }}" \
                 --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_PRODUCTION }}" \
-                --param="RTENV=production" \
-                --param="QUEUE_STAGE_NAME=production"
+                --param="RESOURCE_ACCOUNT_ID=${{ secrets.PROD_ACCOUNT_ID }}" \
+                --param="messageQueueResourceName=MessageQueue" \
+                --param="connectionTokenTableName=ConnectionToken" \
+                --param="connectionTableName=ExpenseConnection" \
+                --param="expenseItemTableName=ExpenseItem" \
+                --param="expensePayerTableName=ExpensePayer" \
+                --param="expensePayerStatusTableName=ExpensePayerStatus" \
+                --param="expenseTableName=Expense" \
+                --param="expenseGroupTableName=ExpenseGroup" \
+                --param="expenseGroupChildIndexName=ChildExpenseIdIndex" \
+                --param="userExpenseTableName=UserExpense" \
+                --param="userExpenseUserIndexName=UserIdIndex" \
+                --param="leadingExpenseTableName=LeadingExpense"
 
     - run: npm ci
       working-directory: ./resources
     - run: sam build
       working-directory: ./resources
     - run: |
-        sam deploy --stack-name expense-service-database-production \
+        sam deploy --stack-name expense-service-database \
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
-        --parameter-overrides "Stage=production" "RtEnv=production"
+        --parameter-overrides "StagingLambdaExecutionRoleArn=${{ secrets.STAGING_EXPENSE_SERVICE_LAMBDA_EXECUTION_ROLE_ARN }}"
       working-directory: ./resources
 
     env:
-      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY }}
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY_PROD }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID_PROD }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY_PROD }}
