@@ -15,4 +15,6 @@ jspm_packages
 
 **/startup*.sh
 
+./utils/local-startup
+
 **/.aws-sam
