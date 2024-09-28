@@ -4,8 +4,6 @@ import { injectable } from "inversify";
 
 @injectable()
 export class DbConfiguration implements IDbConfiguration {
-    private readonly _dbAccessKeyId: string;
-    private readonly _dbSecretAccessKey: string;
     private readonly _dbRegion: string;
     private readonly _connectionTableName: string;
     private readonly _endpoint: string;
@@ -34,8 +32,6 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.userExpenseTableName, "userExpenseTableName was undefined");
         assert(!!process.env.userExpenseUserIndexName, "userExpenseUserIndexName was undefined");
         assert(!!process.env.leadingExpenseTableName, "leadingExpenseTableName was undefined");
-        this._dbAccessKeyId = process.env.dbAccessKeyId;
-        this._dbSecretAccessKey = process.env.dbSecretAccessKey;
         this._dbRegion = process.env.dbRegion;
         this._connectionTableName = process.env.connectionTableName;
         this._endpoint = process.env.dbEndpoint;
@@ -49,14 +45,6 @@ export class DbConfiguration implements IDbConfiguration {
         this.userExpenseTableName = process.env.userExpenseTableName;
         this.userExpenseUserIndexName = process.env.userExpenseUserIndexName;
         this.leadingExpenseTableName = process.env.leadingExpenseTableName;
-    }
-
-    get dbAccessKeyId(): string {
-        return this._dbAccessKeyId;
-    }
-
-    get dbSecretAccessKey(): string {
-        return this._dbSecretAccessKey;
     }
 
     get dbRegion(): string {
