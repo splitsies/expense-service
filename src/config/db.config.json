@@ -1,16 +1,17 @@
 {
     "dbRegion": "${param:DB_REGION}",
     "dbEndpoint": "${param:DB_ENDPOINT}",
+    "dbAccountId": "${param:RESOURCE_ACCOUNT_ID}",
     "messageQueueResourceName": "MessageQueue",
-    "connectionTokenTableName": "${param:connectionTokenTableName}",
-    "connectionTableName": "${param:connectionTableName}",
-    "expenseItemTableName": "${param:expenseItemTableName}",
-    "expensePayerTableName": "${param:expensePayerTableName}",
-    "expensePayerStatusTableName": "${param:expensePayerStatusTableName}",
-    "expenseTableName": "${param:expenseTableName}",
-    "expenseGroupTableName": "${param:expenseGroupTableName}",
-    "expenseGroupChildIndexName": "${param:expenseGroupChildIndexName}",
-    "userExpenseTableName": "${param:userExpenseTableName}",
-    "userExpenseUserIndexName": "${param:userExpenseUserIndexName}",
-    "leadingExpenseTableName": "${param:leadingExpenseTableName}"
+    "connectionTokenTableName": "ConnectionToken",
+    "connectionTableName": "ExpenseConnection",
+    "expenseItemTableName": "ExpenseItem",
+    "expensePayerTableName": "ExpensePayer",
+    "expensePayerStatusTableName": "ExpensePayerStatus",
+    "expenseTableName": "Expense",
+    "expenseGroupTableName": "ExpenseGroup",
+    "expenseGroupChildIndexName": "ChildExpenseIdIndex",
+    "userExpenseTableName": "UserExpense",
+    "userExpenseUserIndexName": "UserIdIndex",
+    "leadingExpenseTableName": "LeadingExpense"
 }

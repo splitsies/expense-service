@@ -49,17 +49,7 @@ jobs:
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PRODUCTION }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PRODUCTION }}" \
                 --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_PRODUCTION }}" \
-                --param="connectionTokenTableName=ConnectionToken" \
-                --param="connectionTableName=ExpenseConnection" \
-                --param="expenseItemTableName=ExpenseItem" \
-                --param="expensePayerTableName=ExpensePayer" \
-                --param="expensePayerStatusTableName=ExpensePayerStatus" \
-                --param="expenseTableName=Expense" \
-                --param="expenseGroupTableName=ExpenseGroup" \
-                --param="expenseGroupChildIndexName=ChildExpenseIdIndex" \
-                --param="userExpenseTableName=UserExpense" \
-                --param="userExpenseUserIndexName=UserIdIndex" \
-                --param="leadingExpenseTableName=LeadingExpense"
+                --param="RESOURCE_ACCOUNT_ID=${{ secrets.PROD_ACCOUNT_ID }}"
 
     - run: npm ci
       working-directory: ./resources

@@ -33,18 +33,18 @@ export class DbConfiguration implements IDbConfiguration {
         assert(!!process.env.userExpenseUserIndexName, "userExpenseUserIndexName was undefined");
         assert(!!process.env.leadingExpenseTableName, "leadingExpenseTableName was undefined");
         this._dbRegion = process.env.dbRegion;
-        this._connectionTableName = process.env.connectionTableName;
         this._endpoint = process.env.dbEndpoint;
-        this.expenseItemTableName = process.env.expenseItemTableName;
-        this.connectionTokenTableName = process.env.connectionTokenTableName;
-        this.expensePayerTableName = process.env.expensePayerTableName;
-        this.expensePayerStatusTableName = process.env.expensePayerStatusTableName;
-        this.expenseTableName = process.env.expenseTableName;
-        this.expenseGroupTableName = process.env.expenseGroupTableName;
-        this.expenseGroupChildIndexName = process.env.expenseGroupChildIndexName;
-        this.userExpenseTableName = process.env.userExpenseTableName;
-        this.userExpenseUserIndexName = process.env.userExpenseUserIndexName;
-        this.leadingExpenseTableName = process.env.leadingExpenseTableName;
+        this._connectionTableName = this.formatResourceName(process.env.connectionTableName);
+        this.expenseItemTableName = this.formatResourceName(process.env.expenseItemTableName);
+        this.connectionTokenTableName = this.formatResourceName(process.env.connectionTokenTableName);
+        this.expensePayerTableName = this.formatResourceName(process.env.expensePayerTableName);
+        this.expensePayerStatusTableName = this.formatResourceName(process.env.expensePayerStatusTableName);
+        this.expenseTableName = this.formatResourceName(process.env.expenseTableName);
+        this.expenseGroupTableName = this.formatResourceName(process.env.expenseGroupTableName);
+        this.expenseGroupChildIndexName = this.formatResourceName(process.env.expenseGroupChildIndexName, process.env.expenseGroupTableName);
+        this.userExpenseTableName = this.formatResourceName(process.env.userExpenseTableName);
+        this.userExpenseUserIndexName = this.formatResourceName(process.env.userExpenseUserIndexName, process.env.userExpenseTableName);
+        this.leadingExpenseTableName = this.formatResourceName(process.env.leadingExpenseTableName);
     }
 
     get dbRegion(): string {
@@ -57,5 +57,15 @@ export class DbConfiguration implements IDbConfiguration {
 
     get endpoint(): string {
         return this._endpoint;
+    }
+
+    private formatResourceName(resourceName: string, associatedTableName: string = undefined): string {
+        if (process.env.AWS_ACCOUNT_ID !== process.env.dbAccountId) {
+            return associatedTableName === undefined
+                ? `arn:aws:dynamodb:${process.env.dbRegion}:${process.env.DB_ACCOUNT_ID}:table/${resourceName}`
+                : `arn:aws:dynamodb:${process.env.dbRegion}:${process.env.DB_ACCOUNT_ID}:table/${associatedTableName}/index/${resourceName}`
+        }
+
+        return resourceName;
     }
 }

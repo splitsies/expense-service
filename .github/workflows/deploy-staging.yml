@@ -41,25 +41,15 @@ jobs:
                 --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
                 --param="APIG_URL=https://bq5chgizig.execute-api.us-east-1.amazonaws.com/staging/" \
                 --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_STAGING }}" \
-                --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_PRODUCTION }}" \
-                --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_PRODUCTION }}" \
-                --param="FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID_PRODUCTION }}" \
-                --param="FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID_PRODUCTION }}" \
-                --param="FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY_PRODUCTION }}" \
-                --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PRODUCTION }}" \
-                --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PRODUCTION }}" \
-                --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_PRODUCTION }}" \
-                --param="connectionTokenTableName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/ConnectionToken" \
-                --param="connectionTableName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/ExpenseConnection" \
-                --param="expenseItemTableName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/ExpenseItem" \
-                --param="expensePayerTableName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/ExpensePayer" \
-                --param="expensePayerStatusTableName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/ExpensePayerStatus" \
-                --param="expenseTableName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/Expense" \
-                --param="expenseGroupTableName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/ExpenseGroup" \
-                --param="expenseGroupChildIndexName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/ExpenseGroup/index/ChildExpenseIdIndex" \
-                --param="userExpenseTableName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/UserExpense" \
-                --param="userExpenseUserIndexName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/UserExpense/index/UserIdIndex" \
-                --param="leadingExpenseTableName=arn:aws:dynamodb:us-east-1:${{ secrets.DEV_ACCOUNT_ID }}:table/LeadingExpense"
+                --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_DEV_PR }}" \
+                --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_DEV_PR }}" \
+                --param="FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID_DEV_PR }}" \
+                --param="FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID_DEV_PR }}" \
+                --param="FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY_DEV_PR }}" \
+                --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_DEV_PR }}" \
+                --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_DEV_PR }}" \
+                --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \
+                --param="RESOURCE_ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }}
 
     env:
       SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY_STAGING }}
