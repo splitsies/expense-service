@@ -39,7 +39,7 @@ jobs:
                 --param="DB_REGION=us-east-1" \
                 --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
                 --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
-                --param="APIG_URL=https://i1nnpdkz89.execute-api.us-east-1.amazonaws.com/production/" \
+                --param="APIG_URL=https://bybk9vinge.execute-api.us-east-1.amazonaws.com/production/" \
                 --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_PRODUCTION }}" \
                 --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_PRODUCTION }}" \
                 --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_PRODUCTION }}" \
@@ -49,7 +49,6 @@ jobs:
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PRODUCTION }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PRODUCTION }}" \
                 --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_PRODUCTION }}" \
-                --param="RESOURCE_ACCOUNT_ID=${{ secrets.PROD_ACCOUNT_ID }}" \
                 --param="messageQueueResourceName=MessageQueue" \
                 --param="connectionTokenTableName=ConnectionToken" \
                 --param="connectionTableName=ExpenseConnection" \
