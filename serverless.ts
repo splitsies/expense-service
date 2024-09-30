@@ -47,9 +47,10 @@ const serverlessConfiguration: AWS = {
                         Effect: "Allow",
                         Action: "dynamodb:*",
                         Resource: [
-                            "arn:aws:dynamodb:${param:DB_REGION}:${aws:accountId}:table/*",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${aws:accountId}:table/*/stream/*",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${aws:accountId}:table/*/index/*",
+                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
+                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/stream/*",
+                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",
+                            "${param:MESSAGE_QUEUE_ARN}",
                         ],
                     },
                 ],
