@@ -34,7 +34,34 @@ Resources:
           Statement:
             - Effect: Allow
               Principal:
-                AWS: !Sub ${StagingLambdaExecutionRoleArn}/*
+                AWS: 
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyApiKey
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-create
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-connect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-disconnect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-message
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpiredConnections
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addUserToExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getUsersForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequests
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-mergeGuestUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeUserFromExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-createConnectionToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-broadcast
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteUserData
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayers
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayerStatus
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addNewExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
               Action:
                 - dynamodb:GetItem
                 - dynamodb:PutItem
