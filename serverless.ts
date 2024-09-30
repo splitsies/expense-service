@@ -60,6 +60,15 @@ const serverlessConfiguration: AWS = {
                             "${param:MESSAGE_QUEUE_ARN}",
                         ],
                     },
+                    {
+                        Effect: "Allow",
+                        Action: [
+                            "sns:Publish"
+                        ],
+                        Resource: [
+                            "arn:aws:sns:*:*:CrossStageExpenseMessage",
+                        ],
+                    },
                 ],
             },
         },

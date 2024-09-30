@@ -53,6 +53,18 @@ jobs:
                 --param="DB_ACCESS_KEY_ID=${{ secrets.DB_ACCESS_KEY_ID_DEV }}" \
                 --param="DB_SECRET_ACCESS_KEY=${{ secrets.DB_SECRET_ACCESS_KEY_DEV }}"
 
+    - run: sam build
+      working-directory: ./resources/topics
+    - run: |
+        sam deploy --stack-name expense-service-topics \
+        --no-confirm-changeset \
+        --no-fail-on-empty-changeset \
+        --parameter-overrides \
+            "DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
+            "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
+            "ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}"
+      working-directory: ./resources/topics
+
     env:
       SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY_STAGING }}
       AWS_ACCESS_KEY_ID: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID_STAGING }}
