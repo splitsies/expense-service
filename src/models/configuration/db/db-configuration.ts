@@ -62,8 +62,8 @@ export class DbConfiguration implements IDbConfiguration {
     private formatResourceName(resourceName: string, associatedTableName: string = undefined): string {
         if (process.env.AWS_ACCOUNT_ID !== process.env.dbAccountId) {
             return associatedTableName === undefined
-                ? `arn:aws:dynamodb:${process.env.dbRegion}:${process.env.DB_ACCOUNT_ID}:table/${resourceName}`
-                : `arn:aws:dynamodb:${process.env.dbRegion}:${process.env.DB_ACCOUNT_ID}:table/${associatedTableName}/index/${resourceName}`
+                ? `arn:aws:dynamodb:${process.env.dbRegion}:${process.env.dbAccountId}:table/${resourceName}`
+                : `arn:aws:dynamodb:${process.env.dbRegion}:${process.env.dbAccountId}:table/${associatedTableName}/index/${resourceName}`
         }
 
         return resourceName;
