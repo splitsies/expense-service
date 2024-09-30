@@ -375,12 +375,7 @@ Resources:
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
               Action:
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-                - dynamodb:Query
-                - dynamodb:Scan
+                - dynamodb:*
               Resource: 
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/UserExpense
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/UserExpense/index/UserIdIndex

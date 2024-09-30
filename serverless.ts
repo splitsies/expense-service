@@ -46,12 +46,7 @@ const serverlessConfiguration: AWS = {
                     {
                         Effect: "Allow",
                         Action: [
-                            "dynamodb:GetItem",
-                            "dynamodb:PutItem",
-                            "dynamodb:UpdateItem",
-                            "dynamodb:DeleteItem",
-                            "dynamodb:Query",
-                            "dynamodb:Scan"
+                            "dynamodb:*"
                         ],
                         Resource: [
                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/ConnectionToken",
