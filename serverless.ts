@@ -60,6 +60,7 @@ const serverlessConfiguration: AWS = {
                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/LeadingExpense",
                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/UserExpense",
                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/UserExpense/index/UserIdIndex",
+                            "arn:aws:dynamodb:${param:DB_REGION}:${aws:accountId}:table/MessageQueue",
                             "${param:MESSAGE_QUEUE_ARN}",
                         ],
                     },
