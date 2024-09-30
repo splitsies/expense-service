@@ -40,9 +40,9 @@ jobs:
                 --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
                 --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
                 --param="APIG_URL=https://i1nnpdkz89.execute-api.us-east-1.amazonaws.com/dev/" \
-                --param="APIG_KEY_DEV=i1nnpdkz89#us-east-1#dev" \
-                --param="APIG_KEY_STAGING=bq5chgizig#us-east-1#staging" \
-                --param="APIG_KEY_PROD=bybk9vinge#us-east-1#production" \
+                --param="APIG_KEY_DEV_US_EAST_1=i1nnpdkz89#us-east-1#dev" \
+                --param="APIG_KEY_STAGING_US_EAST_1=bq5chgizig#us-east-1#staging" \
+                --param="APIG_KEY_PROD_US_EAST_1=bybk9vinge#us-east-1#production" \
                 --param="DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
                 --param="StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
                 --param="ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}" \

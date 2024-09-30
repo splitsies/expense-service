@@ -6,38 +6,44 @@ import { sendMessage } from "@libs/broadcast";
 import { ILogger } from "@splitsies/utils";
 import { IConnection } from "src/models/connection/connection-interface";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
-import { IExpenseService } from "src/services/expense-service/expense-service-interface";
+import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
+import { ICrossStageTopicProvider } from "src/providers/cross-stage-topic-provider/cross-stage-topic-provider.i";
 
 @injectable()
 export class ExpenseBroadcaster implements IExpenseBroadcaster {
+    private readonly _snsClient = new SNSClient({ region: process.env.dbRegion });
+    
     constructor(
         @inject(ILogger) private readonly _logger: ILogger,
         @inject(IConnectionService) private readonly _connectionService: IConnectionService,
         @inject(IConnectionConfiguration) private readonly _connectionConfiguration: IConnectionConfiguration,
-        @inject(IExpenseService) private readonly _expenseService: IExpenseService
-    ) {}
+        @inject(ICrossStageTopicProvider) private readonly _crossStageTopicProvider: ICrossStageTopicProvider,
+    ) { }
 
     async broadcast(expense: ExpenseMessage, ignoredConnectionIds: string[] = []): Promise<void> {
         const ignored = new Set(ignoredConnectionIds);
-        const connections = (await this._connectionService.getConnectionsForExpenseId(expense.connectedExpenseId))
-            .filter(c => !ignored.has(c.connectionId));
-        
-        const externalStageConnections: IConnection[] = [];
-        const matchingStageConnections: IConnection[] = [];
+        const connections = (await this._connectionService.getConnectionsForExpenseId(expense.connectedExpenseId));        
+        const notifications = [];
 
         for (const connection of connections) {
+            if (ignored.has(connection.connectionId)) continue;
+
             if (connection.gatewayUrl !== this._connectionConfiguration.gatewayUrl) {
-                externalStageConnections.push(connection);
+                // If the connection does not belong to the current API Gateway, then the update message
+                // needs to be routed to the correct API Gateway. This added complexity allows for distributed 
+                // API Gateway replicas cross-region while still maintaining real-time connection features
+                const associatedTopic = this._crossStageTopicProvider.provide(connection.gatewayUrl);
+                console.log(`Found topic=${associatedTopic} for gatewayUrl=${connection.gatewayUrl}. Publishing notification...`);
+                notifications.push(this._snsClient.send(new PublishCommand({
+                    TopicArn: associatedTopic,
+                    Message: JSON.stringify(expense)
+                })));
             } else {
-                matchingStageConnections.push(connection);
+                notifications.push(this.notify(expense, connection));
             }
         }
 
-        // See local-emulation/queue-runner for setting up local listening to DynamoDB Stream
-        await Promise.all([
-            this._expenseService.queueExpenseUpdate(expense, externalStageConnections),
-            ...matchingStageConnections.map((connection) => this.notify(expense, connection)),
-        ]);
+        await Promise.all(notifications);
     }
 
     async notify(expense: ExpenseMessage, connection: IConnection): Promise<void> {
