@@ -8,6 +8,7 @@ import { IConnection } from "src/models/connection/connection-interface";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
 import { ICrossStageTopicProvider } from "src/providers/cross-stage-topic-provider/cross-stage-topic-provider.i";
+import { CrossGatewayExpenseMessage } from "src/models/cross-gateway-expense-message";
 
 @injectable()
 export class ExpenseBroadcaster implements IExpenseBroadcaster {
@@ -36,7 +37,7 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
                 console.log(`Found topic=${associatedTopic} for gatewayUrl=${connection.gatewayUrl}. Publishing notification...`);
                 notifications.push(this._snsClient.send(new PublishCommand({
                     TopicArn: associatedTopic,
-                    Message: JSON.stringify(expense)
+                    Message: JSON.stringify(new CrossGatewayExpenseMessage(expense, connection))
                 })));
             } else {
                 notifications.push(this.notify(expense, connection));

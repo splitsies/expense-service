@@ -1,34 +1,19 @@
 import "reflect-metadata";
-import { AttributeValue } from "@aws-sdk/client-dynamodb";
-import { unmarshall } from "@aws-sdk/util-dynamodb";
-import { DynamoDBStreamHandler } from "aws-lambda";
+import { SNSEvent } from "aws-lambda";
 import { container } from "src/di/inversify.config";
 import { IExpenseBroadcaster } from "@libs/expense-broadcaster/expense-broadcaster-interface";
-import { IQueueMessage } from "@splitsies/shared-models";
-import { IExpensePublishRequest } from "src/models/expense-publish-request/expense-publish-request-interface";
-import { IMessageQueueClient } from "@splitsies/utils";
+import { CrossGatewayExpenseMessage } from "src/models/cross-gateway-expense-message";
 
 const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
-const messageQueueClient = container.get<IMessageQueueClient>(IMessageQueueClient);
 
-export const main: DynamoDBStreamHandler = async (event, _, callback) => {
-    const promises: Promise<void>[] = [];
-    const updates: IQueueMessage<IExpensePublishRequest>[] = [];
-
+export const main = async (event: SNSEvent) => {  
+    const notifications = [];
     for (const record of event.Records) {
-        if (!record.dynamodb?.NewImage) continue;
-
-        const update = unmarshall(
-            record.dynamodb.NewImage as Record<string, AttributeValue>,
-        ) as IQueueMessage<IExpensePublishRequest>;
-        updates.push(update);
-
-        if (Date.now() > update.ttl) continue;
-        promises.push(expenseBroadcaster.notify(update.data.message, update.data.connection));
+        console.log({ record });
+        const { message, connection } = JSON.parse(record.Sns.Message) as CrossGatewayExpenseMessage;
+        console.log({ message, connection });
+        notifications.push(expenseBroadcaster.notify(message, connection));
     }
 
-    promises.push(messageQueueClient.deleteBatch(updates));
-    await Promise.all(promises);
-
-    callback(null);
-};
+    await Promise.all(notifications);
+}
