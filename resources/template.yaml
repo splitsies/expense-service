@@ -63,12 +63,7 @@ Resources:
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
               Action:
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-                - dynamodb:Query
-                - dynamodb:Scan
+                - dynamodb:*
               Resource: 
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpensePayer
 
@@ -122,12 +117,7 @@ Resources:
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
               Action:
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-                - dynamodb:Query
-                - dynamodb:Scan
+                - dynamodb:*
               Resource: 
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpensePayerStatus
 
@@ -182,12 +172,7 @@ Resources:
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
               Action:
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-                - dynamodb:Query
-                - dynamodb:Scan
+                - dynamodb:*
               Resource: 
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/LeadingExpense
 
@@ -238,12 +223,7 @@ Resources:
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
               Action:
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-                - dynamodb:Query
-                - dynamodb:Scan
+                - dynamodb:*
               Resource: 
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/Expense
 
@@ -305,12 +285,7 @@ Resources:
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
               Action:
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-                - dynamodb:Query
-                - dynamodb:Scan
+                - dynamodb:*
               Resource: 
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpenseGroup
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpenseGroup/index/ChildExpenseIdIndex
@@ -440,12 +415,7 @@ Resources:
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
               Action:
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-                - dynamodb:Query
-                - dynamodb:Scan
+                - dynamodb:*
               Resource: 
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpenseConnection
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpenseConnection/index/ExpenseIdIndex
@@ -501,12 +471,7 @@ Resources:
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
               Action:
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-                - dynamodb:Query
-                - dynamodb:Scan
+                - dynamodb:*
               Resource: 
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ConnectionToken
 
@@ -561,11 +526,6 @@ Resources:
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
                   - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
               Action:
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-                - dynamodb:Query
-                - dynamodb:Scan
+                - dynamodb:*
               Resource: 
                 - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpenseItem
