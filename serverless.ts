@@ -40,6 +40,8 @@ const serverlessConfiguration: AWS = {
         name: "aws",
         stage: "dev",
         runtime: "nodejs18.x",
+        timeout: 30,
+        memorySize: 3000,
         iam: {
             role: {
                 statements: [
