@@ -17,6 +17,8 @@ export class DbConfiguration implements IDbConfiguration {
     readonly userExpenseTableName: string;
     readonly userExpenseUserIndexName: string;
     readonly leadingExpenseTableName: string;
+    readonly dbAccessKeyId: string;
+    readonly dbSecretAccessKey: string;
 
     constructor() {
         assert(!!process.env.dbRegion, "db region was undefined");
@@ -45,6 +47,9 @@ export class DbConfiguration implements IDbConfiguration {
         this.userExpenseTableName = this.formatResourceName(process.env.userExpenseTableName);
         this.userExpenseUserIndexName = process.env.userExpenseUserIndexName;
         this.leadingExpenseTableName = this.formatResourceName(process.env.leadingExpenseTableName);
+
+        this.dbAccessKeyId = process.env.dbAccessKeyId === "null" ? undefined : process.env.dbAccessKeyId;
+        this.dbSecretAccessKey = process.env.dbSecretAccessKey === "null" ? undefined : process.env.dbSecretAccessKey;
     }
 
     get dbRegion(): string {

@@ -1,4 +1,6 @@
 {
+    "dbAccessKeyId": "${param:DB_ACCESS_KEY_ID}",
+    "dbSecretAccessKey": "${param:DB_SECRET_ACCESS_KEY}",
     "dbRegion": "${param:DB_REGION}",
     "dbEndpoint": "${param:DB_ENDPOINT}",
     "dbAccountId": "${param:RESOURCE_ACCOUNT_ID}",

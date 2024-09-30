@@ -49,7 +49,9 @@ jobs:
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PRODUCTION }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PRODUCTION }}" \
                 --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_PRODUCTION }}" \
-                --param="RESOURCE_ACCOUNT_ID=${{ secrets.PROD_ACCOUNT_ID }}"
+                --param="RESOURCE_ACCOUNT_ID=${{ secrets.PROD_ACCOUNT_ID }}" \
+                --param="DB_ACCESS_KEY_ID=null" \
+                --param="DB_SECRET_ACCESS_KEY=null"
 
     - run: npm ci
       working-directory: ./resources
