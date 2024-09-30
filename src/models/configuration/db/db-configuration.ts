@@ -41,9 +41,9 @@ export class DbConfiguration implements IDbConfiguration {
         this.expensePayerStatusTableName = this.formatResourceName(process.env.expensePayerStatusTableName);
         this.expenseTableName = this.formatResourceName(process.env.expenseTableName);
         this.expenseGroupTableName = this.formatResourceName(process.env.expenseGroupTableName);
-        this.expenseGroupChildIndexName = this.formatResourceName(process.env.expenseGroupChildIndexName, process.env.expenseGroupTableName);
+        this.expenseGroupChildIndexName = process.env.expenseGroupChildIndexName;
         this.userExpenseTableName = this.formatResourceName(process.env.userExpenseTableName);
-        this.userExpenseUserIndexName = this.formatResourceName(process.env.userExpenseUserIndexName, process.env.userExpenseTableName);
+        this.userExpenseUserIndexName = process.env.userExpenseUserIndexName;
         this.leadingExpenseTableName = this.formatResourceName(process.env.leadingExpenseTableName);
     }
 
@@ -59,13 +59,9 @@ export class DbConfiguration implements IDbConfiguration {
         return this._endpoint;
     }
 
-    private formatResourceName(resourceName: string, associatedTableName: string = undefined): string {
-        if (process.env.AWS_ACCOUNT_ID !== process.env.dbAccountId) {
-            return associatedTableName === undefined
-                ? `arn:aws:dynamodb:${process.env.dbRegion}:${process.env.dbAccountId}:table/${resourceName}`
-                : `arn:aws:dynamodb:${process.env.dbRegion}:${process.env.dbAccountId}:table/${associatedTableName}/index/${resourceName}`
-        }
-
-        return resourceName;
+    private formatResourceName(resourceName: string): string {
+        return process.env.AWS_ACCOUNT_ID !== process.env.dbAccountId
+            ? `arn:aws:dynamodb:${process.env.dbRegion}:${process.env.dbAccountId}:table/${resourceName}`
+            : resourceName;
     }
 }
