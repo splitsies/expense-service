@@ -80,18 +80,34 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
         this._logger.log({ tableName: this._tableName, index: this._dbConfiguration.userExpenseUserIndexName });
 
         try {
+            // const res = await this._client.send(
+            //     new ScanCommand({
+            //         TableName: this._tableName,
+            //         IndexName: this._dbConfiguration.userExpenseUserIndexName,
+            //         FilterExpression: "#userId = :userId AND #pendingJoin = :pendingJoin",
+            //         ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
+            //         ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
+            //         Select: "COUNT",
+            //     }),
+            // );
+
+            // return res.Count ?? 0;
+
             const res = await this._client.send(
-                new ScanCommand({
+                new QueryCommand({
                     TableName: this._tableName,
                     IndexName: this._dbConfiguration.userExpenseUserIndexName,
-                    FilterExpression: "#userId = :userId AND #pendingJoin = :pendingJoin",
+                    KeyConditionExpression: "#userId = :userId",
+                    FilterExpression: "#pendingJoin = :pendingJoin",
                     ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
                     ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
-                    Select: "COUNT",
+                    ExclusiveStartKey: offset as Record<string, AttributeValue>,
                 }),
             );
 
-            return res.Count ?? 0;
+            this._logger.log(res);
+
+            return res.Items?.length ?? 0;
         }
         catch (e) {
             this._logger.error(e);
