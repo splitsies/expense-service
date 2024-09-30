@@ -26,6 +26,11 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
         );
     }
 
+    create(model: UserExpense, shouldCommit?: Promise<boolean> | undefined): Promise<UserExpense> {
+        this._logger.log({ tableName: this._tableName });
+        return super.create(model, shouldCommit);
+    }
+
     async getForUser(userId: string): Promise<IUserExpense[]> {
         const userExpenses = await this.queryAll({
             TableName: this._tableName,
@@ -87,7 +92,7 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
                 ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
             }),
         );
-        
+
         return res.Count ?? 0;
     }
 
