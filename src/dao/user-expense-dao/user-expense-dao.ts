@@ -54,7 +54,6 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
         limit: number,
         offset: Record<string, object> = undefined,
     ): Promise<IScanResult<IUserExpense>> {
-        this._logger.log({ tableName: this._tableName, index: this._dbConfiguration.userExpenseUserIndexName });
         const res = await this._client.send(
             new QueryCommand({
                 TableName: this._tableName,
@@ -77,43 +76,19 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
     }
 
     async getJoinRequestCountForUser(userId: string): Promise<number> {
-        this._logger.log({ tableName: this._tableName, index: this._dbConfiguration.userExpenseUserIndexName });
-
-        try {
-            // const res = await this._client.send(
-            //     new ScanCommand({
-            //         TableName: this._tableName,
-            //         IndexName: this._dbConfiguration.userExpenseUserIndexName,
-            //         FilterExpression: "#userId = :userId AND #pendingJoin = :pendingJoin",
-            //         ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
-            //         ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
-            //         Select: "COUNT",
-            //     }),
-            // );
-
-            // return res.Count ?? 0;
-
-            const res = await this._client.send(
-                new QueryCommand({
-                    TableName: this._tableName,
-                    IndexName: this._dbConfiguration.userExpenseUserIndexName,
-                    KeyConditionExpression: "#userId = :userId",
-                    FilterExpression: "#pendingJoin = :pendingJoin",
-                    Select: "COUNT",
-                    ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
-                    ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
-                }),
-            );
-
-            this._logger.log(res);
-
-            return res.Count ?? 0;
-        }
-        catch (e) {
-            this._logger.error(e);
-            throw e;
-        }
-
+        const res = await this._client.send(
+            new QueryCommand({
+                TableName: this._tableName,
+                IndexName: this._dbConfiguration.userExpenseUserIndexName,
+                KeyConditionExpression: "#userId = :userId",
+                FilterExpression: "#pendingJoin = :pendingJoin",
+                Select: "COUNT",
+                ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
+                ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
+            }),
+        );
+        
+        return res.Count ?? 0;
     }
 
     async getJoinRequestsForExpense(expenseId: string): Promise<IUserExpense[]> {
