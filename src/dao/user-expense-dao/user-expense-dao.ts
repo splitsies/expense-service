@@ -99,6 +99,7 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
                     IndexName: this._dbConfiguration.userExpenseUserIndexName,
                     KeyConditionExpression: "#userId = :userId",
                     FilterExpression: "#pendingJoin = :pendingJoin",
+                    Select: "COUNT",
                     ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
                     ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
                 }),
@@ -106,7 +107,7 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
 
             this._logger.log(res);
 
-            return res.Items?.length ?? 0;
+            return res.Count ?? 0;
         }
         catch (e) {
             this._logger.error(e);
