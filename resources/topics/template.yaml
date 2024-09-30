@@ -31,6 +31,7 @@ Resources:
           - Effect: Allow
             Principal:
               AWS: 
+                # TODO: Remove dev from here (shouldn't be allowed to access staging/prod)
                 - !Sub arn:aws:iam::${DevAccountId}:role/expense-service-dev-us-east-1-lambdaRole
                 - !Sub arn:aws:iam::${StagingAccountId}:role/expense-service-staging-us-east-1-lambdaRole
                 - !Sub arn:aws:iam::${ProdAccountId}:role/expense-service-production-us-east-1-lambdaRole
