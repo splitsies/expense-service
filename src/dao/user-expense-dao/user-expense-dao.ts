@@ -101,7 +101,6 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
                     FilterExpression: "#pendingJoin = :pendingJoin",
                     ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
                     ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
-                    ExclusiveStartKey: offset as Record<string, AttributeValue>,
                 }),
             );
 
