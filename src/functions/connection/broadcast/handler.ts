@@ -6,7 +6,7 @@ import { CrossGatewayExpenseMessage } from "src/models/cross-gateway-expense-mes
 
 const expenseBroadcaster = container.get<IExpenseBroadcaster>(IExpenseBroadcaster);
 
-export const main = async (event: SNSEvent) => {  
+export const main = async (event: SNSEvent) => {
     const notifications = [];
     for (const record of event.Records) {
         console.log({ record });
@@ -16,4 +16,4 @@ export const main = async (event: SNSEvent) => {
     }
 
     await Promise.all(notifications);
-}
+};

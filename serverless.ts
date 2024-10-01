@@ -47,9 +47,7 @@ const serverlessConfiguration: AWS = {
                 statements: [
                     {
                         Effect: "Allow",
-                        Action: [
-                            "dynamodb:*"
-                        ],
+                        Action: ["dynamodb:*"],
                         Resource: [
                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",
@@ -62,12 +60,8 @@ const serverlessConfiguration: AWS = {
                     },
                     {
                         Effect: "Allow",
-                        Action: [
-                            "sns:Publish"
-                        ],
-                        Resource: [
-                            "arn:aws:sns:*:*:CrossStageExpenseMessage",
-                        ],
+                        Action: ["sns:Publish"],
+                        Resource: ["arn:aws:sns:*:*:CrossStageExpenseMessage"],
                     },
                 ],
             },

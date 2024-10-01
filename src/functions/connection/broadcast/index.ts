@@ -6,7 +6,7 @@ export default {
         {
             sns: {
                 arn: "arn:aws:sns:${aws:region}:${aws:accountId}:CrossStageExpenseMessage",
-                topicName: "CrossStageExpenseMessage"
+                topicName: "CrossStageExpenseMessage",
             },
         },
     ],

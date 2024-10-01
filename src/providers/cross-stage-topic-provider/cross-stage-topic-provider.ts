@@ -5,7 +5,6 @@ import { NotFoundError } from "@splitsies/shared-models";
 
 @injectable()
 export class CrossStageTopicProvider implements ICrossStageTopicProvider {
-
     private readonly _apigToTopicMap = new Map<string, string>();
 
     constructor(@inject(IConnectionConfiguration) _connectionConfiguration: IConnectionConfiguration) {
@@ -18,7 +17,7 @@ export class CrossStageTopicProvider implements ICrossStageTopicProvider {
         if (!this._apigToTopicMap.has(gatewayUrl)) {
             throw new NotFoundError(`Could not find a topic route for gateway ${gatewayUrl}`);
         }
-        
+
         return this._apigToTopicMap.get(gatewayUrl);
     }
 }
