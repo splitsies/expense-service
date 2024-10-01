@@ -1,5 +1,6 @@
 {
     "connectionTtlSec": "${param:CONNECTION_TTL_SEC}",
     "deleteExpiredIntervalMin": "${param:DELETE_EXPIRED_INTERVAL_MIN}",
-    "gatewayUrl": "${param:APIG_URL}"
+    "gatewayUrl": "${param:APIG_URL}",
+    "connectionGateways": "${param:APIG_KEY_DEV_US_EAST_1}#${param:DevAccountId},${param:APIG_KEY_STAGING_US_EAST_1}#${param:StagingAccountId},${param:APIG_KEY_PROD_US_EAST_1}#${param:ProdAccountId}"  
 }

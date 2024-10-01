@@ -23,33 +23,29 @@ jobs:
     - uses: aws-actions/setup-sam@v2
     - uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY }}
+        aws-access-key-id: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID_STAGING }}
+        aws-secret-access-key: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY_STAGING }}
         aws-region: us-east-1
-  
+
     - run: npm ci
     - name: serverless deploy
       uses: serverless/github-action@v3.1
       with:
         args: deploy --stage staging \
-                --param="DB_EXPENSE_JOIN_REQUEST_TABLE_NAME=Splitsies-ExpenseJoinRequest-production" \
+                --param="RTENV=staging" \
+                --param="QUEUE_STAGE_NAME=staging" \
                 --param="CONNECTION_TTL_SEC=1800" \
                 --param="DB_REGION=us-east-1" \
-                --param="CONNECTION_TOKEN_TABLE_NAME=Splitsies-ConnectionToken-production" \
-                --param="CONNECTION_TABLE_NAME=Splitsies-ExpenseConnection-production" \
-                --param="TRANSACTION_DATE_INDEX_NAME=TransactionDateIndex" \
                 --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
-                --param="MESSAGE_QUEUE_RESOURCE_NAME=Splitsies-MessageQueue-production" \
-                --param="EXPENSE_UPDATE_TABLE_NAME=Splitsies-ExpenseUpdate-production" \
-                --param="DB_TABLE_NAME=Splitsies-Expense-production" \
                 --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
-                --param="EXPENSE_ITEM_TABLE_NAME=Splitsies-ExpenseItem-production" \
-                --param="DB_USER_EXPENSE_TABLE_NAME=Splitsies-UserExpense-production" \
-                --param="APIG_URL=https://djb25cevxg.execute-api.us-east-1.amazonaws.com/staging/" \
-                --param="INTERNAL_API_KEY=${{ secrets.INTERNAL_API_KEY }}" \
-                --param="DB_ACCESS_KEY_ID=${{ secrets.DB_ACCESS_KEY_ID }}" \
-                --param="DB_SECRET_ACCESS_KEY=${{ secrets.DB_SECRET_ACCESS_KEY }}" \
-                --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_PRODUCTION }}" \
+                --param="APIG_URL=https://bq5chgizig.execute-api.us-east-1.amazonaws.com/staging/" \
+                --param="APIG_KEY_DEV_US_EAST_1=i1nnpdkz89#us-east-1#dev" \
+                --param="APIG_KEY_STAGING_US_EAST_1=bq5chgizig#us-east-1#staging" \
+                --param="APIG_KEY_PROD_US_EAST_1=bybk9vinge#us-east-1#production" \
+                --param="DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
+                --param="StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
+                --param="ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}" \
+                --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_STAGING }}" \
                 --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_PRODUCTION }}" \
                 --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_PRODUCTION }}" \
                 --param="FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID_PRODUCTION }}" \
@@ -58,21 +54,23 @@ jobs:
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PRODUCTION }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PRODUCTION }}" \
                 --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_PRODUCTION }}" \
-                --param="RTENV=production" \
-                --param="QUEUE_STAGE_NAME=staging"
+                --param="RESOURCE_ACCOUNT_ID=${{ secrets.PROD_ACCOUNT_ID }}" \
+                --param="DB_ACCESS_KEY_ID=${{ secrets.DB_ACCESS_KEY_ID_PROD }}" \
+                --param="DB_SECRET_ACCESS_KEY=${{ secrets.DB_SECRET_ACCESS_KEY_PROD }}"
 
-    - run: npm ci
-      working-directory: ./resources
     - run: sam build
-      working-directory: ./resources
+      working-directory: ./resources/topics
     - run: |
-        sam deploy --stack-name expense-service-database-production \
+        sam deploy --stack-name expense-service-topics \
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
-        --parameter-overrides "Stage=production" "RtEnv=production"
-      working-directory: ./resources
+        --parameter-overrides \
+            "DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
+            "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
+            "ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}"
+      working-directory: ./resources/topics
 
     env:
-      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY }}
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY_STAGING }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID_STAGING }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY_STAGING }}

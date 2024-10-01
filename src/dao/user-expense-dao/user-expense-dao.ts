@@ -26,6 +26,11 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
         );
     }
 
+    create(model: UserExpense, shouldCommit?: Promise<boolean> | undefined): Promise<UserExpense> {
+        this._logger.log({ tableName: this._tableName });
+        return super.create(model, shouldCommit);
+    }
+
     async getForUser(userId: string): Promise<IUserExpense[]> {
         const userExpenses = await this.queryAll({
             TableName: this._tableName,
@@ -77,13 +82,14 @@ export class UserExpenseDao extends DaoBase<UserExpenseDa, Key, UserExpense> imp
 
     async getJoinRequestCountForUser(userId: string): Promise<number> {
         const res = await this._client.send(
-            new ScanCommand({
+            new QueryCommand({
                 TableName: this._tableName,
                 IndexName: this._dbConfiguration.userExpenseUserIndexName,
-                FilterExpression: "#userId = :userId AND #pendingJoin = :pendingJoin",
+                KeyConditionExpression: "#userId = :userId",
+                FilterExpression: "#pendingJoin = :pendingJoin",
+                Select: "COUNT",
                 ExpressionAttributeNames: { "#userId": "userId", "#pendingJoin": "pendingJoin" },
                 ExpressionAttributeValues: { ":userId": { S: userId }, ":pendingJoin": { BOOL: true } },
-                Select: "COUNT",
             }),
         );
 

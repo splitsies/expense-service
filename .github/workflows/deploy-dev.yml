@@ -40,6 +40,12 @@ jobs:
                 --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
                 --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
                 --param="APIG_URL=https://i1nnpdkz89.execute-api.us-east-1.amazonaws.com/dev/" \
+                --param="APIG_KEY_DEV_US_EAST_1=i1nnpdkz89#us-east-1#dev" \
+                --param="APIG_KEY_STAGING_US_EAST_1=bq5chgizig#us-east-1#staging" \
+                --param="APIG_KEY_PROD_US_EAST_1=bybk9vinge#us-east-1#production" \
+                --param="DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
+                --param="StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
+                --param="ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}" \
                 --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_DEV_PR }}" \
                 --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_DEV_PR }}" \
                 --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_DEV_PR }}" \
@@ -49,7 +55,9 @@ jobs:
                 --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_DEV_PR }}" \
                 --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_DEV_PR }}" \
                 --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \
-                --param="RESOURCE_ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }}"
+                --param="RESOURCE_ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }}" \
+                --param="DB_ACCESS_KEY_ID=${{ secrets.DB_ACCESS_KEY_ID_DEV }}" \
+                --param="DB_SECRET_ACCESS_KEY=${{ secrets.DB_SECRET_ACCESS_KEY_DEV }}"
 
     - run: npm ci
       working-directory: ./resources
@@ -59,8 +67,24 @@ jobs:
         sam deploy --stack-name expense-service-database \
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
-        --parameter-overrides "Stage=dev" "RtEnv=dev"
+        --parameter-overrides \
+            "StagingLambdaExecutionRoleArn=${{ secrets.STAGING_EXPENSE_SERVICE_LAMBDA_EXECUTION_ROLE_ARN }}" \
+            "DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
+            "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
+            "ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}"
       working-directory: ./resources
+
+    - run: sam build
+      working-directory: ./resources/topics
+    - run: |
+        sam deploy --stack-name expense-service-topics \
+        --no-confirm-changeset \
+        --no-fail-on-empty-changeset \
+        --parameter-overrides \
+            "DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
+            "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
+            "ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}"
+      working-directory: ./resources/topics
 
     env:
       SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY_DEV }}

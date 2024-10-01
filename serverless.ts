@@ -40,17 +40,28 @@ const serverlessConfiguration: AWS = {
         name: "aws",
         stage: "dev",
         runtime: "nodejs18.x",
+        timeout: 30,
+        memorySize: 3000,
         iam: {
             role: {
                 statements: [
                     {
                         Effect: "Allow",
-                        Action: "dynamodb:*",
+                        Action: ["dynamodb:*"],
                         Resource: [
                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/stream/*",
                             "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",
+                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/MessageQueue",
+                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/MessageQueue/stream/*",
+                            "arn:aws:dynamodb:${param:DB_REGION}:${aws:accountId}:table/MessageQueue",
+                            "arn:aws:dynamodb:${param:DB_REGION}:${aws:accountId}:table/MessageQueue/stream/*",
+                            "${param:MESSAGE_QUEUE_ARN}",
                         ],
+                    },
+                    {
+                        Effect: "Allow",
+                        Action: ["sns:Publish"],
+                        Resource: ["arn:aws:sns:*:*:CrossStageExpenseMessage"],
                     },
                 ],
             },
@@ -70,10 +81,11 @@ const serverlessConfiguration: AWS = {
         },
         environment: {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
-            NODE_OPTIONS: "--stack-trace-limit=1000",
+            NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
             APIG_URL: "${param:APIG_URL}",
             FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST,
             STAGE: "${param:QUEUE_STAGE_NAME}",
+            AWS_ACCOUNT_ID: "${aws:accountId}",
             ...dbConfig,
             ...connectionConfig,
             ...firebaseConfig,
@@ -116,7 +128,7 @@ const serverlessConfiguration: AWS = {
             format: "esm",
             bundle: true,
             minify: true,
-            sourcemap: false,
+            sourcemap: true,
             sourcesContent: false,
             keepNames: false,
             outputFileExtension: ".mjs",

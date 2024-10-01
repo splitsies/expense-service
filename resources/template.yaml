@@ -5,6 +5,13 @@ Description: >
 
   SAM Template for expense-service database
 
+Parameters:
+  StagingLambdaExecutionRoleArn:
+    Type: String
+  DbRegion:
+    Type: String
+    Default: us-east-1
+
 Resources:  
   ExpensePayer:
     Type: AWS::DynamoDB::Table
@@ -21,6 +28,45 @@ Resources:
         - AttributeName: userId
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
+      ResourcePolicy:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: 
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyApiKey
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-create
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-connect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-disconnect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-message
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpiredConnections
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addUserToExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getUsersForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequests
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-mergeGuestUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeUserFromExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-createConnectionToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-broadcast
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteUserData
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayers
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayerStatus
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addNewExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
+              Action:
+                - dynamodb:*
+              Resource: 
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpensePayer
+
   ExpensePayerStatus:
     Type: AWS::DynamoDB::Table
     Properties: 
@@ -36,6 +82,44 @@ Resources:
         - AttributeName: userId
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
+      ResourcePolicy:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: 
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyApiKey
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-create
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-connect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-disconnect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-message
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpiredConnections
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addUserToExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getUsersForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequests
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-mergeGuestUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeUserFromExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-createConnectionToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-broadcast
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteUserData
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayers
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayerStatus
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addNewExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
+              Action:
+                - dynamodb:*
+              Resource: 
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpensePayerStatus
 
   LeadingExpenseTable:
     Type: AWS::DynamoDB::Table
@@ -53,6 +137,44 @@ Resources:
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
       TableClass: STANDARD
+      ResourcePolicy:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: 
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyApiKey
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-create
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-connect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-disconnect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-message
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpiredConnections
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addUserToExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getUsersForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequests
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-mergeGuestUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeUserFromExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-createConnectionToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-broadcast
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteUserData
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayers
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayerStatus
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addNewExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
+              Action:
+                - dynamodb:*
+              Resource: 
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/LeadingExpense
 
   ExpenseTable:
     Type: AWS::DynamoDB::Table
@@ -66,6 +188,44 @@ Resources:
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
       TableClass: STANDARD
+      ResourcePolicy:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: 
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyApiKey
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-create
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-connect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-disconnect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-message
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpiredConnections
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addUserToExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getUsersForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequests
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-mergeGuestUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeUserFromExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-createConnectionToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-broadcast
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteUserData
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayers
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayerStatus
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addNewExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
+              Action:
+                - dynamodb:*
+              Resource: 
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/Expense
 
   ExpenseGroupTable:
     Type: AWS::DynamoDB::Table
@@ -90,6 +250,45 @@ Resources:
               KeyType: HASH
           Projection:
             ProjectionType: ALL
+      ResourcePolicy:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: 
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyApiKey
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-create
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-connect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-disconnect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-message
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpiredConnections
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addUserToExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getUsersForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequests
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-mergeGuestUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeUserFromExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-createConnectionToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-broadcast
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteUserData
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayers
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayerStatus
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addNewExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
+              Action:
+                - dynamodb:*
+              Resource: 
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpenseGroup
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpenseGroup/index/ChildExpenseIdIndex
 
   UserExpenseTable:
     Type: AWS::DynamoDB::Table
@@ -116,6 +315,45 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
+      ResourcePolicy:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: 
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyApiKey
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-create
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-connect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-disconnect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-message
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpiredConnections
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addUserToExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getUsersForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequests
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-mergeGuestUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeUserFromExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-createConnectionToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-broadcast
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteUserData
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayers
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayerStatus
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addNewExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
+              Action:
+                - dynamodb:*
+              Resource: 
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/UserExpense
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/UserExpense/index/UserIdIndex
 
   ExpenseConnectionTable:
     Type: AWS::DynamoDB::Table
@@ -142,6 +380,45 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
+      ResourcePolicy:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: 
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyApiKey
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-create
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-connect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-disconnect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-message
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpiredConnections
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addUserToExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getUsersForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequests
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-mergeGuestUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeUserFromExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-createConnectionToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-broadcast
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteUserData
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayers
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayerStatus
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addNewExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
+              Action:
+                - dynamodb:*
+              Resource: 
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpenseConnection
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpenseConnection/index/ExpenseIdIndex
 
   ConnectionTokenTable:
     Type: AWS::DynamoDB::Table
@@ -159,6 +436,44 @@ Resources:
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
       TableClass: STANDARD
+      ResourcePolicy:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: 
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyApiKey
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-create
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-connect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-disconnect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-message
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpiredConnections
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addUserToExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getUsersForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequests
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-mergeGuestUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeUserFromExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-createConnectionToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-broadcast
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteUserData
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayers
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayerStatus
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addNewExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
+              Action:
+                - dynamodb:*
+              Resource: 
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ConnectionToken
 
   ExpenseItemTable:
     Type: AWS::DynamoDB::Table
@@ -176,3 +491,41 @@ Resources:
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
       TableClass: STANDARD
+      ResourcePolicy:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: 
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-verifyApiKey
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-create
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-connect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-disconnect
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-message
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpiredConnections
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addUserToExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getUsersForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequests
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeJoinRequest
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-mergeGuestUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeUserFromExpense
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-createConnectionToken
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-broadcast
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteUserData
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayers
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-setExpensePayerStatus
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addNewExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-removeExpenseFromGroup
+                  - !Sub ${StagingLambdaExecutionRoleArn}/expense-service-staging-deleteExpense
+              Action:
+                - dynamodb:*
+              Resource: 
+                - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/ExpenseItem
