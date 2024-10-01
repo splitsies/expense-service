@@ -1,15 +1,14 @@
 name: Deploy Production
 
 on:
-  pull_request:
-    branches:
-      - main
-      - "releases/**"
+  release:
+    types: [released]
 
 jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
+    environment: production
     strategy:
       matrix:
         node-version: [18.x]
