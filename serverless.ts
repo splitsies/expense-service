@@ -132,7 +132,7 @@ const serverlessConfiguration: AWS = {
             sourcesContent: false,
             keepNames: false,
             outputFileExtension: ".mjs",
-            exclude: ["aws-sdk", "./resources", "./utils", "./github"],
+            exclude: ["aws-sdk"],
             target: "node18",
             define: { "require.resolve": undefined },
             platform: "node",
