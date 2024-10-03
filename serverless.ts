@@ -82,7 +82,7 @@ const serverlessConfiguration: AWS = {
         environment: {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
             NODE_OPTIONS: "--stack-trace-limit=1000",
-            APIG_URL: "${param:APIG_URL}",
+            APIG_URL: { "Fn::Join" : ["", [ "https://", { "Ref" : "WebsocketsApi" }, ".execute-api.${aws:region}.amazonaws.com/${sls:stage}/" ] ]  },
             FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST,
             STAGE: "${param:QUEUE_STAGE_NAME}",
             AWS_ACCOUNT_ID: "${aws:accountId}",
