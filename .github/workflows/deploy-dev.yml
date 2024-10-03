@@ -58,7 +58,7 @@ jobs:
     - name: serverless deploy (us-west-1)
       uses: serverless/github-action@v3.1
       with:
-        args: deploy --stage dev --region us-west-1 \
+        args: deploy --stage dev --region us-west-1 --verbose \
                 --param="RTENV=dev" \
                 --param="QUEUE_STAGE_NAME=dev" \
                 --param="CONNECTION_TTL_SEC=1800" \
