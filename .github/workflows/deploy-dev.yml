@@ -103,7 +103,7 @@ jobs:
                 --param="DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
                 --param="StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
                 --param="ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}" \
-                --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_DEV_PR }}" \
+                --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_US_WEST_1_DEV }}" \
                 --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_DEV_PR }}" \
                 --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_DEV_PR }}" \
                 --param="FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID_DEV_PR }}" \
