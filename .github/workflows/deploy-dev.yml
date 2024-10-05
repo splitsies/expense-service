@@ -43,8 +43,21 @@ jobs:
 
     - run: sam build
       working-directory: ./resources
+
     - run: |
         sam deploy \
+        --no-confirm-changeset \
+        --no-fail-on-empty-changeset \
+        --parameter-overrides \
+            "Stage=dev" \
+            "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
+            "ResourceAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
+            "OrganizationId=${{ secrets.AWS_ORGANIZATION_ID }}"
+      working-directory: ./resources
+
+    - run: |
+        sam deploy \
+        --region us-west-1 \
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
         --parameter-overrides \
