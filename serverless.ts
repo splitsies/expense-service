@@ -43,29 +43,7 @@ const serverlessConfiguration: AWS = {
         timeout: 30,
         memorySize: 3000,
         iam: {
-            role: {
-                name: "expense-service-LambdaExecutionRole-${aws:region}",
-                statements: [
-                    {
-                        Effect: "Allow",
-                        Action: ["dynamodb:*"],
-                        Resource: [
-                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/MessageQueue",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/MessageQueue/stream/*",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${aws:accountId}:table/MessageQueue",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${aws:accountId}:table/MessageQueue/stream/*",
-                            "${param:MESSAGE_QUEUE_ARN}",
-                        ],
-                    },
-                    {
-                        Effect: "Allow",
-                        Action: ["sns:Publish"],
-                        Resource: ["arn:aws:sns:*:*:CrossStageExpenseMessage"],
-                    },
-                ],
-            },
+            role: "arn:aws:iam::${aws:accountId}:role/expense-service-LambdaExecutionRole",
         },
         httpApi: {
             authorizers: {

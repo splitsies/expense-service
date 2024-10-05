@@ -29,16 +29,24 @@ jobs:
         aws-region: us-east-1    
 
     - run: sam build
+      working-directory: ./resources/roles
+    - run: |
+        sam deploy --stack-name expense-service-roles \
+        --no-confirm-changeset \
+        --no-fail-on-empty-changeset \
+        --parameter-overrides \
+            "MessageQueueArn=${{ secrets.FIREBASE_AUTH_DOMAIN_DEV_PR }}" \
+            "DbRegion=us-east-1" \
+            "ResourceAccountId=${{ secrets.DEV_ACCOUNT_ID }}"
+      working-directory: ./resources/roles
+
+    - run: sam build
       working-directory: ./resources/databases
     - run: |
         sam deploy --stack-name expense-service-database \
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
-        --parameter-overrides \
-            "StagingLambdaExecutionRoleArn=${{ secrets.STAGING_EXPENSE_SERVICE_LAMBDA_EXECUTION_ROLE_ARN }}" \
-            "DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
-            "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
-            "ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}"
+        --parameter-overrides "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" 
       working-directory: ./resources/databases
 
     - run: sam build
