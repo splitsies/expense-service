@@ -20,6 +20,9 @@ Parameters:
       - dev
       - staging
       - production
+  CrossGatewayExpenseMessageTopicName:
+    Type: String
+    Default: CrossGatewayExpenseMessage
 
 Conditions:
   IsNotStaging:
@@ -589,7 +592,7 @@ Resources:
               # Allow Lambda to receive SNS messages
               - Effect: Allow
                 Action: sns:Publish
-                Resource: arn:aws:sns:*:*:CrossGatewayExpenseMessage
+                Resource: !Sub arn:aws:sns:*:*:${CrossGatewayExpenseMessageTopicName}
 
               # Permission for Lambda to read from DynamoDB table
               - Effect: Allow
@@ -606,8 +609,8 @@ Resources:
   CrossGatewayExpenseMessageTopic:
     Type: AWS::SNS::Topic
     Properties:
-      TopicName: CrossGatewayExpenseMessage
-      DisplayName: CrossGatewayExpenseMessage
+      TopicName: !Sub ${CrossGatewayExpenseMessageTopicName}
+      DisplayName: !Sub ${CrossGatewayExpenseMessageTopicName}
 
   CrossGatewayExpenseMessageTopicPolicy:
     Type: AWS::SNS::TopicPolicy
