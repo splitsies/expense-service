@@ -44,6 +44,7 @@ const serverlessConfiguration: AWS = {
         memorySize: 3000,
         iam: {
             role: {
+                name: "expense-service-LambdaExecutionRole-${aws:region}",
                 statements: [
                     {
                         Effect: "Allow",
@@ -149,6 +150,11 @@ const serverlessConfiguration: AWS = {
             ignoreJWTSignature: true,
         },
     },
+    outputs: {
+        LambdaExecutionRoleArn: {
+            Description: ""
+        }
+    }
 };
 
 module.exports = serverlessConfiguration;
