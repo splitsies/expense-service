@@ -1,14 +1,19 @@
 name: Deploy Staging
 
+# on:
+#   release:
+#     types: [prereleased]
 on:
-  release:
-    types: [prereleased]
+  pull_request:
+    branches:
+      - main
+      - "releases/**"
 
 jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
-    environment: production
+    # environment: production
     strategy:
       matrix:
         node-version: [18.x]
