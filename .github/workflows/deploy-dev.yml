@@ -36,7 +36,7 @@ jobs:
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
         --parameter-overrides \
-            "MessageQueueArn=${{ secrets.FIREBASE_AUTH_DOMAIN_DEV_PR }}" \
+            "MessageQueueArn=${{ secrets.MESSAGE_QUEUE_ARN_DEV_PR }}" \
             "DbRegion=us-east-1" \
             "ResourceAccountId=${{ secrets.DEV_ACCOUNT_ID }}"
       working-directory: ./resources/roles
