@@ -46,7 +46,7 @@ jobs:
       working-directory: ./resources/roles
 
     - run: npm ci
-    working-directory: ./resources/databases
+      working-directory: ./resources/databases
 
     - run: sam build
       working-directory: ./resources/databases
