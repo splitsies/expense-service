@@ -54,7 +54,7 @@ jobs:
         sam deploy --stack-name expense-service-database \
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
-        --parameter-overrides "StagingLambdaExecutionRoleArn=${{ secrets.STAGING_EXPENSE_SERVICE_LAMBDA_EXECUTION_ROLE_ARN }}"
+        --parameter-overrides "StagingAccountId=${{ secrets.STAGING_EXPENSE_SERVICE_LAMBDA_EXECUTION_ROLE_ARN }}"
       working-directory: ./resources/databases
 
     - run: sam build
