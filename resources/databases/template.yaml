@@ -6,7 +6,7 @@ Description: >
   SAM Template for expense-service database
 
 Parameters:
-  StagingLambdaExecutionRoleArn:
+  StagingAccountId:
     Type: String
   DbRegion:
     Type: String
