@@ -50,7 +50,8 @@ jobs:
         --parameter-overrides \
             "Stage=dev" \
             "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
-            "ResourceAccountId=${{ secrets.DEV_ACCOUNT_ID }}"
+            "ResourceAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
+            "OrganizationId=${{ secrets.AWS_ORGANIZATION_ID }}"
       working-directory: ./resources
 
     # - run: |

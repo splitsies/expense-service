@@ -23,6 +23,8 @@ Parameters:
   CrossGatewayExpenseMessageTopicName:
     Type: String
     Default: CrossGatewayExpenseMessage
+  OrganizationId:
+    Type: String  
 
 Conditions:
   IsNotStaging:
@@ -612,17 +614,18 @@ Resources:
       TopicName: !Sub ${CrossGatewayExpenseMessageTopicName}
       DisplayName: !Sub ${CrossGatewayExpenseMessageTopicName}
 
-  # CrossGatewayExpenseMessageTopicPolicy:
-  #   Type: AWS::SNS::TopicPolicy
-  #   Properties:
-  #     Topics:
-  #       - !Ref CrossGatewayExpenseMessageTopic
-  #     PolicyDocument:
-  #       Version: '2012-10-17'
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal:
-  #             AWS: 
-  #               - !Sub arn:aws:iam::*:role/${AWS::StackName}-LambdaExecutionRole
-  #           Action: sns:Publish
-  #           Resource: !Ref CrossGatewayExpenseMessageTopic
+  CrossGatewayExpenseMessageTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref CrossGatewayExpenseMessageTopic
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: sns:Publish
+            Resource: !Ref CrossGatewayExpenseMessageTopic
+            Condition:
+              StringEquals:
+                aws:PrincipalOrgID: !Sub ${OrganizationId}
