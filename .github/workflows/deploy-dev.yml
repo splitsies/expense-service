@@ -48,8 +48,8 @@ jobs:
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
         --parameter-overrides \
-            "Stage=dev"
-            "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" 
+            "Stage=dev" \
+            "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
             "ResourceAccountId=${{ secrets.DEV_ACCOUNT_ID }}"
       working-directory: ./resources
 
