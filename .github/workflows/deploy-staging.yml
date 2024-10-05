@@ -1,13 +1,13 @@
 name: Deploy Staging
 
-# on:
-#   release:
-#     types: [prereleased]
 on:
-  pull_request:
-    branches:
-      - main
-      - "releases/**"
+  release:
+    types: [prereleased]
+# on:
+#   pull_request:
+#     branches:
+#       - main
+#       - "releases/**"
 
 jobs:
   deploy:
