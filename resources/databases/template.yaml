@@ -6,14 +6,11 @@ Description: >
   SAM Template for expense-service database
 
 Parameters:
-  StagingAccountId:
+  StagingLambdaExecutionRoleArn:
     Type: String
   DbRegion:
     Type: String
     Default: us-east-1
-  RoleName:
-    Type: String
-    Default: expense-service-roles-LambdaExecutionRole
 
 Resources:  
   ExpensePayer:
@@ -38,33 +35,33 @@ Resources:
             - Effect: Allow
               Principal:
                 AWS: 
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyApiKey
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-create
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-connect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-disconnect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-message
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpiredConnections
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addUserToExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getUsersForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequests
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestsForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-mergeGuestUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeUserFromExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-createConnectionToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-broadcast
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteUserData
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestCountForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayers
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayerStatus
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addNewExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addExistingExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeExpenseFromGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyApiKey
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-create
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-connect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-disconnect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-message
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpiredConnections
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addUserToExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getUsersForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequests
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-mergeGuestUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeUserFromExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-createConnectionToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-broadcast
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteUserData
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayers
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayerStatus
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addNewExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeExpenseFromGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpense
               Action:
                 - dynamodb:*
               Resource: 
@@ -92,33 +89,33 @@ Resources:
             - Effect: Allow
               Principal:
                 AWS: 
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyApiKey
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-create
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-connect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-disconnect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-message
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpiredConnections
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addUserToExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getUsersForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequests
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestsForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-mergeGuestUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeUserFromExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-createConnectionToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-broadcast
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteUserData
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestCountForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayers
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayerStatus
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addNewExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addExistingExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeExpenseFromGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyApiKey
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-create
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-connect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-disconnect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-message
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpiredConnections
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addUserToExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getUsersForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequests
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-mergeGuestUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeUserFromExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-createConnectionToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-broadcast
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteUserData
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayers
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayerStatus
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addNewExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeExpenseFromGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpense
               Action:
                 - dynamodb:*
               Resource: 
@@ -147,33 +144,33 @@ Resources:
             - Effect: Allow
               Principal:
                 AWS: 
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyApiKey
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-create
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-connect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-disconnect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-message
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpiredConnections
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addUserToExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getUsersForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequests
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestsForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-mergeGuestUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeUserFromExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-createConnectionToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-broadcast
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteUserData
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestCountForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayers
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayerStatus
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addNewExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addExistingExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeExpenseFromGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyApiKey
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-create
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-connect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-disconnect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-message
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpiredConnections
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addUserToExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getUsersForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequests
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-mergeGuestUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeUserFromExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-createConnectionToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-broadcast
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteUserData
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayers
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayerStatus
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addNewExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeExpenseFromGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpense
               Action:
                 - dynamodb:*
               Resource: 
@@ -198,33 +195,33 @@ Resources:
             - Effect: Allow
               Principal:
                 AWS: 
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyApiKey
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-create
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-connect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-disconnect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-message
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpiredConnections
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addUserToExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getUsersForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequests
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestsForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-mergeGuestUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeUserFromExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-createConnectionToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-broadcast
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteUserData
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestCountForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayers
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayerStatus
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addNewExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addExistingExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeExpenseFromGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyApiKey
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-create
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-connect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-disconnect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-message
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpiredConnections
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addUserToExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getUsersForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequests
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-mergeGuestUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeUserFromExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-createConnectionToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-broadcast
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteUserData
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayers
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayerStatus
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addNewExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeExpenseFromGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpense
               Action:
                 - dynamodb:*
               Resource: 
@@ -260,33 +257,33 @@ Resources:
             - Effect: Allow
               Principal:
                 AWS: 
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyApiKey
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-create
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-connect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-disconnect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-message
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpiredConnections
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addUserToExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getUsersForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequests
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestsForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-mergeGuestUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeUserFromExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-createConnectionToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-broadcast
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteUserData
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestCountForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayers
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayerStatus
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addNewExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addExistingExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeExpenseFromGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyApiKey
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-create
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-connect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-disconnect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-message
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpiredConnections
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addUserToExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getUsersForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequests
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-mergeGuestUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeUserFromExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-createConnectionToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-broadcast
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteUserData
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayers
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayerStatus
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addNewExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeExpenseFromGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpense
               Action:
                 - dynamodb:*
               Resource: 
@@ -325,33 +322,33 @@ Resources:
             - Effect: Allow
               Principal:
                 AWS: 
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyApiKey
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-create
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-connect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-disconnect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-message
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpiredConnections
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addUserToExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getUsersForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequests
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestsForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-mergeGuestUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeUserFromExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-createConnectionToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-broadcast
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteUserData
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestCountForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayers
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayerStatus
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addNewExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addExistingExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeExpenseFromGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyApiKey
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-create
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-connect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-disconnect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-message
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpiredConnections
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addUserToExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getUsersForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequests
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-mergeGuestUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeUserFromExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-createConnectionToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-broadcast
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteUserData
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayers
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayerStatus
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addNewExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeExpenseFromGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpense
               Action:
                 - dynamodb:*
               Resource: 
@@ -390,33 +387,33 @@ Resources:
             - Effect: Allow
               Principal:
                 AWS: 
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyApiKey
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-create
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-connect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-disconnect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-message
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpiredConnections
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addUserToExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getUsersForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequests
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestsForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-mergeGuestUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeUserFromExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-createConnectionToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-broadcast
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteUserData
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestCountForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayers
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayerStatus
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addNewExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addExistingExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeExpenseFromGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyApiKey
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-create
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-connect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-disconnect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-message
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpiredConnections
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addUserToExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getUsersForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequests
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-mergeGuestUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeUserFromExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-createConnectionToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-broadcast
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteUserData
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayers
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayerStatus
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addNewExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeExpenseFromGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpense
               Action:
                 - dynamodb:*
               Resource: 
@@ -446,33 +443,33 @@ Resources:
             - Effect: Allow
               Principal:
                 AWS: 
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyApiKey
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-create
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-connect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-disconnect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-message
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpiredConnections
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addUserToExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getUsersForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequests
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestsForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-mergeGuestUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeUserFromExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-createConnectionToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-broadcast
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteUserData
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestCountForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayers
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayerStatus
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addNewExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addExistingExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeExpenseFromGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyApiKey
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-create
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-connect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-disconnect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-message
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpiredConnections
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addUserToExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getUsersForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequests
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-mergeGuestUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeUserFromExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-createConnectionToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-broadcast
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteUserData
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayers
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayerStatus
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addNewExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeExpenseFromGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpense
               Action:
                 - dynamodb:*
               Resource: 
@@ -501,33 +498,33 @@ Resources:
             - Effect: Allow
               Principal:
                 AWS: 
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-verifyApiKey
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-create
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-connect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-disconnect
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-message
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpiredConnections
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addUserToExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getUsersForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequests
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeJoinRequest
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestsForExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-mergeGuestUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeUserFromExpense
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-createConnectionToken
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-broadcast
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteUserData
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-getJoinRequestCountForUser
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayers
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-setExpensePayerStatus
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addNewExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-addExistingExpenseToGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-removeExpenseFromGroup
-                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/${RoleName}/expense-service-staging-deleteExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-verifyApiKey
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-create
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-connect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-disconnect
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-message
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpiredConnections
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addUserToExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getUsersForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequests
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeJoinRequest
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestsForExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-mergeGuestUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeUserFromExpense
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-createConnectionToken
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-broadcast
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteUserData
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-getJoinRequestCountForUser
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayers
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-setExpensePayerStatus
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addNewExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-addExistingExpenseToGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-removeExpenseFromGroup
+                  - !Sub arn:aws:sts::${StagingAccountId}:assumed-role/expense-service-roles-LambdaExecutionRole/expense-service-staging-deleteExpense
               Action:
                 - dynamodb:*
               Resource: 
