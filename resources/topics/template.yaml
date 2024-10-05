@@ -12,6 +12,9 @@ Parameters:
     Type: String
   ProdAccountId:
     Type: String
+  RoleName:
+    Type: String
+    Default: expense-service-roles-LambdaExecutionRole
 
 Resources:  
   CrossStageExpenseMessageTopic:
@@ -32,8 +35,8 @@ Resources:
             Principal:
               AWS: 
                 # TODO: Remove dev from here (shouldn't be allowed to access staging/prod)
-                - !Sub arn:aws:iam::${DevAccountId}:role/expense-service-roles-LambdaExecutionRole
-                - !Sub arn:aws:iam::${StagingAccountId}:role/expense-service-roles-LambdaExecutionRole
-                - !Sub arn:aws:iam::${ProdAccountId}:role/expense-service-roles-LambdaExecutionRole
+                - !Sub arn:aws:iam::${DevAccountId}:role/${RoleName}
+                - !Sub arn:aws:iam::${StagingAccountId}:role/${RoleName}
+                - !Sub arn:aws:iam::${ProdAccountId}:role/${RoleName}
             Action: sns:Publish
             Resource: !Ref CrossStageExpenseMessageTopic
