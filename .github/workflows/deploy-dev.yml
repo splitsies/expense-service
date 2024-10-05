@@ -36,6 +36,7 @@ jobs:
         params="${params} ResourceAccountId=${{ secrets.DEV_ACCOUNT_ID }}"
         params="${params} OrganizationId=${{ secrets.AWS_ORGANIZATION_ID }}"
         echo $params > parameters.cfg
+      working-directory: ./resources
 
     - run: sam build
       working-directory: ./resources
