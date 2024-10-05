@@ -32,6 +32,7 @@ jobs:
       working-directory: ./resources/roles
     - run: |
         sam deploy --stack-name expense-service-roles \
+        --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM \
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
         --parameter-overrides \
