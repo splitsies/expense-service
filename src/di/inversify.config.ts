@@ -83,6 +83,8 @@ import { IUserDataStrategy } from "src/strategies/user-data-strategy/user-data-s
 import { UserDataStrategy } from "src/strategies/user-data-strategy/user-data-strategy";
 import { ICrossGatewayTopicProvider } from "src/providers/cross-gateway-topic-provider/cross-gateway-topic-provider.i";
 import { CrossStageTopicProvider } from "src/providers/cross-gateway-topic-provider/cross-gateway-topic-provider";
+import { ISnsClientProvider } from "src/providers/sns-client-provider/sns-client-provider.i";
+import { SnsClientProvider } from "src/providers/sns-client-provider/sns-client-provider";
 
 const container = new Container({ defaultScope: "Singleton" });
 
@@ -132,6 +134,7 @@ container.bind<IDynamoDbTransactionStrategy>(IDynamoDbTransactionStrategy).to(Dy
 container.bind<IUserExpenseDaMapper>(IUserExpenseDaMapper).to(UserExpenseDaMapper);
 container.bind<IPageInfoMapper>(IPageInfoMapper).to(PageInfoMapper);
 container.bind<IUserDataStrategy>(IUserDataStrategy).to(UserDataStrategy);
-container.bind<ICrossStageTopicProvider>(ICrossGatewayTopicProvider).to(CrossStageTopicProvider);
+container.bind<ICrossGatewayTopicProvider>(ICrossGatewayTopicProvider).to(CrossStageTopicProvider);
+container.bind<ISnsClientProvider>(ISnsClientProvider).to(SnsClientProvider);
 
 export { container };

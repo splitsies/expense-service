@@ -6,19 +6,19 @@ import { sendMessage } from "@libs/broadcast";
 import { ILogger } from "@splitsies/utils";
 import { IConnection } from "src/models/connection/connection-interface";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
-import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
+import { PublishCommand } from "@aws-sdk/client-sns";
 import { CrossGatewayExpenseMessage } from "src/models/cross-gateway-expense-message";
 import { ICrossGatewayTopicProvider } from "src/providers/cross-gateway-topic-provider/cross-gateway-topic-provider.i";
+import { ISnsClientProvider } from "src/providers/sns-client-provider/sns-client-provider.i";
 
 @injectable()
 export class ExpenseBroadcaster implements IExpenseBroadcaster {
-    private readonly _snsClient = new SNSClient({ region: process.env.RtRegion });
-
     constructor(
         @inject(ILogger) private readonly _logger: ILogger,
         @inject(IConnectionService) private readonly _connectionService: IConnectionService,
         @inject(IConnectionConfiguration) private readonly _connectionConfiguration: IConnectionConfiguration,
         @inject(ICrossGatewayTopicProvider) private readonly _crossGatewayTopicProvider: ICrossGatewayTopicProvider,
+        @inject(ISnsClientProvider) private readonly _snsClientProvider: ISnsClientProvider,
     ) {}
 
     async broadcast(expense: ExpenseMessage, ignoredConnectionIds: string[] = []): Promise<void> {
@@ -34,8 +34,10 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
                 // needs to be routed to the correct API Gateway. This added complexity allows for distributed
                 // API Gateway replicas cross-region while still maintaining real-time connection features
                 const associatedTopic = this._crossGatewayTopicProvider.provide(connection.gatewayUrl);
+                const client = this._snsClientProvider.provideForArn(associatedTopic);
+
                 notifications.push(
-                    this._snsClient.send(
+                    client.send(
                         new PublishCommand({
                             TopicArn: associatedTopic,
                             Message: JSON.stringify(new CrossGatewayExpenseMessage(expense, connection)),
