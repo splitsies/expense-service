@@ -568,7 +568,6 @@ Resources:
   # IAM Role for Lambda to allow invocation by SNS
   LambdaExecutionRole:
     Type: AWS::IAM::Role
-    Condition: IsUSEast1
     Properties:
       RoleName: !Sub ${AWS::StackName}-LambdaExecutionRole-${AWS::Region}
       AssumeRolePolicyDocument:
