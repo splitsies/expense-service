@@ -591,6 +591,13 @@ Resources:
                   - logs:PutLogEvents
                 Resource: arn:aws:logs:*:*:*
 
+              # WebSockets  
+              - Effect: Allow
+                Action:
+                  - execute-api:ManageConnections
+                Resource:
+                  - arn:aws:execute-api:*:*:*/@connections/*
+
               # Allow Lambda to receive SNS messages
               - Effect: Allow
                 Action: sns:Publish
