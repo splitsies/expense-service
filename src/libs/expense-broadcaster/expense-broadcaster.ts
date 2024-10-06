@@ -8,7 +8,7 @@ import { IConnection } from "src/models/connection/connection-interface";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
 import { CrossGatewayExpenseMessage } from "src/models/cross-gateway-expense-message";
-import { ICrossStageTopicProvider } from "src/providers/cross-stage-topic-provider/cross-stage-topic-provider.i";
+import { ICrossGatewayTopicProvider } from "src/providers/cross-gateway-topic-provider/cross-gateway-topic-provider.i";
 
 @injectable()
 export class ExpenseBroadcaster implements IExpenseBroadcaster {
@@ -18,7 +18,7 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
         @inject(ILogger) private readonly _logger: ILogger,
         @inject(IConnectionService) private readonly _connectionService: IConnectionService,
         @inject(IConnectionConfiguration) private readonly _connectionConfiguration: IConnectionConfiguration,
-        @inject(ICrossStageTopicProvider) private readonly _crossStageTopicProvider: ICrossStageTopicProvider,
+        @inject(ICrossGatewayTopicProvider) private readonly _crossGatewayTopicProvider: ICrossGatewayTopicProvider,
     ) {}
 
     async broadcast(expense: ExpenseMessage, ignoredConnectionIds: string[] = []): Promise<void> {
@@ -33,7 +33,7 @@ export class ExpenseBroadcaster implements IExpenseBroadcaster {
                 // If the connection does not belong to the current API Gateway, then the update message
                 // needs to be routed to the correct API Gateway. This added complexity allows for distributed
                 // API Gateway replicas cross-region while still maintaining real-time connection features
-                const associatedTopic = this._crossStageTopicProvider.provide(connection.gatewayUrl);
+                const associatedTopic = this._crossGatewayTopicProvider.provide(connection.gatewayUrl);
                 notifications.push(
                     this._snsClient.send(
                         new PublishCommand({
