@@ -610,10 +610,10 @@ Resources:
                 Resource: 
                   - !Sub arn:aws:dynamodb:${DbRegion}:${ResourceAccountId}:table/*
                   - !Sub arn:aws:dynamodb:${DbRegion}:${ResourceAccountId}:table/*/index/*
-                  - !Sub arn:aws:dynamodb:${DbRegion}:${ResourceAccountId}:table/MessageQueue
-                  - !Sub arn:aws:dynamodb:${DbRegion}:${ResourceAccountId}:table/MessageQueue/stream/*
-                  - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/MessageQueue
-                  - !Sub arn:aws:dynamodb:${DbRegion}:${AWS::AccountId}:table/MessageQueue/stream/*
+                  - !Sub arn:aws:dynamodb:us-east-1:${ResourceAccountId}:table/MessageQueue
+                  - !Sub arn:aws:dynamodb:us-west-1:${ResourceAccountId}:table/MessageQueue/stream/*
+                  - !Sub arn:aws:dynamodb:us-east-1:${ResourceAccountId}:table/MessageQueue
+                  - !Sub arn:aws:dynamodb:us-west-1:${ResourceAccountId}:table/MessageQueue/stream/*
   
   CrossGatewayExpenseMessageTopic:
     Type: AWS::SNS::Topic
