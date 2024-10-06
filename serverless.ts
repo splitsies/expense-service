@@ -43,7 +43,7 @@ const serverlessConfiguration: AWS = {
         timeout: 30,
         memorySize: 3000,
         iam: {
-            role: "arn:aws:iam::${aws:accountId}:role/expense-service-resources-LambdaExecutionRole",
+            role: "arn:aws:iam::${aws:accountId}:role/expense-service-resources-LambdaExecutionRole-${aws:region}",
         },
         httpApi: {
             authorizers: {

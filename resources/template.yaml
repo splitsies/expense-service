@@ -570,7 +570,7 @@ Resources:
     Type: AWS::IAM::Role
     Condition: IsUSEast1
     Properties:
-      RoleName: !Sub ${AWS::StackName}-LambdaExecutionRole
+      RoleName: !Sub ${AWS::StackName}-LambdaExecutionRole-${AWS::Region}
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
