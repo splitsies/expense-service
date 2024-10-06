@@ -1,13 +1,13 @@
 name: Deploy Production
 
-on:
-  release:
-    types: [released]
 # on:
-#   pull_request:
-#     branches:
-#       - main
-#       - "releases/**"
+#   release:
+#     types: [released]
+on:
+  pull_request:
+    branches:
+      - main
+      - "releases/**"
 
 jobs:
   deploy:
@@ -32,42 +32,35 @@ jobs:
         aws-secret-access-key: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY_PROD }}
         aws-region: us-east-1
 
-    - run: sam build
-      working-directory: ./resources/roles
-    - run: |
-        sam deploy --stack-name expense-service-roles \
-        --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM \
-        --no-confirm-changeset \
-        --no-fail-on-empty-changeset \
-        --parameter-overrides \
-            "MessageQueueArn=${{ secrets.MESSAGE_QUEUE_ARN_PRODUCTION }}" \
-            "DbRegion=us-east-1" \
-            "ResourceAccountId=${{ secrets.PROD_ACCOUNT_ID }}"
-      working-directory: ./resources/roles
-
-    - run: npm ci
-      working-directory: ./resources/databases
+    - name: Create Common Parameter Overrides
+      run: | 
+        params=""
+        params="${params} Stage=dev"
+        params="${params} StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}"
+        params="${params} ResourceAccountId=${{ secrets.PROD_ACCOUNT_ID }}"
+        params="${params} OrganizationId=${{ secrets.AWS_ORGANIZATION_ID }}"
+        echo $params > parameters.cfg
+      working-directory: ./resources
 
     - run: sam build
-      working-directory: ./resources/databases
-    - run: |
-        sam deploy --stack-name expense-service-database \
-        --no-confirm-changeset \
-        --no-fail-on-empty-changeset \
-        --parameter-overrides "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}"
-      working-directory: ./resources/databases
+      working-directory: ./resources
 
-    - run: sam build
-      working-directory: ./resources/topics
     - run: |
-        sam deploy --stack-name expense-service-topics \
+        PARAMETERS=$(cat parameters.cfg)
+        sam deploy \
         --no-confirm-changeset \
         --no-fail-on-empty-changeset \
-        --parameter-overrides \
-            "DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
-            "StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
-            "ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}"
-      working-directory: ./resources/topics
+        --parameter-overrides $PARAMETERS
+      working-directory: ./resources
+
+    - run: |
+        PARAMETERS=$(cat parameters.cfg)
+        sam deploy \
+        --region us-west-1 \
+        --no-confirm-changeset \
+        --no-fail-on-empty-changeset \
+        --parameter-overrides $PARAMETERS
+      working-directory: ./resources
 
     - run: npm ci
     - name: serverless deploy
@@ -109,7 +102,7 @@ jobs:
                 --param="DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
                 --param="StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
                 --param="ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}" \
-                --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_PRODUCTION }}" \
+                --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_PRODUCTION_US_WEST_1 }}" \
                 --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_PRODUCTION }}" \
                 --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_PRODUCTION }}" \
                 --param="FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID_PRODUCTION }}" \
