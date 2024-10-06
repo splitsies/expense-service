@@ -66,6 +66,8 @@ const serverlessConfiguration: AWS = {
             STAGE: "${param:QUEUE_STAGE_NAME}",
             AWS_ACCOUNT_ID: "${aws:accountId}",
             RtRegion: "${aws:region}",
+            QueueRegion: "${aws:region}",
+            QueueEndpoint: "https://dynamodb.${aws:region}.amazonaws.com",
             ...dbConfig,
             ...connectionConfig,
             ...firebaseConfig,
