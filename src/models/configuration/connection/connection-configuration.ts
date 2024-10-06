@@ -23,7 +23,7 @@ export class ConnectionConfiguration implements IConnectionConfiguration {
         for (const key of connectionGateways) {
             const parts = key.split("#");
             const gatewayUrl = `https://${parts[0]}.execute-api.${parts[1]}.amazonaws.com/${parts[2]}/`;
-            const topic = `arn:aws:sns:${parts[1]}:${parts[3]}:CrossStageExpenseMessage`;
+            const topic = `arn:aws:sns:${parts[1]}:${parts[3]}:CrossGatewayExpenseMessage`;
 
             console.log({ gatewayUrl, topic });
             this.apigData.push([gatewayUrl, topic]);

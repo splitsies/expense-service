@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
-import { ICrossStageTopicProvider } from "./cross-stage-topic-provider.i";
-import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
+import { ICrossGatewayTopicProvider } from "./cross-gateway-topic-provider.i";
+import { IConnectionConfiguration } from "../../models/configuration/connection/connection-configuration-interface";
 import { NotFoundError } from "@splitsies/shared-models";
 
 @injectable()
-export class CrossStageTopicProvider implements ICrossStageTopicProvider {
+export class CrossStageTopicProvider implements ICrossGatewayTopicProvider {
     private readonly _apigToTopicMap = new Map<string, string>();
 
     constructor(@inject(IConnectionConfiguration) _connectionConfiguration: IConnectionConfiguration) {
@@ -14,10 +14,11 @@ export class CrossStageTopicProvider implements ICrossStageTopicProvider {
     }
 
     provide(gatewayUrl: string): string {
-        if (!this._apigToTopicMap.has(gatewayUrl)) {
+        const topic = this._apigToTopicMap.get(gatewayUrl);
+        if (!topic) {
             throw new NotFoundError(`Could not find a topic route for gateway ${gatewayUrl}`);
         }
 
-        return this._apigToTopicMap.get(gatewayUrl);
+        return topic;
     }
 }

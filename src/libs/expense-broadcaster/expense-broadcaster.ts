@@ -7,12 +7,12 @@ import { ILogger } from "@splitsies/utils";
 import { IConnection } from "src/models/connection/connection-interface";
 import { IConnectionConfiguration } from "src/models/configuration/connection/connection-configuration-interface";
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
-import { ICrossStageTopicProvider } from "src/providers/cross-stage-topic-provider/cross-stage-topic-provider.i";
 import { CrossGatewayExpenseMessage } from "src/models/cross-gateway-expense-message";
+import { ICrossStageTopicProvider } from "src/providers/cross-stage-topic-provider/cross-stage-topic-provider.i";
 
 @injectable()
 export class ExpenseBroadcaster implements IExpenseBroadcaster {
-    private readonly _snsClient = new SNSClient({ region: process.env.dbRegion });
+    private readonly _snsClient = new SNSClient({ region: process.env.RtRegion });
 
     constructor(
         @inject(ILogger) private readonly _logger: ILogger,

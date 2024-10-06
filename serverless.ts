@@ -65,6 +65,7 @@ const serverlessConfiguration: AWS = {
             FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST,
             STAGE: "${param:QUEUE_STAGE_NAME}",
             AWS_ACCOUNT_ID: "${aws:accountId}",
+            RtRegion: "${aws:region}",
             ...dbConfig,
             ...connectionConfig,
             ...firebaseConfig,
