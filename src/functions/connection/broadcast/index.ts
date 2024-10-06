@@ -5,8 +5,8 @@ export default {
     events: [
         {
             sns: {
-                arn: "arn:aws:sns:${aws:region}:${aws:accountId}:CrossStageExpenseMessage",
-                topicName: "CrossStageExpenseMessage",
+                arn: "arn:aws:sns:${aws:region}:${aws:accountId}:CrossGatewayExpenseMessage",
+                topicName: "CrossGatewayExpenseMessage",
             },
         },
     ],
