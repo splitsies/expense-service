@@ -35,7 +35,7 @@ jobs:
     - name: Create Common Parameter Overrides
       run: | 
         params=""
-        params="${params} Stage=dev"
+        params="${params} Stage=production"
         params="${params} StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}"
         params="${params} ResourceAccountId=${{ secrets.PROD_ACCOUNT_ID }}"
         params="${params} OrganizationId=${{ secrets.AWS_ORGANIZATION_ID }}"
