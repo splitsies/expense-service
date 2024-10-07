@@ -24,8 +24,6 @@ export class ConnectionConfiguration implements IConnectionConfiguration {
             const accountId = process.env[`${configuration.stage}AccountId`];
             const gatewayUrl = `https://${configuration.key}.execute-api.${configuration.region}.amazonaws.com/${configuration.stage}/`;
             const topic = `arn:aws:sns:${configuration.region}:${accountId}:CrossGatewayExpenseMessage`;
-
-            console.log({ gatewayUrl, topic });
             this.apigData.push([gatewayUrl, topic]);
         }
     }
