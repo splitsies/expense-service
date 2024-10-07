@@ -1,6 +1,5 @@
 {
     "connectionTtlSec": "${param:CONNECTION_TTL_SEC}",
     "deleteExpiredIntervalMin": "${param:DELETE_EXPIRED_INTERVAL_MIN}",
-    "gatewayUrl": { "Fn::Join" : ["", [ "https://", { "Ref" : "WebsocketsApi" }, ".execute-api.${aws:region}.amazonaws.com/${sls:stage}/" ] ]  },
-    "connectionGateways": "i1nnpdkz89#us-east-1#dev#${param:DevAccountId},pozcpkxpxh#us-west-1#dev#${param:DevAccountId},bq5chgizig#us-east-1#staging#${param:StagingAccountId},bybk9vinge#us-east-1#production#${param:ProdAccountId}"  
+    "gatewayUrl": { "Fn::Join" : ["", [ "https://", { "Ref" : "WebsocketsApi" }, ".execute-api.${aws:region}.amazonaws.com/${sls:stage}/" ] ]  }
 }

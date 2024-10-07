@@ -3,6 +3,7 @@ import type { AWS } from "@serverless/typescript";
 import dbConfig from "./src/config/db.config.json";
 import connectionConfig from "./src/config/connection.config.json";
 import firebaseConfig from "./src/config/firebase.config.json";
+import accountsConfig from "./src/config/accounts.config.json";
 
 import create from "@functions/expense/create";
 import connect from "@functions/connection/connect";
@@ -69,6 +70,7 @@ const serverlessConfiguration: AWS = {
             ...dbConfig,
             ...connectionConfig,
             ...firebaseConfig,
+            ...accountsConfig,
         },
     },
     // import the function via paths
