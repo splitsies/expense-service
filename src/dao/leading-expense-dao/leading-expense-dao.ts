@@ -43,21 +43,28 @@ export class LeadingExpenseDao extends DaoBase<LeadingExpenseDa, Key, LeadingExp
         limit: number = 10,
         offset: Record<string, object> = undefined,
     ): Promise<IScanResult<LeadingExpense>> {
-        const result = await this._client.send(
-            new QueryCommand({
-                TableName: this._tableName,
-                KeyConditionExpression: "#userId = :userId",
-                ExpressionAttributeNames: { "#userId": "userId" },
-                ExpressionAttributeValues: { ":userId": { S: userId } },
-                Limit: limit,
-                ScanIndexForward: false,
-                ExclusiveStartKey: offset as Record<string, AttributeValue> | undefined,
-            }),
-        );
+        this._logger.log({ tableName: this._tableName });
 
-        return new ScanResult(
-            this.unmarshallResults(result),
-            this._pageInfoMapper.fromResult(result, this._keyMapper.bind(this), limit, offset),
-        );
+        try {
+            const result = await this._client.send(
+                new QueryCommand({
+                    TableName: this._tableName,
+                    KeyConditionExpression: "#userId = :userId",
+                    ExpressionAttributeNames: { "#userId": "userId" },
+                    ExpressionAttributeValues: { ":userId": { S: userId } },
+                    Limit: limit,
+                    ScanIndexForward: false,
+                    ExclusiveStartKey: offset as Record<string, AttributeValue> | undefined,
+                }),
+            );
+
+            return new ScanResult(
+                this.unmarshallResults(result),
+                this._pageInfoMapper.fromResult(result, this._keyMapper.bind(this), limit, offset),
+            );
+        } catch (e) {
+            this._logger.error(e);
+            throw e;
+        }
     }
 }

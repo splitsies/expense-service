@@ -13,6 +13,8 @@ jspm_packages
 
 .DS_Store
 
-**/startup-dev-pr.sh
+**/startup*.sh
+
+./utils/local-startup
 
 **/.aws-sam

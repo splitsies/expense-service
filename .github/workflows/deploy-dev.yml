@@ -1,0 +1,116 @@
+name: Deploy Dev
+
+on:
+  pull_request:
+    branches:
+      - "releases/**"
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    
+    - uses: actions/setup-python@v3
+    - uses: aws-actions/setup-sam@v2
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID_DEV }}
+        aws-secret-access-key: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY_DEV }}
+        aws-region: us-east-1
+
+    - name: Create Common Parameter Overrides
+      run: | 
+        params=""
+        params="${params} Stage=dev"
+        params="${params} StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}"
+        params="${params} ResourceAccountId=${{ secrets.DEV_ACCOUNT_ID }}"
+        params="${params} OrganizationId=${{ secrets.AWS_ORGANIZATION_ID }}"
+        echo $params > parameters.cfg
+      working-directory: ./resources
+
+    - run: sam build
+      working-directory: ./resources
+
+    - run: |
+        PARAMETERS=$(cat parameters.cfg)
+        sam deploy \
+        --no-confirm-changeset \
+        --no-fail-on-empty-changeset \
+        --parameter-overrides $PARAMETERS
+      working-directory: ./resources
+
+    - run: |
+        PARAMETERS=$(cat parameters.cfg)
+        sam deploy \
+        --region us-west-1 \
+        --no-confirm-changeset \
+        --no-fail-on-empty-changeset \
+        --parameter-overrides $PARAMETERS
+      working-directory: ./resources
+
+    - run: npm ci
+    - name: serverless deploy (us-east-1)
+      uses: serverless/github-action@v3.1
+      with:
+        args: deploy --stage dev \
+                --param="RTENV=dev" \
+                --param="QUEUE_STAGE_NAME=dev" \
+                --param="CONNECTION_TTL_SEC=1800" \
+                --param="DB_REGION=us-east-1" \
+                --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
+                --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
+                --param="DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
+                --param="StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
+                --param="ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}" \
+                --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_DEV_PR }}" \
+                --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_DEV_PR }}" \
+                --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_DEV_PR }}" \
+                --param="FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID_DEV_PR }}" \
+                --param="FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID_DEV_PR }}" \
+                --param="FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY_DEV_PR }}" \
+                --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_DEV_PR }}" \
+                --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_DEV_PR }}" \
+                --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \
+                --param="RESOURCE_ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }}" \
+                --param="DB_ACCESS_KEY_ID=${{ secrets.DB_ACCESS_KEY_ID_DEV }}" \
+                --param="DB_SECRET_ACCESS_KEY=${{ secrets.DB_SECRET_ACCESS_KEY_DEV }}"
+
+    - name: serverless deploy (us-west-1)
+      uses: serverless/github-action@v3.1
+      with:
+        args: deploy --stage dev --region us-west-1 --verbose \
+                --param="RTENV=dev" \
+                --param="QUEUE_STAGE_NAME=dev" \
+                --param="CONNECTION_TTL_SEC=1800" \
+                --param="DB_REGION=us-east-1" \
+                --param="DELETE_EXPIRED_INTERVAL_MIN=10080" \
+                --param="DB_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com/" \
+                --param="DevAccountId=${{ secrets.DEV_ACCOUNT_ID }}" \
+                --param="StagingAccountId=${{ secrets.STAGING_ACCOUNT_ID }}" \
+                --param="ProdAccountId=${{ secrets.PROD_ACCOUNT_ID }}" \
+                --param="MESSAGE_QUEUE_ARN=${{ secrets.MESSAGE_QUEUE_ARN_US_WEST_1_DEV }}" \
+                --param="FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_DEV_PR }}" \
+                --param="FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID_DEV_PR }}" \
+                --param="FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID_DEV_PR }}" \
+                --param="FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID_DEV_PR }}" \
+                --param="FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY_DEV_PR }}" \
+                --param="FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_DEV_PR }}" \
+                --param="FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_DEV_PR }}" \
+                --param="FIREBASE_ADMIN_CREDS=${{ secrets.FIREBASE_ADMIN_CREDS_JSON_DEV_PR }}" \
+                --param="RESOURCE_ACCOUNT_ID=${{ secrets.DEV_ACCOUNT_ID }}" \
+                --param="DB_ACCESS_KEY_ID=${{ secrets.DB_ACCESS_KEY_ID_DEV }}" \
+                --param="DB_SECRET_ACCESS_KEY=${{ secrets.DB_SECRET_ACCESS_KEY_DEV }}"
+
+    env:
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY_DEV }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.SPLITSIES_DEPLOY_ACCESS_KEY_ID_DEV }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SPLITSIES_DEPLOY_SECRET_KEY_DEV }}

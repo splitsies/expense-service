@@ -1,0 +1,34 @@
+{    
+    "gateways": [
+        {
+            "key": "i1nnpdkz89",
+            "region": "us-east-1",
+            "stage": "dev"
+        },
+        {
+            "key": "pozcpkxpxh",
+            "region": "us-west-1",
+            "stage": "dev"
+        },
+        {
+            "key": "bq5chgizig",
+            "region": "us-east-1",
+            "stage": "staging"
+        },
+        {
+            "key": "ywizdij9li",
+            "region": "us-west-1",
+            "stage": "staging"
+        },
+        {
+            "key": "bybk9vinge",
+            "region": "us-east-1",
+            "stage": "production"
+        },
+        {
+            "key": "4ifo4v6qka",
+            "region": "us-west-1",
+            "stage": "production"
+        }
+    ]
+}

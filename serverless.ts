@@ -3,6 +3,7 @@ import type { AWS } from "@serverless/typescript";
 import dbConfig from "./src/config/db.config.json";
 import connectionConfig from "./src/config/connection.config.json";
 import firebaseConfig from "./src/config/firebase.config.json";
+import accountsConfig from "./src/config/accounts.config.json";
 
 import create from "@functions/expense/create";
 import connect from "@functions/connection/connect";
@@ -33,15 +34,18 @@ import removeExpenseFromGroup from "@functions/expense/remove-expense-from-group
 import deleteExpense from "@functions/expense/delete";
 
 const serverlessConfiguration: AWS = {
-    org: "splitsies",
-    app: "expense-service",
     service: "expense-service",
     frameworkVersion: "3",
     plugins: ["serverless-esbuild", "serverless-offline"],
     provider: {
         name: "aws",
-        stage: "dev-pr",
+        stage: "dev",
         runtime: "nodejs18.x",
+        timeout: 30,
+        memorySize: 3000,
+        iam: {
+            role: "arn:aws:iam::${aws:accountId}:role/expense-service-resources-LambdaExecutionRole-${aws:region}",
+        },
         httpApi: {
             authorizers: {
                 verifyToken: {
@@ -57,13 +61,16 @@ const serverlessConfiguration: AWS = {
         },
         environment: {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
-            NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
-            APIG_URL: "${param:APIG_URL}",
+            NODE_OPTIONS: "--stack-trace-limit=1000",
             FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST,
             STAGE: "${param:QUEUE_STAGE_NAME}",
+            AWS_ACCOUNT_ID: "${aws:accountId}",
+            QueueRegion: "${aws:region}",
+            QueueEndpoint: "https://dynamodb.${aws:region}.amazonaws.com",
             ...dbConfig,
             ...connectionConfig,
             ...firebaseConfig,
+            ...accountsConfig,
         },
     },
     // import the function via paths
@@ -103,7 +110,7 @@ const serverlessConfiguration: AWS = {
             format: "esm",
             bundle: true,
             minify: true,
-            sourcemap: true,
+            sourcemap: false,
             sourcesContent: false,
             keepNames: false,
             outputFileExtension: ".mjs",
@@ -124,6 +131,11 @@ const serverlessConfiguration: AWS = {
             ignoreJWTSignature: true,
         },
     },
+    outputs: {
+        LambdaExecutionRoleArn: {
+            Description: ""
+        }
+    }
 };
 
 module.exports = serverlessConfiguration;
