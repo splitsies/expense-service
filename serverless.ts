@@ -3,6 +3,7 @@ import type { AWS } from "@serverless/typescript";
 import dbConfig from "./src/config/db.config.json";
 import connectionConfig from "./src/config/connection.config.json";
 import firebaseConfig from "./src/config/firebase.config.json";
+import accountsConfig from "./src/config/accounts.config.json";
 
 import create from "@functions/expense/create";
 import connect from "@functions/connection/connect";
@@ -43,28 +44,7 @@ const serverlessConfiguration: AWS = {
         timeout: 30,
         memorySize: 3000,
         iam: {
-            role: {
-                statements: [
-                    {
-                        Effect: "Allow",
-                        Action: ["dynamodb:*"],
-                        Resource: [
-                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/*/index/*",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/MessageQueue",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${param:RESOURCE_ACCOUNT_ID}:table/MessageQueue/stream/*",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${aws:accountId}:table/MessageQueue",
-                            "arn:aws:dynamodb:${param:DB_REGION}:${aws:accountId}:table/MessageQueue/stream/*",
-                            "${param:MESSAGE_QUEUE_ARN}",
-                        ],
-                    },
-                    {
-                        Effect: "Allow",
-                        Action: ["sns:Publish"],
-                        Resource: ["arn:aws:sns:*:*:CrossStageExpenseMessage"],
-                    },
-                ],
-            },
+            role: "arn:aws:iam::${aws:accountId}:role/expense-service-resources-LambdaExecutionRole-${aws:region}",
         },
         httpApi: {
             authorizers: {
@@ -82,13 +62,15 @@ const serverlessConfiguration: AWS = {
         environment: {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
             NODE_OPTIONS: "--stack-trace-limit=1000",
-            APIG_URL: "${param:APIG_URL}",
             FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST,
             STAGE: "${param:QUEUE_STAGE_NAME}",
             AWS_ACCOUNT_ID: "${aws:accountId}",
+            QueueRegion: "${aws:region}",
+            QueueEndpoint: "https://dynamodb.${aws:region}.amazonaws.com",
             ...dbConfig,
             ...connectionConfig,
             ...firebaseConfig,
+            ...accountsConfig,
         },
     },
     // import the function via paths
@@ -149,6 +131,11 @@ const serverlessConfiguration: AWS = {
             ignoreJWTSignature: true,
         },
     },
+    outputs: {
+        LambdaExecutionRoleArn: {
+            Description: ""
+        }
+    }
 };
 
 module.exports = serverlessConfiguration;

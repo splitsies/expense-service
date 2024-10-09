@@ -81,8 +81,10 @@ import { IExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao-in
 import { ExpenseGroupDao } from "src/dao/expense-group-dao/expense-group-dao";
 import { IUserDataStrategy } from "src/strategies/user-data-strategy/user-data-strategy.i";
 import { UserDataStrategy } from "src/strategies/user-data-strategy/user-data-strategy";
-import { ICrossStageTopicProvider } from "src/providers/cross-stage-topic-provider/cross-stage-topic-provider.i";
-import { CrossStageTopicProvider } from "src/providers/cross-stage-topic-provider/cross-stage-topic-provider";
+import { ICrossGatewayTopicProvider } from "src/providers/cross-gateway-topic-provider/cross-gateway-topic-provider.i";
+import { CrossStageTopicProvider } from "src/providers/cross-gateway-topic-provider/cross-gateway-topic-provider";
+import { ISnsClientProvider } from "src/providers/sns-client-provider/sns-client-provider.i";
+import { SnsClientProvider } from "src/providers/sns-client-provider/sns-client-provider";
 
 const container = new Container({ defaultScope: "Singleton" });
 
@@ -132,6 +134,7 @@ container.bind<IDynamoDbTransactionStrategy>(IDynamoDbTransactionStrategy).to(Dy
 container.bind<IUserExpenseDaMapper>(IUserExpenseDaMapper).to(UserExpenseDaMapper);
 container.bind<IPageInfoMapper>(IPageInfoMapper).to(PageInfoMapper);
 container.bind<IUserDataStrategy>(IUserDataStrategy).to(UserDataStrategy);
-container.bind<ICrossStageTopicProvider>(ICrossStageTopicProvider).to(CrossStageTopicProvider);
+container.bind<ICrossGatewayTopicProvider>(ICrossGatewayTopicProvider).to(CrossStageTopicProvider);
+container.bind<ISnsClientProvider>(ISnsClientProvider).to(SnsClientProvider);
 
 export { container };
