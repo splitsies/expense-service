@@ -1,0 +1,5 @@
+{
+    "devAccountId": "${param:DevAccountId}",
+    "stagingAccountId": "$param:StagingAccountId}",
+    "productionAccountId": "${param:ProdAccountId}"
+}
